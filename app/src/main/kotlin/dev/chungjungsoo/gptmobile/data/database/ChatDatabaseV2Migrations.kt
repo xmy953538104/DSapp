@@ -188,7 +188,7 @@ object ChatDatabaseV2Migrations {
                             `created_at`
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """.trimIndent(),
-                        arrayOf(
+                        arrayOf<Any?>(
                             cursor.getInt(idIndex),
                             cursor.getInt(chatIdIndex),
                             cursor.getString(thoughtsIndex) ?: "",
@@ -239,7 +239,7 @@ object ChatDatabaseV2Migrations {
                             .joinToString(",")
                         db.execSQL(
                             "UPDATE `chats_v2` SET `enabled_platform` = ? WHERE `chat_id` = ?",
-                            arrayOf(enabledPlatforms, chatId)
+                            arrayOf<Any?>(enabledPlatforms, chatId)
                         )
                     }
                 }
