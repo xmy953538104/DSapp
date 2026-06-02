@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GPTモバイル</string>
     <string name="gpt_mobile_introduction_logo">GPTモバイル紹介ロゴ</string>
@@ -10,16 +10,14 @@
     <string name="sample_item_description">項目の説明</string>
     <string name="openai_description">ChatGPTの制作元。</string>
     <string name="anthropic_description">Claudeはここから生まれました。</string>
-    <string name="google_description">Geminiが近づいています。</string>
-    <string name="next">次へ</string>
+<string name="next">次へ</string>
     <string name="enter_api_key">APIキーを入力</string>
     <string name="token_input_description">選択したプラットフォームのAPIキーを入力してください。このアプリはこれらの情報を収集しません。キーおよび会話履歴はデバイス上にのみ保存され、APIエンドポイント以外のサーバーへ送信されることはありません。</string>
     <string name="clear_token">トークンのクリア</string>
     <string name="need_help">助けが必要ですか？</string>
     <string name="openai_api_key">OpenAI APIキー</string>
     <string name="anthropic_api_key">Anthropic APIキー</string>
-    <string name="google_api_key">Google APIキー</string>
-    <string name="select_openai_model">OpenAI Chat Modelを選択</string>
+<string name="select_openai_model">OpenAI Chat Modelを選択</string>
     <string name="select_openai_model_description">OpenAI chat modelを選択してください。選択したモデルがマルチモーダルであっても、現在このアプリではテキスト入力のみが利用できます。将来的にはマルチモーダルに対応するかも知れません。</string>
     <string name="gpt_4o_description">最速かつもっとも手頃な価格のフラグシップモデル。</string>
     <string name="gpt_4o_mini_description">高速で軽量なタスクに最適な、手頃な価格でインテリジェントな小型モデル</string>
@@ -31,11 +29,9 @@
     <string name="claude_3_opus_description">文書作成や複雑なタスクに向いています。</string>
     <string name="claude_3_sonnet_description">インテリジェンスとスピードの両立モデル.</string>
     <string name="claude_3_haiku_description">Anthropicで最も速く、最もコンパクトなモデル。</string>
-    <string name="select_google_model">Google Chat Modelを選択</string>
-    <string name="select_google_model_description">Geminiは、Googleが作った生成AIモデルファミリーです。 テキスト入力のみがサポートされています。</string>
-    <string name="gemini_1_5_pro_description">コードやテキスト生成を含むタスクを推論するために最適化.</string>
-    <string name="gemini_1_5_flash_description">多様なタスクを横断して、迅速かつ多彩なパフォーマンスを実現します.</string>
-    <string name="gemini_1_0_pro_description">自然言語タスク、マルチターンテキスト、コードチャット、コード生成.</string>
+
+
+
     <string name="setup_complete">準備完了です！</string>
     <string name="setup_complete_description">GPT Mobileを始めましょう！</string>
     <string name="done">完了</string>
@@ -60,8 +56,7 @@
     <string name="theme_description">ダイナミックテーマ、 ダークモード</string>
     <string name="openai_setting">OpenAI設定</string>
     <string name="anthropic_setting">Anthropic設定</string>
-    <string name="google_setting">Google設定</string>
-    <string name="platform_setting_description">APIキー、モデル、システム プロンプト</string>
+<string name="platform_setting_description">APIキー、モデル、システム プロンプト</string>
     <string name="enable_api">APIを有効にする</string>
     <string name="api_key">APIキー</string>
     <string name="api_model">APIモデル</string>
@@ -109,33 +104,25 @@
     <string name="api_url">API URL</string>
     <string name="url_icon">URL アイコン</string>
     <string name="invalid_api_url">有効なURLを入力してください.</string>
-    <string name="ollama_description">自分のモデルを使う.</string>
-    <string name="select_ollama_model">OllamaのChat Modelを選択</string>
-    <string name="ollama_setting">Ollama の設定</string>
-    <string name="select_ollama_model_description">Ollamaモデルを選択してください。 対応するモデルやタグが多々ありますので、モデル値をカスタマイズできます。 エンドポイントは実際にモデルをサポートして実行していることを確認してください。 それ以外の場合は、応答を生成しません.</string>
-    <string name="custom">カスタム</string>
+
+
+<string name="custom">カスタム</string>
     <string name="custom_description">リストにないモデルを使用。</string>
     <string name="model_name">モデル名</string>
     <string name="model_custom_example">例:llama3.2、llava、llama3:latest…</string>
     <string name="custom_model_warning">API でモデル名がサポートされている必要があります.</string>
     <string name="enter_api_address">API アドレスを入力</string>
-    <string name="api_address_description">ポート番号を含むOllama APIのアドレスを入力してください。 アプリは v1/chat/completions エンドポイントを利用しますので、フルアドレスのフロント部分だけを入力してください。 アドレスは \'/\' で終わる必要があります。例: http://192.168.1.100:11434/</string>
-    <string name="ollama_api_address">Ollama APIアドレス</string>
-    <string name="reset">リセット</string>
-    <string name="ollama_api_key">Ollama API キー</string>
-    <string name="api_url_cautions">Url は \'/\' で終わる必要があります.</string>
+
+<string name="reset">リセット</string>
+<string name="api_url_cautions">Url は \'/\' で終わる必要があります.</string>
     <string name="bug_report">バグ報告</string>
     <string name="bug_report_description">なにかうまく動かないですか？</string>
     <string name="bug_report_icon">バグ報告アイコン</string>
     <string name="scroll_to_bottom_icon">下にスクロール アイコン</string>
-    <string name="llama_3_2_description">Metaからの最新の軽量オープンソース言語モデル.</string>
-    <string name="llama_3_1_description">Metaから最先端の多言語オープンソースの大きな言語モデル.</string>
-    <string name="gemma2_description">Googleが公開する小さな言語モデル.</string>
-    <string name="select_groq_model">Groqのチャットモデルを選択</string>
-    <string name="select_groq_model_description">Groqチャットモデルを選択してください。 リストにないモデルが必要な場合は、 Groq API のドキュメント Web サイトをチェックし、利用可能なものを確認してください.</string>
-    <string name="groq_setting">Groq設定</string>
-    <string name="groq_description">公開モデルへの高速なAIインターフェース。</string>
-    <string name="groq_api_key">Groq API キー</string>
+
+
+
+
     <string name="options">オプション</string>
     <string name="update_chat_title">チャットタイトルの変更</string>
     <string name="chat_title">チャットタイトル</string>

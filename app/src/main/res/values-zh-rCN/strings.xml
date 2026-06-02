@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GPTMobile</string>
     <string name="gpt_mobile_introduction_logo">GPT Mobile 的介绍图标</string>
@@ -10,16 +10,14 @@
     <string name="sample_item_description">项目描述</string>
     <string name="openai_description">ChatGPT 的创建者。</string>
     <string name="anthropic_description">Claude 于此诞生</string>
-    <string name="google_description">Gemini，未来可期。</string>
-    <string name="next">继续</string>
+<string name="next">继续</string>
     <string name="enter_api_key">API 密钥</string>
     <string name="token_input_description">输入所选提供商的密钥，我们不会收集这些数据，密钥和会话只会存储在您的设备上，不会发送到API服务器之外的任何地方</string>
     <string name="clear_token">清空Token</string>
     <string name="need_help">需要帮助？</string>
     <string name="openai_api_key">OpenAI 的 API 密钥</string>
     <string name="anthropic_api_key">Anthropic 的 API 密钥</string>
-    <string name="google_api_key">Google 的 API 密钥</string>
-    <string name="select_openai_model">选择 OpenAI 会话的模型</string>
+<string name="select_openai_model">选择 OpenAI 会话的模型</string>
     <string name="select_openai_model_description">请选择 OpenAI 会话的模型，尽管部分模型是多模态的，但我们目前只支持纯文本输入，在未来可能会支持更多功能。</string>
     <string name="gpt_4o_description">最快最实惠的旗舰模型。</string>
     <string name="gpt_4o_mini_description">经济且快速的小模型，但只适合处理简单任务</string>
@@ -31,11 +29,9 @@
     <string name="claude_3_opus_description">擅长写作等复杂的任务</string>
     <string name="claude_3_sonnet_description">智能和速度的平衡</string>
     <string name="claude_3_haiku_description">Anthropic的最快且最小巧的模型</string>
-    <string name="select_google_model">选择Google会话的模型</string>
-    <string name="select_google_model_description">Gemini 是 Google 研发的生成式AI，此应用现仅支持纯文本输入</string>
-    <string name="gemini_1_5_pro_description">对代码和生成文本等推理任务有优化的模型</string>
-    <string name="gemini_1_5_flash_description">胜任不同场景的高性能模型</string>
-    <string name="gemini_1_0_pro_description">自然语言，上下文对话和代码生成与修正</string>
+
+
+
     <string name="setup_complete">已经配置完毕！</string>
     <string name="setup_complete_description">开始使用GPT Mobile吧！</string>
     <string name="done">完成</string>
@@ -60,8 +56,7 @@
     <string name="theme_description">动态取色主题、暗黑模式</string>
     <string name="openai_setting">OpenAI</string>
     <string name="anthropic_setting">Anthropic</string>
-    <string name="google_setting">Google</string>
-    <string name="platform_setting_description">API密钥、模型、系统提示词</string>
+<string name="platform_setting_description">API密钥、模型、系统提示词</string>
     <string name="enable_api">启用API</string>
     <string name="api_key">API密钥</string>
     <string name="api_model">模型</string>
@@ -110,34 +105,27 @@
     <string name="api_url">API 网址</string>
     <string name="url_icon">URL 的图标</string>
     <string name="invalid_api_url">请输入一个有效的网址</string>
-    <string name="ollama_description">使用您自己的模型。</string>
-    <string name="select_ollama_model">选择Ollama会话的模型</string>
-    <string name="ollama_setting">Ollama</string>
-    <string name="select_ollama_model_description">由于Ollama的模型型号过多，您需要自定义模型。确保API端点支持您自定义的模型，否则将无法生成响应。</string>
+
+
     <string name="custom">自定义模型</string>
     <string name="custom_description">使用的模型不在这个列表中</string>
     <string name="model_name">模型标识符</string>
     <string name="model_custom_example">示例: llama3.2, llava, llama3:latest, …</string>
     <string name="custom_model_warning">注意：API必须支持您自定义的模型，才可正常使用</string>
     <string name="enter_api_address">API地址</string>
-    <string name="api_address_description">请输入您的 Ollama API 地址，包括端口号，我们将自动在结尾加入 v1/chat/coompletions，因此请仅输入完整地址的前半部分(地址必须以“/”结尾，例如http://192.168.1.100:11434/)</string>
-    <string name="ollama_api_address">Ollama API 地址</string>
+
     <string name="reset">重置</string>
-    <string name="ollama_api_key">Ollama API 密钥</string>
+
     <string name="api_url_cautions">网址的结尾必须有一个\"/\"</string>
     <string name="bug_report">错误报告</string>
     <string name="bug_report_description">有什么无法工作了吗？</string>
     <string name="bug_report_icon">错误报告的图标</string>
     <string name="scroll_to_bottom_icon">滚动到底部的图标</string>
-    <string name="llama_3_2_description">Meta最新的轻量开源模型</string>
-    <string name="llama_3_1_description">Meta最先进的大型开源模型</string>
-    <string name="gemma2_description">Google的轻量模型</string>
-    <string name="select_groq_model">选择Groq会话的模型</string>
-    <string name="select_groq_model_description">请选择 Groq 会话的模型，如果您想使用模型不在列表中，请查看 Groq 的 API 文档来知道可用的模型</string>
-    <string name="groq_setting">Groq</string>
-    <string name="groq_description">快速推理的开放模型</string>
-    <string name="groq_api_key">Groq 的 API 密钥</string>
-    <string name="edit">编辑</string>
+
+
+
+
+<string name="edit">编辑</string>
     <string name="options">选择</string>
     <string name="update_chat_title">修改会话标题</string>
     <string name="chat_title">会话标题</string>
@@ -180,10 +168,8 @@
     <string name="api_type">API 协议</string>
     <string name="client_type_openai_desc">OpenAI chat completions API（OpenAI 兼容格式）</string>
     <string name="client_type_anthropic_desc">Anthropic Messages API</string>
-    <string name="client_type_google_desc">Google Gemini Generative AI API</string>
-    <string name="client_type_groq_desc">Groq（OpenAI 兼容格式）</string>
-    <string name="client_type_ollama_desc">Ollama（OpenAI 兼容格式）</string>
-    <string name="client_type_openrouter_desc">OpenRouter（OpenAI 兼容格式）</string>
+
+
     <string name="client_type_custom_desc">自定义 OpenAI 兼容格式端点</string>
     <string name="api_url_hint">https://api.example.com</string>
     <string name="api_key_hint">sk-…</string>
@@ -201,7 +187,7 @@
     <string name="expand">展开</string>
     <string name="collapse">收起</string>
     <string name="extended_thinking">深度推理</string>
-    <string name="extended_thinking_description">支持深度推理的模型（例如 o1、o3, Claude 思考模式、Gemini 思考模式）</string>
+    <string name="extended_thinking_description">支持深度推理的模型（例如 Claude 思考模式、DeepSeek 深度思考）</string>
     <string name="your_platforms">你的提供商</string>
     <string name="no_platforms_yet">尚未添加任何提供商</string>
     <string name="add_your_first_platform">开始前，请先添加一个提供商</string>
@@ -215,13 +201,12 @@
     <string name="step_x_of_y">第 %1$d 步，共 %2$d 步</string>
     <string name="platform_basics_description">为你的提供商命名并验证 API 端点</string>
     <string name="api_key_description">请输入你的 API 密钥，它只存储在您的设备上。</string>
-    <string name="api_key_optional_note">对于类似 Ollama 的本地部署模型，API 密钥不是必需的。</string>
+
     <string name="model_description">请输入您使用模型的标识符</string>
     <string name="model_examples">例如：gpt-4o、claude-sonnet-4-20250514、gemini-1.5-pro</string>
     <string name="back">返回</string>
     <string name="finish">完成</string>
-    <string name="openrouter_description">通过单一 API 端点，使用多种 AI 模型</string>
-    <string name="custom_provider">自定义提供商</string>
+<string name="custom_provider">自定义提供商</string>
     <string name="custom_provider_description">连接到任意兼容 OpenAI 格式的 API 端点</string>
     <string name="platform_added_successfully">提供商添加成功</string>
     <string name="at_least_one_platform_required">请至少启用一个提供商</string>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GPTMobile</string>
     <string name="gpt_mobile_introduction_logo">Logo de introducción de GPT Mobile</string>
@@ -10,16 +10,14 @@
     <string name="sample_item_description">Descripción del elemento</string>
     <string name="openai_description">Creador de ChatGPT.</string>
     <string name="anthropic_description">Claude nació aquí.</string>
-    <string name="google_description">Gemini ya viene.</string>
-    <string name="next">Siguiente</string>
+<string name="next">Siguiente</string>
     <string name="enter_api_key">Introduce la clave API</string>
     <string name="token_input_description">Introduce la clave API de la plataforma que seleccionaste. Esta app nunca recopila esos datos. Estas llaves y datos del chat solo se guardarán en tu dispositivo y no serán enviados a otros servidores aparte de los puntos finales de la API.</string>
     <string name="clear_token">Eliminar token</string>
     <string name="need_help">¿Necesitas ayuda?</string>
     <string name="openai_api_key">Clave API de OpenAI</string>
     <string name="anthropic_api_key">Clave API de Anthropic</string>
-    <string name="google_api_key">Clave API de Google</string>
-    <string name="select_openai_model">Selecciona modelo de chat de OpenAI</string>
+<string name="select_openai_model">Selecciona modelo de chat de OpenAI</string>
     <string name="select_openai_model_description">Por favor, selecciona el modelo de chat de OpenAI. Incluso si el modelo seleccionado es multimodal, la aplicación solo es compatible con texto. Podría ser compatible en el futuro.</string>
     <string name="gpt_4o_description">El modelo insignia más rápido y económico.</string>
     <string name="gpt_4o_mini_description">Pequeño modelo económico e inteligente para tareas rápidas y ligeras</string>
@@ -31,11 +29,9 @@
     <string name="claude_3_opus_description">Destaca en escritura y tareas complejas.</string>
     <string name="claude_3_sonnet_description">Modelo balanceado entre inteligencia y velocidad.</string>
     <string name="claude_3_haiku_description">Modelo más rápido y compacto de Anthropic.</string>
-    <string name="select_google_model">Selecciona modelo de chat de Google</string>
-    <string name="select_google_model_description">Gemini es una familia de modelos de IA generativos hechos por Google. Solo texto es compatible.</string>
-    <string name="gemini_1_5_pro_description">Optimizado para tareas que hay que pensar incluyendo código y generación de texto.</string>
-    <string name="gemini_1_5_flash_description">Rendimiento rápido y versátil en varios tipos de tareas.</string>
-    <string name="gemini_1_0_pro_description">Tareas de lenguaje natural, conversaciones en varios turnos de texto y código, y generación de código.</string>
+
+
+
     <string name="setup_complete">¡Ya está!</string>
     <string name="setup_complete_description">¡Empieza a usar GPT Mobile!</string>
     <string name="done">Hecho</string>
@@ -60,8 +56,7 @@
     <string name="theme_description">Tema dinámico, Modo oscuro</string>
     <string name="openai_setting">Ajustes de OpenAI</string>
     <string name="anthropic_setting">Ajustes de Anthropic</string>
-    <string name="google_setting">Ajustes de Google</string>
-    <string name="platform_setting_description">Clave API, Modelo, Prompt</string>
+<string name="platform_setting_description">Clave API, Modelo, Prompt</string>
     <string name="enable_api">Activar API</string>
     <string name="api_key">Clave API</string>
     <string name="api_model">Modelo API</string>
@@ -107,33 +102,25 @@
     <string name="github_icon">Icono de github</string>
     <string name="api_url">URL API</string>
     <string name="invalid_api_url">Por favor introduce una URL válida.</string>
-    <string name="ollama_description">Usa tu propio modelo.</string>
-    <string name="select_ollama_model">Selecciona modelo de chat de Ollama</string>
-    <string name="ollama_setting">Ajustes de Ollama</string>
-    <string name="select_ollama_model_description">Por favor, selecciona el modelo Ollama. Dado que hay muchos modelos y etiquetas soportados, puedes personalizar el valor del modelo. Asegúrate de que el endpoint realmente soporte el modelo y esté funcionando. De lo contrario, no generará una respuesta.</string>
-    <string name="custom">Personalizado</string>
+
+
+<string name="custom">Personalizado</string>
     <string name="custom_description">Usa un modelo que no este en la lista.</string>
     <string name="model_name">Nombre del modelo</string>
     <string name="model_custom_example">por ejemplo llama3.2, llava, llama3:latest, …</string>
     <string name="custom_model_warning">Ten en cuenta que el modelo deberá ser compatible por la API.</string>
     <string name="enter_api_address">Introduce la dirección de la API</string>
-    <string name="api_address_description">Por favor, introduce la dirección de tu API de Ollama, incluyendo el número de puerto. La aplicación usará el endpoint v1/chat/completions, así que solo introduce la primera parte de la dirección completa. La dirección debe terminar con una ‘/’. Por ejemplo: http://192.168.1.100:11434/</string>
-    <string name="ollama_api_address">Dirección de la API de Ollama</string>
-    <string name="reset">Resetear</string>
-    <string name="ollama_api_key">Clave API de Ollama</string>
-    <string name="api_url_cautions">La url debe terminar con \'/\'.</string>
+
+<string name="reset">Resetear</string>
+<string name="api_url_cautions">La url debe terminar con \'/\'.</string>
     <string name="bug_report">Reportar bugs</string>
     <string name="bug_report_description">¿Algo no va bien?</string>
     <string name="bug_report_icon">Icono de reportar</string>
     <string name="scroll_to_bottom_icon">Icono de bajar abajo</string>
-    <string name="llama_3_2_description">El último modelo de lenguaje ligero de código abierto de Meta.</string>
-    <string name="llama_3_1_description">Modelo de lenguaje grande multilingüe de código abierto y de última generación de Meta.</string>
-    <string name="gemma2_description">Pequeño modelo de lenguaje de Google.</string>
-    <string name="select_groq_model">Selecciona modelo de chat de Groq</string>
-    <string name="select_groq_model_description">Por favor selecciona el modelo de chat de Groq. Si quieres modelos que no están en la lista, mira la documentación del API de Groq para ver que está disponible.</string>
-    <string name="groq_setting">Ajustes de Groq</string>
-    <string name="groq_description">Inferencia rápida de IA para modelos disponibles de manera abierta.</string>
-    <string name="groq_api_key">Clave API de Groq</string>
+
+
+
+
     <string name="options">Opciones</string>
     <string name="update_chat_title">Actualizar el título</string>
     <string name="chat_title">Título del chat</string>

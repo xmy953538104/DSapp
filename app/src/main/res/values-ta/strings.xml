@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="chats">அரட்டைகள்</string>
     <string name="system_prompt">கணினி வரியில்</string>
     <string name="version">பதிப்பு</string>
     <string name="api_url">பநிஇ முகவரி</string>
-    <string name="ollama_setting">ஓலாமா அமைப்புகள்</string>
-    <string name="enter_api_address">பநிஇ முகவரியை உள்ளிடவும்</string>
+<string name="enter_api_address">பநிஇ முகவரியை உள்ளிடவும்</string>
     <string name="app_name">Gptmobile</string>
     <string name="gpt_mobile_introduction_logo">சிபிடி மொபைல் அறிமுகம் லோகோ</string>
     <string name="welcome_title">சிறந்த AI உதவியாளர்\n நீங்கள் பெறலாம்\n ச்மார்ட்போன்.</string>
@@ -17,7 +16,7 @@
     <string name="openai_description">சாட்சிப்ட்டை உருவாக்கியவர்.</string>
     <string name="gpt_4o_description">வேகமான மற்றும் மிகவும் மலிவு முதன்மை மாதிரி.</string>
     <string name="anthropic_description">கிளாட் இங்கே பிறந்தார்.</string>
-    <string name="google_description">செமினி அதன் வழியில் உள்ளது.</string>
+
     <string name="next">அடுத்தது</string>
     <string name="enter_api_key">பநிஇ விசையை உள்ளிடவும்</string>
     <string name="token_input_description">நீங்கள் தேர்ந்தெடுத்த தளத்தின் பநிஇ விசையை உள்ளிடவும். இந்த பயன்பாடு இந்தத் தரவை ஒருபோதும் சேகரிக்காது. இந்த விசைகள் மற்றும் அரட்டை தரவு உங்கள் சாதனத்தில் மட்டுமே சேமிக்கப்படும், மேலும் பநிஇ இறுதிப் புள்ளிகளைத் தவிர மற்ற சேவையகங்களுக்கு அனுப்பப்படாது.</string>
@@ -25,7 +24,7 @@
     <string name="need_help">உதவி தேவையா?</string>
     <string name="openai_api_key">OpenAI பநிஇ விசை</string>
     <string name="anthropic_api_key">மானுட பநிஇ விசை</string>
-    <string name="google_api_key">கூகிள் பநிஇ விசை</string>
+
     <string name="select_openai_model">OpenAI அரட்டை மாதிரியைத் தேர்ந்தெடுக்கவும்</string>
     <string name="select_openai_model_description">OpenAI அரட்டை மாதிரியைத் தேர்ந்தெடுக்கவும். தேர்ந்தெடுக்கப்பட்ட மாதிரி மல்டிமோடல் என்றாலும், பயன்பாடு தற்போது உரை உள்ளீடுகளை மட்டுமே ஆதரிக்கிறது. எதிர்காலத்தில் பின்னர் ஆதரிக்கப்படலாம்.</string>
     <string name="gpt_4o_mini_description">வேகமான, இலகுரக பணிகளுக்கு மலிவு மற்றும் புத்திசாலித்தனமான சிறிய மாதிரி</string>
@@ -37,11 +36,9 @@
     <string name="claude_3_opus_description">எழுத்து மற்றும் சிக்கலான பணிகளில் சிறந்து விளங்குகிறது.</string>
     <string name="claude_3_sonnet_description">உளவுத்துறை மற்றும் வேகத்திற்கு இடையில் சீரான மாதிரி.</string>
     <string name="claude_3_haiku_description">மானுடத்தின் வேகமான மற்றும் மிகவும் சிறிய மாதிரி.</string>
-    <string name="select_google_model">Google அரட்டை மாதிரியைத் தேர்ந்தெடுக்கவும்</string>
-    <string name="select_google_model_description">செமினி என்பது கூகிள் தயாரித்த உருவாக்கும் AI மாதிரிகளின் குடும்பமாகும். உரை உள்ளீடுகள் மட்டுமே ஆதரிக்கப்படுகின்றன.</string>
-    <string name="gemini_1_5_pro_description">குறியீடு மற்றும் உரை உருவாக்கம் உள்ளிட்ட பகுத்தறிவு பணிகளுக்கு உகந்ததாகும்.</string>
-    <string name="gemini_1_0_pro_description">இயற்கை மொழி பணிகள், மல்டி-டர்ன் உரை மற்றும் குறியீடு அரட்டை மற்றும் குறியீடு உருவாக்கம்.</string>
-    <string name="gemini_1_5_flash_description">பல்வேறு வகையான பணிகளில் வேகமான மற்றும் பல்துறை செயல்திறன்.</string>
+
+
+
     <string name="setup_complete">நீங்கள் அனைவரும் அமைக்கப்பட்டிருக்கிறீர்கள்!</string>
     <string name="done">முடிந்தது</string>
     <string name="setup_complete_description">சிபிடி மொபைலைப் பயன்படுத்த ஆரம்பிக்கலாம்!</string>
@@ -65,7 +62,7 @@
     <string name="theme_description">மாறும் கருப்பொருள், இருண்ட பயன்முறை</string>
     <string name="openai_setting">OpenAI அமைப்புகள்</string>
     <string name="anthropic_setting">மானுட அமைப்புகள்</string>
-    <string name="google_setting">கூகிள் அமைப்புகள்</string>
+
     <string name="platform_setting_description">பநிஇ விசை, மாதிரி, கணினி வரியில்</string>
     <string name="enable_api">பநிஇ ஐ இயக்கு</string>
     <string name="api_key">பநிஇ விசை</string>
@@ -111,33 +108,27 @@
     <string name="f_droid_icon">எஃப்-டிராய்டு படவுரு</string>
     <string name="play_store_icon">கடை படவுரு விளையாடுங்கள்</string>
     <string name="url_icon">முகவரி படவுரு</string>
-    <string name="select_ollama_model">ஒல்லாமா அரட்டை மாதிரியைத் தேர்ந்தெடுக்கவும்</string>
+
     <string name="invalid_api_url">செல்லுபடியாகும் முகவரி ஐ உள்ளிடவும்.</string>
-    <string name="ollama_description">உங்கள் சொந்த மாதிரியைப் பயன்படுத்தவும்.</string>
-    <string name="select_ollama_model_description">ஒல்லாமா மாதிரியைத் தேர்ந்தெடுக்கவும். ஆதரிக்கப்படும் பல மாதிரிகள் மற்றும் குறிச்சொற்கள் இருப்பதால், நீங்கள் மாதிரி மதிப்பைத் தனிப்பயனாக்கலாம். இறுதிப்புள்ளி உண்மையில் மாதிரியை ஆதரிக்கிறது என்பதை உறுதிப்படுத்திக் கொள்ளுங்கள். இல்லையெனில், அது ஒரு பதிலை உருவாக்காது.</string>
-    <string name="custom">தனிப்பயன்</string>
+
+<string name="custom">தனிப்பயன்</string>
     <string name="custom_description">பட்டியலில் இல்லாத மாதிரியைப் பயன்படுத்தவும்.</string>
     <string name="model_name">மாதிரி பெயர்</string>
     <string name="model_custom_example">எ.கா. slama3.2, தூக்கி, லேசாக,…</string>
     <string name="custom_model_warning">மாதிரி பெயரை பநிஇ ஆதரிக்க வேண்டும் என்பதை நினைவில் கொள்க.</string>
-    <string name="api_address_description">துறைமுகம் எண் உட்பட உங்கள் ஓலாமா பநிஇ முகவரியை உள்ளிடவும். பயன்பாடு V1/CHAT/CONTIONS ENDPOINT ஐப் பயன்படுத்தும், எனவே தயவுசெய்து முழு முகவரியின் முன் பகுதியை மட்டுமே உள்ளிடவும். முகவரி ஒரு \'/\' உடன் முடிவடைய வேண்டும். எ.கா.) http://192.168.1.100:11434/</string>
-    <string name="ollama_api_address">ஓலாமா பநிஇ முகவரி</string>
+
     <string name="reset">மீட்டமை</string>
     <string name="api_url_cautions">முகவரி ஒரு \'/\' உடன் முடிவடைய வேண்டும்.</string>
     <string name="bug_report">பிழை அறிக்கை</string>
-    <string name="ollama_api_key">ஓலாமா பநிஇ விசை</string>
+
     <string name="bug_report_description">ஏதோ சரியாக வேலை செய்யவில்லையா?</string>
     <string name="bug_report_icon">பிழை அறிக்கை படவுரு</string>
     <string name="scroll_to_bottom_icon">கீழே ஐகானுக்கு உருட்டவும்</string>
-    <string name="llama_3_2_description">மெட்டாவிலிருந்து அண்மைக் கால இலகுரக திறந்த மூல மொழி மாதிரி.</string>
-    <string name="llama_3_1_description">மெட்டாவிலிருந்து அதிநவீன பன்மொழி திறந்த மூல பெரிய மொழி மாதிரி.</string>
-    <string name="gemma2_description">கூகிள் வெளியிட்ட சிறிய மொழி மாதிரி.</string>
-    <string name="select_groq_model">GROQ அரட்டை மாதிரியைத் தேர்ந்தெடுக்கவும்</string>
-    <string name="select_groq_model_description">CRACQ அரட்டை மாதிரியைத் தேர்ந்தெடுக்கவும். பட்டியலில் இல்லாத மாதிரிகளை நீங்கள் விரும்பினால், GRACQ பநிஇ ஆவணப்படுத்தல் வலைத்தளத்தைப் பார்த்து, கிடைப்பதைப் பாருங்கள்.</string>
-    <string name="groq_setting">GROQ அமைப்புகள்</string>
-    <string name="groq_description">வெளிப்படையாக கிடைக்கக்கூடிய மாதிரிகளுக்கு விரைவான AI அனுமானம்.</string>
-    <string name="groq_api_key">GROQ பநிஇ விசை</string>
-    <string name="options">விருப்பங்கள்</string>
+
+
+
+
+<string name="options">விருப்பங்கள்</string>
     <string name="update_chat_title">அரட்டை தலைப்பைப் புதுப்பிக்கவும்</string>
     <string name="chat_title">அரட்டை தலைப்பு</string>
     <string name="untitled_chat">பெயரிடப்படாத அரட்டை</string>

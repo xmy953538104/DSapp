@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GPTMobile</string>
     <string name="gpt_mobile_introduction_logo">GPT Mobile логотип приветствия</string>
@@ -10,16 +10,14 @@
     <string name="sample_item_description">Описание элемента</string>
     <string name="openai_description">Создатель ChatGPT.</string>
     <string name="anthropic_description">Здесь появился Claude.</string>
-    <string name="google_description">Gemini скоро появится.</string>
-    <string name="next">Далее</string>
+<string name="next">Далее</string>
     <string name="enter_api_key">Введите ключ API</string>
     <string name="token_input_description">Введите ключ API выбранной платформы. Это приложение никогда не собирает эти данные. Эти ключи и данные чата будут храниться только на вашем устройстве и не будут отправляться на другие серверы, кроме конечных точек API.</string>
     <string name="clear_token">Очистить токен</string>
     <string name="need_help">Нужна помощь?</string>
     <string name="openai_api_key">Ключ API OpenAI</string>
     <string name="anthropic_api_key">Ключ API Anthropic</string>
-    <string name="google_api_key">Ключ API Google</string>
-    <string name="select_openai_model">Выберите модель чата OpenAI</string>
+<string name="select_openai_model">Выберите модель чата OpenAI</string>
     <string name="select_openai_model_description">Выберите модель чата OpenAI. Даже если выбранная модель мультимодальна, в настоящее время приложение поддерживает только текстовые запросы. Поддержка может быть добавлена в будущем.</string>
     <string name="gpt_4o_description">Самая быстрая и доступная флагманская модель.</string>
     <string name="gpt_4o_mini_description">Доступная и интеллектуальная компактная модель для быстрых и несложных задач</string>
@@ -31,11 +29,9 @@
     <string name="claude_3_opus_description">Превосходит в написании текстов и решении сложных задач.</string>
     <string name="claude_3_sonnet_description">Сбалансированная модель между интеллектом и скоростью.</string>
     <string name="claude_3_haiku_description">Самая быстрая и компактная модель от Anthropic.</string>
-    <string name="select_google_model">Выберите модель чата Google</string>
-    <string name="select_google_model_description">Gemini - это семейство генеративных моделей искусственного интеллекта, разработанных компанией Google. Поддерживаются только текстовые входные данные.</string>
-    <string name="gemini_1_5_pro_description">Оптимизирован для решения задач, требующих логических рассуждений, включая генерацию кода и текста.</string>
-    <string name="gemini_1_5_flash_description">Высокая производительность и универсальность при решении широкого спектра задач.</string>
-    <string name="gemini_1_0_pro_description">Задачи обработки естественного языка, многооборотный текстовый и программный чат, а также генерация кода.</string>
+
+
+
     <string name="setup_complete">Всё готово!</string>
     <string name="setup_complete_description">Начнём использовать GPT Mobile!</string>
     <string name="done">Готово</string>
@@ -60,8 +56,7 @@
     <string name="theme_description">Динамическая тема, Тёмный режим</string>
     <string name="openai_setting">Настройки OpenAI</string>
     <string name="anthropic_setting">Настройки Anthropic</string>
-    <string name="google_setting">Настройки Google</string>
-    <string name="platform_setting_description">API-ключ, Модель, Системный промпт</string>
+<string name="platform_setting_description">API-ключ, Модель, Системный промпт</string>
     <string name="enable_api">Активировать API</string>
     <string name="api_key">API-ключ</string>
     <string name="api_model">Модель API</string>
@@ -110,36 +105,29 @@
     <string name="api_url">API URL</string>
     <string name="url_icon">Значок URL</string>
     <string name="invalid_api_url">Пожалуйста, введите корректный URL-адрес.</string>
-    <string name="ollama_description">Используйте свою собственную модель.</string>
-    <string name="select_ollama_model">Выбор модели чата Ollama</string>
-    <string name="ollama_setting">Настройки Ollama</string>
-    <string name="select_ollama_model_description">Пожалуйста, выберите модель Ollama. Учитывая поддержку множества моделей и тегов, вы можете настроить значение модели. Убедитесь, что конечная точка действительно поддерживает выбранную модель и успешно её запустила. В противном случае ответ сформирован не будет.</string>
+
+
     <string name="custom">Пользовательский</string>
     <string name="custom_description">Использовать модель, отсутствующую в списке.</string>
     <string name="model_name">Идентификатор модели</string>
     <string name="model_custom_example">например, llama3.2, llava, llama3:latest, …</string>
     <string name="custom_model_warning">Обратите внимание, что имя модели должно поддерживаться API.</string>
     <string name="enter_api_address">Введите адрес API</string>
-    <string name="api_address_description">Введите адрес вашего Ollama API, включая номер порта. Приложение будет использовать эндпоинт v1/chat/completions, поэтому введите только начальную часть полного адреса. Адрес должен заканчиваться на \'/\'. например) http://192.168.1.100:11434/</string>
-    <string name="ollama_api_address">Адрес Ollama API</string>
+
     <string name="reset">Сброс</string>
-    <string name="ollama_api_key">API-ключ Ollama</string>
+
     <string name="api_url_cautions">URL должен заканчиваться символом \'/\'.</string>
     <string name="bug_report">Отчёт об ошибке</string>
     <string name="bug_report_description">Что-то работает неправильно?</string>
     <string name="bug_report_icon">Значок отчёта об ошибке</string>
     <string name="scroll_to_bottom_icon">Значок перехода вниз</string>
-    <string name="llama_3_2_description">Новейшая лёгкая языковая модель с открытым исходным кодом от Meta.</string>
-    <string name="llama_3_1_description">Передовая мультиязычная открытая большая языковая модель от Meta.</string>
-    <string name="gemma2_description">Малая языковая модель, выпущенная Google.</string>
-    <string name="select_groq_model">Выберите модель чата Groq</string>
-    <string name="select_groq_model_description">Пожалуйста, выберите модель чата Groq. Если вам нужны модели, которых нет в списке, ознакомьтесь с документацией Groq API, чтобы узнать доступные варианты.</string>
-    <string name="groq_setting">Настройки Groq</string>
-    <string name="chat_title_dialog_description">Генерация заголовка с помощью ИИ доступна только на устройствах с поддержкой AICore.</string>
+
+
+
+<string name="chat_title_dialog_description">Генерация заголовка с помощью ИИ доступна только на устройствах с поддержкой AICore.</string>
     <string name="edit_question">Редактировать сообщение пользователя</string>
     <string name="token_input_warning">ПРИМЕЧАНИЕ: OpenAI и Anthropic используют систему предоплаты, поэтому перед использованием необходимо ПОПОЛНИТЬ БАЛАНС на каждом аккаунте. В противном случае запрос вернёт ошибку.</string>
-    <string name="groq_api_key">API-ключ Groq</string>
-    <string name="groq_description">Быстрый инференс ИИ для открытых моделей.</string>
+
     <string name="options">Настройки</string>
     <string name="update_chat_title">Обновить название чата</string>
     <string name="chat_title">Название чата</string>
@@ -180,10 +168,8 @@
     <string name="platform_name_icon">Значок названия платформы</string>
     <string name="api_type">Тип API</string>
     <string name="client_type_anthropic_desc">API сообщений Anthropic</string>
-    <string name="client_type_google_desc">API генеративного ИИ Google Gemini</string>
-    <string name="client_type_groq_desc">API Groq, совместимый с OpenAI</string>
-    <string name="client_type_ollama_desc">API Ollama, совместимый с OpenAI</string>
-    <string name="client_type_openrouter_desc">API OpenRouter, совместимый с OpenAI</string>
+
+
     <string name="client_type_custom_desc">Пользовательский эндпоинт, совместимый с OpenAI</string>
     <string name="api_url_hint">https://api.example.com</string>
     <string name="api_key_hint">sk-…</string>
@@ -199,7 +185,7 @@
     <string name="hide_thinking">Скрыть ход мыслей</string>
     <string name="expand">Развернуть</string>
     <string name="collapse">Свернуть</string>
-    <string name="extended_thinking_description">Включить для моделей с рассуждением (o1, o3, Claude с функцией thinking, Gemini thinking)</string>
+    <string name="extended_thinking_description">Enable for reasoning-capable models such as Claude thinking and DeepSeek thinking</string>
     <string name="your_platforms">Ваши платформы</string>
     <string name="no_platforms_yet">Платформы ещё не добавлены</string>
     <string name="add_your_first_platform">Добавьте первую ИИ-платформу, чтобы начать работу</string>
@@ -213,13 +199,12 @@
     <string name="step_x_of_y">Шаг %1$d из %2$d</string>
     <string name="platform_basics_description">Дайте название вашей платформе и проверьте URL-адрес API</string>
     <string name="api_key_description">Введите ваш API-ключ. Данные хранятся локально на вашем устройстве.</string>
-    <string name="api_key_optional_note">Для локальных провайдеров, таких как Ollama, API-ключ не требуется</string>
+
     <string name="model_description">Введите идентификатор модели, которую вы хотите использовать</string>
     <string name="model_examples">Примеры: gpt-4o, claude-sonnet-4-20250514, gemini-1.5-pro</string>
     <string name="back">Назад</string>
     <string name="finish">Готово</string>
-    <string name="openrouter_description">Доступ к нескольким моделям ИИ через один API</string>
-    <string name="custom_provider">Пользовательский поставщик</string>
+<string name="custom_provider">Пользовательский поставщик</string>
     <string name="custom_provider_description">Подключение к любому API, совместимому с OpenAI</string>
     <string name="platform_added_successfully">Платформа успешно добавлена</string>
     <string name="at_least_one_platform_required">Добавьте хотя бы одну платформу, чтобы продолжить</string>

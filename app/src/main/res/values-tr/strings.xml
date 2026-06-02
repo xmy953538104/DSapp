@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GPTMobile</string>
     <string name="gpt_mobile_introduction_logo">GPT Mobile Tanıtım Logosu</string>
@@ -10,10 +10,9 @@
     <string name="sample_item_description">Öğe açıklaması</string>
     <string name="openai" translatable="false">OpenAI</string>
     <string name="anthropic" translatable="false">Anthropic</string>
-    <string name="google" translatable="false">Google</string>
-    <string name="openai_description">ChatGPT’nin yaratıcısı.</string>
+<string name="openai_description">ChatGPT’nin yaratıcısı.</string>
     <string name="anthropic_description">Claude burada doğdu.</string>
-    <string name="google_description">Gemini yolda.</string>
+
     <string name="next">İleri</string>
     <string name="enter_api_key">API Anahtarını Girin</string>
     <string name="token_input_description">Seçtiğiniz platformun API anahtarını girin. Bu uygulama asla bu verileri toplamaz. Bu anahtarlar ve sohbet verileri yalnızca cihazınızda saklanır ve API uç noktaları dışında başka sunuculara gönderilmez.</string>
@@ -21,11 +20,10 @@
     <string name="need_help">Yardım mı lazım?</string>
     <string name="openai_api_key">OpenAI API Anahtarı</string>
     <string name="anthropic_api_key">Anthropic API Anahtarı</string>
-    <string name="google_api_key">Google API Anahtarı</string>
+
     <string name="openai_api_help" translatable="false">https://platform.openai.com/account/api-keys</string>
     <string name="anthropic_api_help" translatable="false">https://console.anthropic.com/settings/keys</string>
-    <string name="google_api_help" translatable="false">https://aistudio.google.com/app/apikey</string>
-    <string name="select_openai_model">OpenAI Sohbet Modelini Seçin</string>
+<string name="select_openai_model">OpenAI Sohbet Modelini Seçin</string>
     <string name="select_openai_model_description">Lütfen OpenAI sohbet modelini seçin. Seçilen model çok modlu olsa bile, uygulama şu anda yalnızca metin girişlerini destekliyor. İleride desteklenebilir.</string>
     <string name="gpt_4o" translatable="false">GPT-4o</string>
     <string name="gpt_4o_mini" translatable="false">GPT-4o mini</string>
@@ -45,15 +43,11 @@
     <string name="claude_3_opus_description">Yazma ve karmaşık görevlerde üstün.</string>
     <string name="claude_3_sonnet_description">Zeka ve hız arasında dengeli model.</string>
     <string name="claude_3_haiku_description">Anthropic’in en hızlı ve en kompakt modeli.</string>
-    <string name="select_google_model">Google Sohbet Modelini Seçin</string>
-    <string name="select_google_model_description">Gemini, Google tarafından geliştirilen bir yapay zeka model ailesidir. Yalnızca metin girişleri desteklenir.</string>
-    <string name="gemini_1_5_pro" translatable="false">Gemini 1.5 Pro</string>
-    <string name="gemini_1_5_flash" translatable="false">Gemini 1.5 Flash</string>
-    <string name="gemini_1_0_pro" translatable="false">Gemini 1.0 Pro</string>
-    <string name="gemini_1_5_pro_description">Kod ve metin oluşturma dahil akıl yürütme görevleri için optimize edilmiştir.</string>
-    <string name="gemini_1_5_flash_description">Çeşitli görevlerde hızlı ve çok yönlü performans.</string>
-    <string name="gemini_1_0_pro_description">Doğal dil görevleri, çok turlu metin ve kod sohbeti ve kod oluşturma.</string>
-    <string name="setup_complete">Her şey hazır!</string>
+
+
+
+
+<string name="setup_complete">Her şey hazır!</string>
     <string name="setup_complete_description">GPT Mobile’ı kullanmaya başlayalım!</string>
     <string name="done">Tamam</string>
     <string name="setup_complete_logo">Kurulum Tamamlandı Logosu</string>
@@ -77,7 +71,7 @@
     <string name="theme_description">Dinamik tema, Karanlık mod</string>
     <string name="openai_setting">OpenAI Ayarları</string>
     <string name="anthropic_setting">Anthropic Ayarları</string>
-    <string name="google_setting">Google Ayarları</string>
+
     <string name="platform_setting_description">API Anahtarı, Model, Sistem Komutu</string>
     <string name="enable_api">API’yi Etkinleştir</string>
     <string name="api_key">API Anahtarı</string>
@@ -93,7 +87,7 @@
     <string name="some_platforms_disabled">Bazı API’ler devre dışı</string>
     <string name="openai_brand_text" translatable="false">Powered by OpenAI</string>
     <string name="anthropic_brand_text" translatable="false">Powered by Claude</string>
-    <string name="google_brand_text" translatable="false">Powered by Gemini</string>
+
     <string name="token_not_set">Anahtar ayarlanmadı</string>
     <string name="token_set">Anahtar %s***** olarak ayarlandı</string>
     <string name="close">Kapat</string>
@@ -138,44 +132,30 @@
     <string name="api_url">API URL’si</string>
     <string name="url_icon">URL Simgesi</string>
     <string name="invalid_api_url">Lütfen geçerli bir URL girin.</string>
-    <string name="ollama" translatable="false">Ollama</string>
-    <string name="ollama_description">Kendi modelinizi kullanın.</string>
-    <string name="select_ollama_model">Ollama Sohbet Modelini Seçin</string>
-    <string name="ollama_setting">Ollama Ayarları</string>
-    <string name="ollama_brand_text" translatable="false">Powered by Ollama</string>
-    <string name="select_ollama_model_description">Lütfen Ollama modelini seçin. Desteklenen çok sayıda model ve etiket olduğundan, model değerini özelleştirebilirsiniz. Uç noktanın modeli gerçekten desteklediğinden ve çalışır durumda olduğundan emin olun. Aksi takdirde yanıt oluşturulmaz.</string>
+
+
+
     <string name="custom">Özel</string>
     <string name="custom_description">Listede olmayan modeli kullanın.</string>
     <string name="model_name">Model Adı</string>
     <string name="model_custom_example">ör. llama3.2, llava, llama3:latest, …</string>
     <string name="custom_model_warning">Model adının API tarafından desteklenmesi gerektiğini unutmayın.</string>
     <string name="enter_api_address">API Adresini Girin</string>
-    <string name="api_address_description">Lütfen Ollama API’nizin adresini, port numarası dahil olmak üzere girin. Uygulama v1/chat/completions uç noktasını kullanacağından, yalnızca adresin ön kısmını girin. Adres bir ‘/’ ile bitmelidir. ör.) http://192.168.1.100:11434/</string>
-    <string name="ollama_api_address">Ollama API Adresi</string>
-    <string name="ollama_api_help" translatable="false">https://ollama.com/blog/openai-compatibility</string>
-    <string name="reset">Sıfırla</string>
-    <string name="ollama_api_key">Ollama API Anahtarı</string>
-    <string name="api_url_cautions">URL bir ‘/’ ile bitmelidir.</string>
+
+<string name="reset">Sıfırla</string>
+<string name="api_url_cautions">URL bir ‘/’ ile bitmelidir.</string>
     <string name="bug_report">Hata Raporu</string>
     <string name="bug_report_description">Bir şey doğru çalışmıyor mu?</string>
     <string name="bug_report_icon">Hata Raporu Simgesi</string>
     <string name="scroll_to_bottom_icon">Aşağı kaydır simgesi</string>
-    <string name="llama_3_2_3b" translatable="false">Llama 3.2 3B (Preview) 8k</string>
-    <string name="llama_3_2_1b" translatable="false">Llama 3.2 1B (Preview) 8k</string>
-    <string name="llama_3_1_70b_versatile" translatable="false">Llama 3.1 70B Versatile 128k</string>
-    <string name="llama_3_1_8b_instant" translatable="false">Llama 3.1 8B Instant 128k</string>
-    <string name="gemma_2_9b" translatable="false">Gemma 2 9B 8k</string>
-    <string name="llama_3_2_description">Meta’dan en son hafif açık kaynak dil modeli.</string>
-    <string name="llama_3_1_description">Meta’dan son teknoloji çok dilli açık kaynak büyük dil modeli.</string>
-    <string name="gemma2_description">Google tarafından piyasaya sürülen Küçük Dil Modeli.</string>
-    <string name="select_groq_model">Groq Sohbet Modelini Seçin</string>
-    <string name="select_groq_model_description">Lütfen Groq sohbet modelini seçin. Listede olmayan modelleri istiyorsanız, Groq API dokümantasyon web sitesine göz atın ve neler mevcut olduğunu görün.</string>
-    <string name="groq_setting">Groq Ayarları</string>
-    <string name="groq_brand_text" translatable="false">Powered by Groq</string>
-    <string name="groq" translatable="false">Groq</string>
-    <string name="groq_description">Açıkça mevcut modeller için hızlı yapay zeka çıkarımı.</string>
-    <string name="groq_api_key">Groq API Anahtarı</string>
-    <string name="groq_api_help" translatable="false">https://console.groq.com/keys</string>
+
+
+
+
+
+
+
+
     <string name="options">Seçenekler</string>
     <string name="update_chat_title">Sohbet başlığını güncelle</string>
     <string name="chat_title">Sohbet Başlığı</string>
