@@ -136,7 +136,7 @@ fun AddPlatformScreen(
                     expanded = clientTypeExpanded,
                     onDismissRequest = { clientTypeExpanded = false }
                 ) {
-                    ClientType.entries.forEach { clientType ->
+                    ClientType.USER_SELECTABLE.forEach { clientType ->
                         DropdownMenuItem(
                             text = {
                                 Column {
@@ -157,12 +157,10 @@ fun AddPlatformScreen(
                                 apiUrl = when (clientType) {
                                     ClientType.OPENAI -> ModelConstants.OPENAI_API_URL
                                     ClientType.ANTHROPIC -> ModelConstants.ANTHROPIC_API_URL
-                                    ClientType.GOOGLE -> ModelConstants.GOOGLE_API_URL
-                                    ClientType.GROQ -> ModelConstants.GROQ_API_URL
-                                    ClientType.OLLAMA -> ModelConstants.OLLAMA_API_URL
-                                    ClientType.OPENROUTER -> ModelConstants.OPENROUTER_API_URL
+                                    ClientType.DEEPSEEK -> ModelConstants.DEEPSEEK_API_URL
                                     ClientType.CUSTOM -> ""
                                 }
+                                model = getDefaultModel(clientType)
                                 clientTypeExpanded = false
                             }
                         )
@@ -283,11 +281,8 @@ fun AddPlatformScreen(
 @Composable
 private fun getClientTypeName(clientType: ClientType): String = when (clientType) {
     ClientType.OPENAI -> "OpenAI"
-    ClientType.ANTHROPIC -> "Anthropic"
-    ClientType.GOOGLE -> "Google"
-    ClientType.GROQ -> "Groq"
-    ClientType.OLLAMA -> "Ollama"
-    ClientType.OPENROUTER -> "OpenRouter"
+    ClientType.ANTHROPIC -> "Claude"
+    ClientType.DEEPSEEK -> "DeepSeek"
     ClientType.CUSTOM -> stringResource(R.string.custom)
 }
 
@@ -295,20 +290,19 @@ private fun getClientTypeName(clientType: ClientType): String = when (clientType
 private fun getClientTypeDescription(clientType: ClientType): String = when (clientType) {
     ClientType.OPENAI -> stringResource(R.string.client_type_openai_desc)
     ClientType.ANTHROPIC -> stringResource(R.string.client_type_anthropic_desc)
-    ClientType.GOOGLE -> stringResource(R.string.client_type_google_desc)
-    ClientType.GROQ -> stringResource(R.string.client_type_groq_desc)
-    ClientType.OLLAMA -> stringResource(R.string.client_type_ollama_desc)
-    ClientType.OPENROUTER -> stringResource(R.string.client_type_openrouter_desc)
+    ClientType.DEEPSEEK -> stringResource(R.string.client_type_deepseek_desc)
     ClientType.CUSTOM -> stringResource(R.string.client_type_custom_desc)
 }
 
 @Composable
 private fun getModelPlaceholder(clientType: ClientType): String = when (clientType) {
+    ClientType.CUSTOM -> stringResource(R.string.model_name)
+    else -> getDefaultModel(clientType)
+}
+
+private fun getDefaultModel(clientType: ClientType): String = when (clientType) {
     ClientType.OPENAI -> "gpt-5.2"
     ClientType.ANTHROPIC -> "claude-sonnet-4-5-20250929"
-    ClientType.GOOGLE -> "gemini-3-pro-preview"
-    ClientType.GROQ -> "openai/gpt-oss-120b"
-    ClientType.OLLAMA -> "gpt-oss"
-    ClientType.OPENROUTER -> "openai/gpt-4o"
-    ClientType.CUSTOM -> stringResource(R.string.model_name)
+    ClientType.DEEPSEEK -> "deepseek-v4-flash"
+    ClientType.CUSTOM -> ""
 }

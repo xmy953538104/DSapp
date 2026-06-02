@@ -6,6 +6,7 @@ import dev.chungjungsoo.gptmobile.data.database.entity.Message
 import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.dto.ApiState
+import dev.chungjungsoo.gptmobile.util.TokenUsageStats
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
@@ -18,6 +19,7 @@ interface ChatRepository {
     suspend fun fetchMessagesV2(chatId: Int): List<MessageV2>
     suspend fun fetchChatPlatformModels(chatId: Int): Map<String, String>
     suspend fun saveChatPlatformModels(chatId: Int, models: Map<String, String>)
+    suspend fun getTokenUsageStats(): TokenUsageStats
     suspend fun migrateToChatRoomV2MessageV2()
     fun generateDefaultChatTitle(messages: List<MessageV2>): String?
     suspend fun updateChatTitle(chatRoom: ChatRoomV2, title: String)

@@ -18,6 +18,7 @@ import dev.chungjungsoo.gptmobile.data.database.entity.effectiveThoughts
 import dev.chungjungsoo.gptmobile.data.database.entity.resetActiveRevision
 import dev.chungjungsoo.gptmobile.data.database.entity.selectRevision
 import dev.chungjungsoo.gptmobile.data.database.entity.snapshotLatestAssistantRevision
+import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.data.repository.AttachmentUploadCoordinator
 import dev.chungjungsoo.gptmobile.data.repository.ChatRepository
 import dev.chungjungsoo.gptmobile.data.repository.SettingRepository
@@ -66,7 +67,7 @@ class ChatViewModel @Inject constructor(
 
     private val chatRoomId: Int = checkNotNull(savedStateHandle["chatRoomId"])
     private val enabledPlatformString: String = checkNotNull(savedStateHandle["enabledPlatforms"])
-    val enabledPlatformsInChat = enabledPlatformString.split(',')
+    val enabledPlatformsInChat = enabledPlatformString.split(',').filter { it.isNotBlank() }
 
     private val currentTimeStamp: Long
         get() = System.currentTimeMillis() / 1000
@@ -240,9 +241,76 @@ class ChatViewModel @Inject constructor(
             .mapValues { (_, model) -> model.trim() }
 
         _chatPlatformModels.update { it + sanitizedModels }
+        val deepSeekReasoningUpdates = sanitizedModels.mapNotNull { (platformUid, model) ->
+            val platform = _platformsInApp.value.firstOrNull { it.uid == platformUid && it.compatibleType == ClientType.DEEPSEEK }
+                ?: return@mapNotNull null
+            val reasoning = when {
+                model.equals("deepseek-reasoner", ignoreCase = true) -> true
+                model.equals("deepseek-chat", ignoreCase = true) -> false
+                else -> return@mapNotNull null
+            }
+            platformUid to reasoning
+        }.toMap()
+
+        if (deepSeekReasoningUpdates.isNotEmpty()) {
+            _platformsInApp.update { platforms ->
+                platforms.map { platform ->
+                    deepSeekReasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
+                }
+            }
+            _enabledPlatformsInApp.update { platforms ->
+                platforms.map { platform ->
+                    deepSeekReasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
+                }
+            }
+        }
 
         if (_chatRoom.value.id > 0) {
             viewModelScope.launch {
+                deepSeekReasoningUpdates.forEach { (platformUid, reasoning) ->
+                    _platformsInApp.value.firstOrNull { it.uid == platformUid }
+                        ?.let { settingRepository.updatePlatformV2(it.copy(reasoning = reasoning)) }
+                }
+                chatRepository.saveChatPlatformModels(_chatRoom.value.id, _chatPlatformModels.value)
+            }
+        }
+    }
+
+    fun updateDeepSeekReasoning(enabled: Boolean) {
+        val deepSeekPlatforms = _platformsInApp.value.filter { platform ->
+            platform.uid in enabledPlatformsInChat && platform.compatibleType == ClientType.DEEPSEEK
+        }
+        if (deepSeekPlatforms.isEmpty()) return
+
+        val deepSeekPlatformUids = deepSeekPlatforms.map { it.uid }.toSet()
+        _platformsInApp.update { platforms ->
+            platforms.map { platform ->
+                if (platform.uid in deepSeekPlatformUids) platform.copy(reasoning = enabled) else platform
+            }
+        }
+        _enabledPlatformsInApp.update { platforms ->
+            platforms.map { platform ->
+                if (platform.uid in deepSeekPlatformUids) platform.copy(reasoning = enabled) else platform
+            }
+        }
+
+        _chatPlatformModels.update { currentModels ->
+            currentModels + deepSeekPlatforms.associate { platform ->
+                val currentModel = currentModels[platform.uid]?.trim().orEmpty().ifBlank { platform.model }
+                val updatedModel = when {
+                    enabled && currentModel.equals("deepseek-chat", ignoreCase = true) -> "deepseek-reasoner"
+                    !enabled && currentModel.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-chat"
+                    else -> currentModel
+                }
+                platform.uid to updatedModel
+            }
+        }
+
+        viewModelScope.launch {
+            deepSeekPlatforms.forEach { platform ->
+                settingRepository.updatePlatformV2(platform.copy(reasoning = enabled))
+            }
+            if (_chatRoom.value.id > 0) {
                 chatRepository.saveChatPlatformModels(_chatRoom.value.id, _chatPlatformModels.value)
             }
         }
@@ -902,9 +970,16 @@ class ChatViewModel @Inject constructor(
 
     private fun resolvePlatformModel(platform: PlatformV2): PlatformV2 {
         val chatModel = _chatPlatformModels.value[platform.uid]?.trim().orEmpty()
-        if (chatModel.isBlank() || chatModel == platform.model) return platform
+        if (chatModel.isBlank()) return platform
 
-        return platform.copy(model = chatModel)
+        val reasoning = when {
+            platform.compatibleType == ClientType.DEEPSEEK && chatModel.equals("deepseek-reasoner", ignoreCase = true) -> true
+            platform.compatibleType == ClientType.DEEPSEEK && chatModel.equals("deepseek-chat", ignoreCase = true) -> false
+            else -> platform.reasoning
+        }
+        if (chatModel == platform.model && reasoning == platform.reasoning) return platform
+
+        return platform.copy(model = chatModel, reasoning = reasoning)
     }
 
     private fun persistCurrentChatSnapshot() {

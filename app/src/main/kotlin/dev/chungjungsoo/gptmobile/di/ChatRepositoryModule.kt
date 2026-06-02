@@ -7,14 +7,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.chungjungsoo.gptmobile.data.context.ContextBuilder
+import dev.chungjungsoo.gptmobile.data.database.dao.ChatCompactionPointV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatPlatformModelV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatRoomDao
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatRoomV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.MessageDao
 import dev.chungjungsoo.gptmobile.data.database.dao.MessageV2Dao
 import dev.chungjungsoo.gptmobile.data.network.AnthropicAPI
-import dev.chungjungsoo.gptmobile.data.network.GoogleAPI
-import dev.chungjungsoo.gptmobile.data.network.GroqAPI
 import dev.chungjungsoo.gptmobile.data.network.OpenAIAPI
 import dev.chungjungsoo.gptmobile.data.repository.ChatRepository
 import dev.chungjungsoo.gptmobile.data.repository.ChatRepositoryImpl
@@ -34,11 +33,10 @@ object ChatRepositoryModule {
         chatRoomV2Dao: ChatRoomV2Dao,
         messageV2Dao: MessageV2Dao,
         chatPlatformModelV2Dao: ChatPlatformModelV2Dao,
+        chatCompactionPointV2Dao: ChatCompactionPointV2Dao,
         settingRepository: SettingRepository,
         openAIAPI: OpenAIAPI,
-        groqAPI: GroqAPI,
         anthropicAPI: AnthropicAPI,
-        googleAPI: GoogleAPI,
         attachmentUploadCoordinator: dev.chungjungsoo.gptmobile.data.repository.AttachmentUploadCoordinator,
         contextBuilder: ContextBuilder
     ): ChatRepository = ChatRepositoryImpl(
@@ -48,11 +46,10 @@ object ChatRepositoryModule {
         chatRoomV2Dao,
         messageV2Dao,
         chatPlatformModelV2Dao,
+        chatCompactionPointV2Dao,
         settingRepository,
         openAIAPI,
-        groqAPI,
         anthropicAPI,
-        googleAPI,
         attachmentUploadCoordinator,
         contextBuilder
     )

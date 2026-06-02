@@ -44,6 +44,5 @@ data class AttachmentProviderRef(
 @Serializable
 enum class AttachmentRemoteType {
     OPENAI_FILE,
-    ANTHROPIC_FILE,
-    GOOGLE_FILE
+    ANTHROPIC_FILE
 }

@@ -5,8 +5,6 @@ import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.dto.anthropic.request.MessageRequest
 import dev.chungjungsoo.gptmobile.data.dto.anthropic.response.MessageResponseChunk
-import dev.chungjungsoo.gptmobile.data.dto.google.request.GenerateContentRequest
-import dev.chungjungsoo.gptmobile.data.dto.google.response.GenerateContentResponse
 import dev.chungjungsoo.gptmobile.data.dto.openai.request.ChatCompletionRequest
 import dev.chungjungsoo.gptmobile.data.dto.openai.request.ResponsesRequest
 import dev.chungjungsoo.gptmobile.data.dto.openai.response.ChatCompletionChunk
@@ -16,7 +14,6 @@ import dev.chungjungsoo.gptmobile.data.model.AttachmentRemoteType
 import dev.chungjungsoo.gptmobile.data.model.ChatAttachment
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.data.network.AnthropicAPI
-import dev.chungjungsoo.gptmobile.data.network.GoogleAPI
 import dev.chungjungsoo.gptmobile.data.network.OpenAIAPI
 import dev.chungjungsoo.gptmobile.data.network.UploadedProviderFile
 import java.io.File
@@ -30,7 +27,7 @@ class AttachmentUploadCoordinatorTest {
     @Test
     fun `existing openai ref is reused without upload`() = runBlocking {
         val openAIAPI = FakeOpenAIAPI(isAvailable = true)
-        val coordinator = AttachmentUploadCoordinator(openAIAPI, FakeAnthropicAPI(), FakeGoogleAPI())
+        val coordinator = AttachmentUploadCoordinator(openAIAPI, FakeAnthropicAPI())
         val message = MessageV2(
             content = "hello",
             platformType = null,
@@ -69,47 +66,9 @@ class AttachmentUploadCoordinatorTest {
         assertEquals("file-existing", updated.attachments.single().providerRefs.single().remoteId)
     }
 
-    @Test
-    fun `missing google ref uploads and stores remote uri`() = runBlocking {
-        val googleAPI = FakeGoogleAPI()
-        val coordinator = AttachmentUploadCoordinator(FakeOpenAIAPI(), FakeAnthropicAPI(), googleAPI)
-        val tempFile = File.createTempFile("attachment", ".png").apply {
-            writeBytes(ByteArray(32))
-            deleteOnExit()
-        }
-        val message = MessageV2(
-            content = "describe",
-            platformType = null,
-            attachments = listOf(
-                ChatAttachment(
-                    localFilePath = tempFile.absolutePath,
-                    preparedFilePath = tempFile.absolutePath,
-                    displayName = tempFile.name,
-                    mimeType = "image/png",
-                    sizeBytes = tempFile.length()
-                )
-            )
-        )
-
-        val updated = coordinator.ensureMessageAttachmentsForPlatform(
-            message,
-            PlatformV2(
-                uid = "google-platform",
-                name = "Google",
-                compatibleType = ClientType.GOOGLE,
-                apiUrl = "https://generativelanguage.googleapis.com",
-                model = "gemini-2.0-flash"
-            )
-        )
-
-        assertEquals(1, googleAPI.uploadCount)
-        assertEquals("google-uri", updated.attachments.single().providerRefs.single().remoteId)
-        assertEquals("files/google-file", updated.attachments.single().providerRefs.single().remoteName)
-    }
-
     @Test(expected = IllegalStateException::class)
     fun `inline attachment budget rejects oversized payloads`() = runBlocking {
-        val coordinator = AttachmentUploadCoordinator(FakeOpenAIAPI(), FakeAnthropicAPI(), FakeGoogleAPI())
+        val coordinator = AttachmentUploadCoordinator(FakeOpenAIAPI(), FakeAnthropicAPI())
         val first = File.createTempFile("inline-first", ".png").apply {
             writeBytes(ByteArray(7 * 1024 * 1024))
             deleteOnExit()
@@ -186,29 +145,4 @@ class AttachmentUploadCoordinatorTest {
         override suspend fun isFileAvailable(fileId: String): Boolean = false
     }
 
-    private class FakeGoogleAPI : GoogleAPI {
-        var uploadCount = 0
-
-        override fun setToken(token: String?) = Unit
-
-        override fun setAPIUrl(url: String) = Unit
-
-        override fun streamGenerateContent(
-            request: GenerateContentRequest,
-            model: String,
-            timeoutSeconds: Int
-        ): Flow<GenerateContentResponse> = emptyFlow()
-
-        override suspend fun uploadFile(filePath: String, fileName: String, mimeType: String): UploadedProviderFile {
-            uploadCount += 1
-            return UploadedProviderFile(
-                id = "google-id",
-                name = "files/google-file",
-                uri = "google-uri",
-                mimeType = mimeType
-            )
-        }
-
-        override suspend fun isFileAvailable(fileName: String): Boolean = false
-    }
 }

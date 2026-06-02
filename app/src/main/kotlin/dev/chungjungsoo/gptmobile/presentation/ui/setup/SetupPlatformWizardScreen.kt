@@ -81,7 +81,7 @@ fun SetupPlatformWizardScreen(
 
                 WIZARD_STEP_API_KEY -> true
 
-                // API key is optional for some providers (e.g., Ollama)
+                // API key is optional for some custom OpenAI-compatible providers.
                 WIZARD_STEP_MODEL -> modelState.value.isNotBlank()
 
                 else -> false
@@ -340,13 +340,8 @@ private fun BasicsStep(
             placeholder = { Text(stringResource(R.string.api_url_hint)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            enabled = clientType != ClientType.GOOGLE,
             supportingText = {
-                if (clientType == ClientType.GOOGLE) {
-                    Text(stringResource(R.string.client_type_google_desc))
-                } else {
-                    Text(stringResource(R.string.api_url_cautions))
-                }
+                Text(stringResource(R.string.api_url_cautions))
             }
         )
     }
@@ -378,15 +373,6 @@ private fun ApiKeyStep(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
-        if (clientType == ClientType.OLLAMA) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.api_key_optional_note),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -527,9 +513,6 @@ private fun WizardNavigationButtons(
 private fun getApiHelpUrl(clientType: ClientType): String? = when (clientType) {
     ClientType.OPENAI -> "https://platform.openai.com/account/api-keys"
     ClientType.ANTHROPIC -> "https://console.anthropic.com/settings/keys"
-    ClientType.GOOGLE -> "https://aistudio.google.com/app/apikey"
-    ClientType.GROQ -> "https://console.groq.com/keys"
-    ClientType.OLLAMA -> "https://ollama.com/blog/openai-compatibility"
-    ClientType.OPENROUTER -> "https://openrouter.ai/keys"
+    ClientType.DEEPSEEK -> "https://platform.deepseek.com/api_keys"
     ClientType.CUSTOM -> null
 }

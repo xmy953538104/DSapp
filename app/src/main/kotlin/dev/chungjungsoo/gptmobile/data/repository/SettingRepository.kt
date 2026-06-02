@@ -11,6 +11,8 @@ interface SettingRepository {
     suspend fun migrateToPlatformV2()
     suspend fun updatePlatforms(platforms: List<Platform>)
     suspend fun updateThemes(themeSetting: ThemeSetting)
+    suspend fun getAutoContextCompression(): Boolean
+    suspend fun updateAutoContextCompression(enabled: Boolean)
 
     // PlatformV2 CRUD operations
     suspend fun addPlatformV2(platform: PlatformV2)

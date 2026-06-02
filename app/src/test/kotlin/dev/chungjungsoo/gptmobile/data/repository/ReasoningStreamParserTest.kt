@@ -4,10 +4,10 @@ import dev.chungjungsoo.gptmobile.data.dto.ApiState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class GroqReasoningParserTest {
+class ReasoningStreamParserTest {
     @Test
     fun `parsed reasoning is emitted separately from content`() {
-        val parser = GroqReasoningParser()
+        val parser = ReasoningStreamParser()
 
         val emitted = parser.append(
             reasoningChunk = "Thoughts",
@@ -25,7 +25,7 @@ class GroqReasoningParserTest {
 
     @Test
     fun `raw think tags are extracted into thinking state`() {
-        val parser = GroqReasoningParser()
+        val parser = ReasoningStreamParser()
 
         val emitted = parser.append(contentChunk = "<think>Reasoning</think>Answer") + parser.flush()
 
@@ -40,7 +40,7 @@ class GroqReasoningParserTest {
 
     @Test
     fun `empty think block does not leave blank answer gap`() {
-        val parser = GroqReasoningParser()
+        val parser = ReasoningStreamParser()
 
         val emitted = parser.append(contentChunk = "<think>   \n </think>\n\nAnswer") + parser.flush()
 
@@ -54,7 +54,7 @@ class GroqReasoningParserTest {
 
     @Test
     fun `split think tags across chunks are reconstructed`() {
-        val parser = GroqReasoningParser()
+        val parser = ReasoningStreamParser()
 
         val emitted = buildList {
             addAll(parser.append(contentChunk = "<thi"))
@@ -75,7 +75,7 @@ class GroqReasoningParserTest {
 
     @Test
     fun `unclosed think block falls back to visible text`() {
-        val parser = GroqReasoningParser()
+        val parser = ReasoningStreamParser()
 
         val emitted = parser.append(contentChunk = "<think>unfinished") + parser.flush()
 

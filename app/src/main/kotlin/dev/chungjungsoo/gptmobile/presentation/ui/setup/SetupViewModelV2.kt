@@ -68,7 +68,7 @@ class SetupViewModelV2 @Inject constructor(
         _platformName.value = getDefaultPlatformName(clientType)
         _apiUrl.value = getDefaultApiUrl(clientType)
         _apiKey.value = ""
-        _model.value = ""
+        _model.value = getDefaultModel(clientType)
         _wizardStep.value = 0
     }
 
@@ -157,7 +157,7 @@ class SetupViewModelV2 @Inject constructor(
 
         1 -> true
 
-        // API key is optional for some providers (e.g., Ollama)
+        // API key is optional for some custom OpenAI-compatible providers.
         2 -> _model.value.isNotBlank()
 
         else -> false
@@ -167,21 +167,22 @@ class SetupViewModelV2 @Inject constructor(
 
     private fun getDefaultPlatformName(clientType: ClientType): String = when (clientType) {
         ClientType.OPENAI -> "OpenAI"
-        ClientType.ANTHROPIC -> "Anthropic"
-        ClientType.GOOGLE -> "Google"
-        ClientType.GROQ -> "Groq"
-        ClientType.OLLAMA -> "Ollama"
-        ClientType.OPENROUTER -> "OpenRouter"
+        ClientType.ANTHROPIC -> "Claude"
+        ClientType.DEEPSEEK -> "DeepSeek"
         ClientType.CUSTOM -> ""
     }
 
     private fun getDefaultApiUrl(clientType: ClientType): String = when (clientType) {
         ClientType.OPENAI -> ModelConstants.OPENAI_API_URL
         ClientType.ANTHROPIC -> ModelConstants.ANTHROPIC_API_URL
-        ClientType.GOOGLE -> ModelConstants.GOOGLE_API_URL
-        ClientType.GROQ -> ModelConstants.GROQ_API_URL
-        ClientType.OLLAMA -> "http://localhost:11434/"
-        ClientType.OPENROUTER -> ModelConstants.OPENROUTER_API_URL
+        ClientType.DEEPSEEK -> ModelConstants.DEEPSEEK_API_URL
+        ClientType.CUSTOM -> ""
+    }
+
+    private fun getDefaultModel(clientType: ClientType): String = when (clientType) {
+        ClientType.OPENAI -> "gpt-5.2"
+        ClientType.ANTHROPIC -> "claude-sonnet-4-5-20250929"
+        ClientType.DEEPSEEK -> "deepseek-v4-flash"
         ClientType.CUSTOM -> ""
     }
 

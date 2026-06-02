@@ -47,28 +47,13 @@ private val platformTypes = listOf(
     ),
     PlatformTypeInfo(
         clientType = ClientType.ANTHROPIC,
-        titleResId = R.string.anthropic,
-        descriptionResId = R.string.anthropic_description
+        titleResId = R.string.claude,
+        descriptionResId = R.string.claude_description
     ),
     PlatformTypeInfo(
-        clientType = ClientType.GOOGLE,
-        titleResId = R.string.google,
-        descriptionResId = R.string.google_description
-    ),
-    PlatformTypeInfo(
-        clientType = ClientType.GROQ,
-        titleResId = R.string.groq,
-        descriptionResId = R.string.groq_description
-    ),
-    PlatformTypeInfo(
-        clientType = ClientType.OLLAMA,
-        titleResId = R.string.ollama,
-        descriptionResId = R.string.ollama_description
-    ),
-    PlatformTypeInfo(
-        clientType = ClientType.OPENROUTER,
-        titleResId = R.string.openrouter,
-        descriptionResId = R.string.openrouter_description
+        clientType = ClientType.DEEPSEEK,
+        titleResId = R.string.deepseek,
+        descriptionResId = R.string.deepseek_description
     ),
     PlatformTypeInfo(
         clientType = ClientType.CUSTOM,

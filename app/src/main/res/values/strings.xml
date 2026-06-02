@@ -9,10 +9,10 @@
     <string name="sample_item_description">Item description</string>
     <string name="openai" translatable="false">OpenAI</string>
     <string name="anthropic" translatable="false">Anthropic</string>
-    <string name="google" translatable="false">Google</string>
+    <string name="claude" translatable="false">Claude</string>
     <string name="openai_description">Creator of ChatGPT.</string>
     <string name="anthropic_description">Claude was born here.</string>
-    <string name="google_description">Gemini is on its way.</string>
+    <string name="claude_description">Anthropic Claude Messages API.</string>
     <string name="next">Next</string>
     <string name="enter_api_key">Enter API Key</string>
     <string name="token_input_description">Enter the API Key of the platform you selected. This app never collect these data. These keys and chat data will be only stored in your device, and will not be sent to other servers besides API endpoints.</string>
@@ -20,10 +20,8 @@
     <string name="need_help">Need Help?</string>
     <string name="openai_api_key">OpenAI API Key</string>
     <string name="anthropic_api_key">Anthropic API Key</string>
-    <string name="google_api_key">Google API Key</string>
     <string name="openai_api_help" translatable="false">https://platform.openai.com/account/api-keys</string>
     <string name="anthropic_api_help" translatable="false">https://console.anthropic.com/settings/keys</string>
-    <string name="google_api_help" translatable="false">https://aistudio.google.com/app/apikey</string>
     <string name="select_openai_model">Select OpenAI Chat Model</string>
     <string name="select_openai_model_description">Please select the OpenAI chat model. Even if the selected model is multimodal, the app currently supports text inputs only. May be supported later in the future.</string>
     <string name="gpt_4o" translatable="false">GPT-4o</string>
@@ -44,14 +42,6 @@
     <string name="claude_3_opus_description">Excels at writing and complex tasks.</string>
     <string name="claude_3_sonnet_description">Balanced model between intelligence and speed.</string>
     <string name="claude_3_haiku_description">Anthropic\'s fastest and most compact model.</string>
-    <string name="select_google_model">Select Google Chat Model</string>
-    <string name="select_google_model_description">Gemini is a family of generative AI models made by Google. Only text inputs are supported.</string>
-    <string name="gemini_1_5_pro" translatable="false">Gemini 1.5 Pro</string>
-    <string name="gemini_1_5_flash" translatable="false">Gemini 1.5 Flash</string>
-    <string name="gemini_1_0_pro" translatable="false">Gemini 1.0 Pro</string>
-    <string name="gemini_1_5_pro_description">Optimized for reasoning tasks including code and text generation.</string>
-    <string name="gemini_1_5_flash_description">Fast and versatile performance across a diverse variety of tasks.</string>
-    <string name="gemini_1_0_pro_description">Natural language tasks, multi-turn text and code chat, and code generation.</string>
     <string name="setup_complete">You’re all set!</string>
     <string name="setup_complete_description">Let’s start using GPT Mobile!</string>
     <string name="done">Done</string>
@@ -75,9 +65,10 @@
     <string name="theme_settings">Theme Settings</string>
     <string name="supported_soon">Supported Soon</string>
     <string name="theme_description">Dynamic theme, Dark mode</string>
+    <string name="auto_context_compression">&#33258;&#21160;&#21387;&#32553;&#19978;&#19979;&#25991;</string>
+    <string name="auto_context_compression_description">&#23545;&#35805;&#36739;&#38271;&#26102;&#33258;&#21160;&#25226;&#36739;&#26089;&#20869;&#23481;&#21387;&#32553;&#25104;&#25688;&#35201;&#65292;&#24182;&#20445;&#30041;&#26368;&#36817;&#28040;&#24687;&#12290;</string>
     <string name="openai_setting">OpenAI Settings</string>
     <string name="anthropic_setting">Anthropic Settings</string>
-    <string name="google_setting">Google Settings</string>
     <string name="platform_setting_description">API Key, Model, System Prompt</string>
     <string name="enable_api">Enable API</string>
     <string name="api_key">API Key</string>
@@ -95,7 +86,6 @@
     <string name="some_platforms_disabled">Some APIs are disabled</string>
     <string name="openai_brand_text" translatable="false">Powered by OpenAI</string>
     <string name="anthropic_brand_text" translatable="false">Powered by Claude</string>
-    <string name="google_brand_text" translatable="false">Powered by Gemini</string>
     <string name="token_not_set">Token not set</string>
     <string name="token_set">Token is set as %s*****</string>
     <string name="not_set">Not set</string>
@@ -148,49 +138,30 @@
     <string name="api_url">API URL</string>
     <string name="url_icon">URL Icon</string>
     <string name="invalid_api_url">Please enter a valid URL.</string>
-    <string name="ollama" translatable="false">Ollama</string>
-    <string name="ollama_description">Use your own model.</string>
-    <string name="select_ollama_model">Select Ollama Chat Model</string>
-    <string name="ollama_setting">Ollama Settings</string>
-    <string name="ollama_brand_text" translatable="false">Powered by Ollama</string>
-    <string name="select_ollama_model_description">Please select the Ollama model. Since there is so many models and tags that are supported, you can customize the model value. Make sure that the endpoint actually supports the model and get it running. Otherwise, it will not generate a response.</string>
     <string name="custom">Custom</string>
     <string name="custom_description">Use model that is not on the list.</string>
     <string name="model_name">Model Identifier</string>
     <string name="model_custom_example">e.g. llama3.2, llava, llama3:latest, …</string>
     <string name="custom_model_warning">Note that the model name should be supported by the api.</string>
     <string name="enter_api_address">Enter API Address</string>
-    <string name="api_address_description">Please enter the address of your Ollama API including the port number. The app will be using v1/chat/completions endpoint, so please enter only the front part of the full address. The address must end with a \'/\'. e.g) http://192.168.1.100:11434/</string>
-    <string name="ollama_api_address">Ollama API Address</string>
-    <string name="ollama_api_help" translatable="false">https://ollama.com/blog/openai-compatibility</string>
     <string name="reset">Reset</string>
-    <string name="ollama_api_key">Ollama API Key</string>
     <string name="api_url_cautions">The url must end with a \'/\'.</string>
     <string name="bug_report">Bug Report</string>
     <string name="bug_report_description">Something isn\'t working correctly?</string>
     <string name="bug_report_icon">Bug Report Icon</string>
     <string name="scroll_to_bottom_icon">Scroll to bottom icon</string>
-    <string name="llama_3_2_3b" translatable="false">Llama 3.2 3B (Preview) 8k</string>
-    <string name="llama_3_2_1b" translatable="false">Llama 3.2 1B (Preview) 8k</string>
-    <string name="llama_3_1_70b_versatile" translatable="false">Llama 3.1 70B Versatile 128k</string>
-    <string name="llama_3_1_8b_instant" translatable="false">Llama 3.1 8B Instant 128k</string>
-    <string name="gemma_2_9b" translatable="false">Gemma 2 9B 8k</string>
-    <string name="llama_3_2_description">Latest Lightweight Open Source language model from Meta.</string>
-    <string name="llama_3_1_description">State-of-the-art multilingual open source large language model from Meta.</string>
-    <string name="gemma2_description">Small Language Model released by Google.</string>
-    <string name="select_groq_model">Select Groq Chat Model</string>
-    <string name="select_groq_model_description">Please select the Groq chat model. If you want models that are not on the list, check out Groq API documentation website and see what\'s available.</string>
-    <string name="groq_setting">Groq Settings</string>
-    <string name="groq_brand_text" translatable="false">Powered by Groq</string>
-    <string name="groq" translatable="false">Groq</string>
-    <string name="groq_description">Fast AI inference for openly-available models.</string>
-    <string name="groq_api_key">Groq API Key</string>
-    <string name="groq_api_help" translatable="false">https://console.groq.com/keys</string>
     <string name="options">Options</string>
     <string name="chat_models">Chat Models</string>
     <string name="chat_models_description">Set model identifiers for each provider in this chat only.</string>
     <string name="chat_model_for_platform">Model for %1$s</string>
     <string name="update_chat_models">Update Models</string>
+    <string name="estimated_tokens">&#32422; %1$d tokens</string>
+    <string name="deepseek_thinking_on">&#28145;&#24230;&#24605;&#32771;</string>
+    <string name="deepseek_thinking_off">&#24555;&#36895;&#22238;&#31572;</string>
+    <string name="deepseek_model_fast">&#24555;&#36895;&#22238;&#31572;</string>
+    <string name="deepseek_model_pro">&#19987;&#19994;&#25512;&#29702;</string>
+    <string name="deepseek_model_chat">&#26222;&#36890;&#23545;&#35805;</string>
+    <string name="deepseek_model_reasoner">&#28145;&#24230;&#24605;&#32771;</string>
     <string name="update_chat_title">Update chat title</string>
     <string name="chat_title">Chat Title</string>
     <string name="chat_title_dialog_description">AI generated title is only available with AICore supported devices.</string>
@@ -233,15 +204,13 @@
     <string name="platform_name_icon">Platform Name Icon</string>
     <string name="api_type">API Type</string>
     <string name="client_type_openai_desc">OpenAI chat completions API</string>
-    <string name="client_type_anthropic_desc">Anthropic Messages API</string>
-    <string name="client_type_google_desc">Google Gemini Generative AI API</string>
-    <string name="client_type_groq_desc">Groq OpenAI-compatible API</string>
-    <string name="client_type_ollama_desc">Ollama OpenAI-compatible API</string>
-    <string name="client_type_openrouter_desc">OpenRouter OpenAI-compatible API</string>
+    <string name="client_type_anthropic_desc">Claude Messages API</string>
+    <string name="client_type_deepseek_desc">DeepSeek OpenAI-compatible API</string>
     <string name="client_type_custom_desc">Custom OpenAI-compatible endpoint</string>
     <string name="api_url_hint">https://api.example.com</string>
     <string name="api_key_hint">sk-…</string>
     <string name="api_key_supporting">Your API key is stored locally</string>
+    <string name="loading">&#21152;&#36733;&#20013;</string>
     <string name="model">Model</string>
     <string name="model_supporting">Enter the model identifier exactly as specified by the API</string>
     <string name="save">Save</string>
@@ -255,7 +224,15 @@
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <string name="extended_thinking">Extended Thinking</string>
-    <string name="extended_thinking_description">Enable for reasoning models (o1, o3, Claude with thinking, Gemini thinking)</string>
+    <string name="extended_thinking_description">Enable for reasoning-capable models such as Claude thinking and DeepSeek thinking</string>
+    <string name="token_usage">Token &#32479;&#35745;</string>
+    <string name="token_usage_description">&#26597;&#30475;&#20840;&#37096;&#23545;&#35805;&#30340; token &#20272;&#31639;&#19982;&#21387;&#32553;&#33410;&#30465;</string>
+    <string name="total_chats_tokens">&#20849; %1$d &#20010;&#23545;&#35805;&#65292;&#32422; %2$d tokens</string>
+    <string name="total_messages_tokens">&#20849; %1$d &#26465;&#28040;&#24687;</string>
+    <string name="compacted_tokens_saved">&#33258;&#21160;&#21387;&#32553;&#24050;&#33410;&#30465;&#32422; %1$d tokens</string>
+    <string name="chat_compacted_saved">&#35813;&#23545;&#35805;&#21387;&#32553;&#33410;&#30465;&#32422; %1$d tokens</string>
+    <string name="export_diagnostic_log">&#23548;&#20986;&#35786;&#26029;&#26085;&#24535;</string>
+    <string name="export_diagnostic_log_description">&#23548;&#20986;&#24179;&#21488;&#12289;token &#32479;&#35745;&#21644;&#26368;&#36817;&#38169;&#35823;&#26085;&#24535;</string>
 
     <!-- Setup Wizard Strings -->
     <string name="your_platforms">Your Platforms</string>
@@ -271,13 +248,12 @@
     <string name="step_x_of_y">Step %1$d of %2$d</string>
     <string name="platform_basics_description">Give your platform a name and verify the API URL</string>
     <string name="api_key_description">Enter your API key. This is stored locally on your device.</string>
-    <string name="api_key_optional_note">API key is optional for local providers like Ollama</string>
     <string name="model_description">Enter the model identifier you want to use</string>
-    <string name="model_examples">Examples: gpt-4o, claude-sonnet-4-20250514, gemini-1.5-pro</string>
+    <string name="model_examples">Examples: gpt-4o, claude-sonnet-4-20250514, deepseek-v4-flash</string>
     <string name="back">Back</string>
     <string name="finish">Finish</string>
-    <string name="openrouter" translatable="false">OpenRouter</string>
-    <string name="openrouter_description">Access multiple AI models through one API</string>
+    <string name="deepseek" translatable="false">DeepSeek</string>
+    <string name="deepseek_description">Use DeepSeek V4 models with thinking mode support</string>
     <string name="custom_provider">Custom Provider</string>
     <string name="custom_provider_description">Connect to any OpenAI-compatible API</string>
     <string name="platform_added_successfully">Platform added successfully</string>

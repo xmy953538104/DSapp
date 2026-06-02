@@ -37,6 +37,10 @@ data class ChatCompletionRequest(
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     val reasoningEffort: String? = null,
 
+    @SerialName("thinking")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val thinking: ThinkingConfig? = null,
+
     @SerialName("presence_penalty")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     val presencePenalty: Float? = null,
@@ -48,4 +52,10 @@ data class ChatCompletionRequest(
     @SerialName("stop")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     val stop: List<String>? = null
+)
+
+@Serializable
+data class ThinkingConfig(
+    @SerialName("type")
+    val type: String
 )

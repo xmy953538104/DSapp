@@ -9,7 +9,6 @@ import dev.chungjungsoo.gptmobile.data.model.AttachmentRemoteType
 import dev.chungjungsoo.gptmobile.data.model.ChatAttachment
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.data.network.AnthropicAPI
-import dev.chungjungsoo.gptmobile.data.network.GoogleAPI
 import dev.chungjungsoo.gptmobile.data.network.OpenAIAPI
 import dev.chungjungsoo.gptmobile.util.FileUtils
 import java.io.File
@@ -19,8 +18,7 @@ import kotlinx.coroutines.withContext
 
 class AttachmentUploadCoordinator @Inject constructor(
     private val openAIAPI: OpenAIAPI,
-    private val anthropicAPI: AnthropicAPI,
-    private val googleAPI: GoogleAPI
+    private val anthropicAPI: AnthropicAPI
 ) {
     suspend fun prepareLocalAttachment(context: Context, filePath: String): ChatAttachment? = withContext(Dispatchers.IO) {
         val preparationResult = FileUtils.prepareAttachmentForUpload(context, filePath) ?: return@withContext null
@@ -43,7 +41,6 @@ class AttachmentUploadCoordinator @Inject constructor(
         val updatedAttachments = when (platform.compatibleType) {
             ClientType.OPENAI -> message.attachments.map { ensureOpenAIRef(it, platform.uid) }
             ClientType.ANTHROPIC -> message.attachments.map { ensureAnthropicRef(it, platform.uid) }
-            ClientType.GOOGLE -> message.attachments.map { ensureGoogleRef(it, platform.uid) }
             else -> message.attachments
         }
         return if (updatedAttachments == message.attachments) message else message.copy(attachments = updatedAttachments)
@@ -71,7 +68,7 @@ class AttachmentUploadCoordinator @Inject constructor(
 
         if (totalPreparedBytes > maxInlineBytes) {
             throw IllegalStateException(
-                "These images are too large to upload safely on this provider. Remove some images or use OpenAI, Anthropic, or Google."
+                "These images are too large to upload safely on this provider. Remove some images or use OpenAI or Claude."
             )
         }
     }
@@ -114,33 +111,6 @@ class AttachmentUploadCoordinator @Inject constructor(
                 platformUid = platformUid,
                 remoteType = AttachmentRemoteType.ANTHROPIC_FILE,
                 remoteId = uploadFile.id,
-                mimeType = uploadFile.mimeType,
-                uploadedAt = System.currentTimeMillis() / 1000
-            )
-        )
-    }
-
-    private suspend fun ensureGoogleRef(attachment: ChatAttachment, platformUid: String): ChatAttachment {
-        val existingRef = attachment.providerRefFor(platformUid)
-        if (
-            existingRef?.remoteType == AttachmentRemoteType.GOOGLE_FILE &&
-            !existingRef.remoteName.isNullOrBlank() &&
-            googleAPI.isFileAvailable(existingRef.remoteName)
-        ) {
-            return attachment
-        }
-
-        val uploadFile = googleAPI.uploadFile(
-            filePath = resolveUploadFilePath(attachment),
-            fileName = attachment.resolvedDisplayName,
-            mimeType = resolveMimeType(attachment)
-        )
-        return attachment.upsertProviderRef(
-            AttachmentProviderRef(
-                platformUid = platformUid,
-                remoteType = AttachmentRemoteType.GOOGLE_FILE,
-                remoteId = uploadFile.uri ?: uploadFile.id,
-                remoteName = uploadFile.name,
                 mimeType = uploadFile.mimeType,
                 uploadedAt = System.currentTimeMillis() / 1000
             )

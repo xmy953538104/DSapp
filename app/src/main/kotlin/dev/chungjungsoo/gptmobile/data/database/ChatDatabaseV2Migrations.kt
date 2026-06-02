@@ -213,6 +213,74 @@ object ChatDatabaseV2Migrations {
         }
     }
 
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            val removedPlatformUids = mutableSetOf<String>()
+            db.query(
+                "SELECT `uid` FROM `platform_v2` " +
+                    "WHERE `compatible_type` NOT IN ('OPENAI', 'ANTHROPIC', 'DEEPSEEK', 'CUSTOM')"
+            ).use { cursor ->
+                val uidIndex = cursor.getColumnIndex("uid")
+                while (cursor.moveToNext()) {
+                    removedPlatformUids += cursor.getString(uidIndex)
+                }
+            }
+
+            if (removedPlatformUids.isNotEmpty()) {
+                val removedPlatformUidArgs = removedPlatformUids.map { it as Any }.toTypedArray()
+                db.query("SELECT `chat_id`, `enabled_platform` FROM `chats_v2`").use { cursor ->
+                    val chatIdIndex = cursor.getColumnIndex("chat_id")
+                    val enabledPlatformIndex = cursor.getColumnIndex("enabled_platform")
+                    while (cursor.moveToNext()) {
+                        val chatId = cursor.getInt(chatIdIndex)
+                        val enabledPlatforms = cursor.getString(enabledPlatformIndex)
+                            .split(",")
+                            .filter { it.isNotBlank() && it !in removedPlatformUids }
+                            .joinToString(",")
+                        db.execSQL(
+                            "UPDATE `chats_v2` SET `enabled_platform` = ? WHERE `chat_id` = ?",
+                            arrayOf(enabledPlatforms, chatId)
+                        )
+                    }
+                }
+
+                db.execSQL(
+                    "DELETE FROM `chat_platform_model_v2` WHERE `platform_uid` IN (" +
+                        removedPlatformUids.joinToString(",") { "?" } +
+                        ")",
+                    removedPlatformUidArgs
+                )
+                db.execSQL(
+                    "DELETE FROM `platform_v2` WHERE `uid` IN (" +
+                        removedPlatformUids.joinToString(",") { "?" } +
+                        ")",
+                    removedPlatformUidArgs
+                )
+            }
+
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `chat_compaction_point_v2` (
+                    `compaction_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `chat_id` INTEGER NOT NULL,
+                    `platform_uid` TEXT NOT NULL,
+                    `summary` TEXT NOT NULL,
+                    `boundary_message_id` INTEGER NOT NULL,
+                    `tokens_before` INTEGER NOT NULL,
+                    `tokens_after` INTEGER NOT NULL,
+                    `created_at` INTEGER NOT NULL,
+                    FOREIGN KEY(`chat_id`) REFERENCES `chats_v2`(`chat_id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_chat_compaction_point_v2_chat_id` ON `chat_compaction_point_v2` (`chat_id`)")
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_chat_compaction_point_v2_chat_id_platform_uid` " +
+                    "ON `chat_compaction_point_v2` (`chat_id`, `platform_uid`)"
+            )
+        }
+    }
+
     internal fun legacyFilesToAttachmentsJson(filesValue: String): String {
         val attachments = filesValue
             .split(",")

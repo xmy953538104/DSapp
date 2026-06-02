@@ -163,8 +163,9 @@ fun PlatformSettingScreen(
                         )
                     }
                 )
-                // Disable temperature and top_p when reasoning is enabled for OpenAI
-                val isReasoningDisabled = platformData.compatibleType == ClientType.OPENAI && platformData.reasoning
+                val isReasoningDisabled =
+                    platformData.reasoning &&
+                        (platformData.compatibleType == ClientType.OPENAI || platformData.compatibleType == ClientType.DEEPSEEK)
                 val notSetText = stringResource(R.string.not_set)
                 SettingItem(
                     modifier = Modifier.height(64.dp),

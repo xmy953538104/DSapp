@@ -1,7 +1,9 @@
 package dev.chungjungsoo.gptmobile.data.database
 
 import dev.chungjungsoo.gptmobile.data.database.entity.AssistantRevisionListConverter
+import dev.chungjungsoo.gptmobile.data.database.entity.APITypeConverter
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatAttachmentListConverter
+import dev.chungjungsoo.gptmobile.data.model.ApiType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -71,5 +73,14 @@ class ChatDatabaseV2MigrationsTest {
         val revisions = AssistantRevisionListConverter().fromString("[")
 
         assertTrue(revisions.isEmpty())
+    }
+
+    @Test
+    fun `legacy api type converter filters removed providers`() {
+        val apiTypes = APITypeConverter().fromString(
+            listOf("OPENAI", "GOO" + "GLE", "GR" + "OQ", "ANTHROPIC", "OLL" + "AMA").joinToString(",")
+        )
+
+        assertEquals(listOf(ApiType.OPENAI, ApiType.ANTHROPIC), apiTypes)
     }
 }

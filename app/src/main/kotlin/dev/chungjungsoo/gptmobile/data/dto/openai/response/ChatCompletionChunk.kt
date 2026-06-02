@@ -41,6 +41,9 @@ data class Delta(
     @SerialName("role")
     val role: String? = null,
 
+    @SerialName("reasoning_content")
+    val reasoningContent: String? = null,
+
     @SerialName("content")
     val content: String? = null
 )

@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +49,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -95,6 +97,8 @@ import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveContent
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveThoughts
+import dev.chungjungsoo.gptmobile.data.model.ClientType
+import dev.chungjungsoo.gptmobile.util.estimateMessagesTokens
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -132,8 +136,20 @@ fun ChatScreen(
     val appAllPlatforms by chatViewModel.platformsInApp.collectAsStateWithLifecycle()
     val chatPlatformModels by chatViewModel.chatPlatformModels.collectAsStateWithLifecycle()
     val enabledPlatformLookup = remember(appEnabledPlatforms) { appEnabledPlatforms.associateBy { it.uid } }
-    val canUseChat = (chatViewModel.enabledPlatformsInChat.toSet() - appEnabledPlatforms.map { it.uid }.toSet()).isEmpty()
+    val chatPlatformSet = chatViewModel.enabledPlatformsInChat.toSet()
+    val canUseChat = chatPlatformSet.isNotEmpty() && (chatPlatformSet - appEnabledPlatforms.map { it.uid }.toSet()).isEmpty()
     val isIdle = loadingStates.all { it == ChatViewModel.LoadingState.Idle }
+    val deepSeekPlatformsInChat = remember(appEnabledPlatforms, chatViewModel.enabledPlatformsInChat) {
+        appEnabledPlatforms.filter { platform ->
+            platform.uid in chatViewModel.enabledPlatformsInChat && platform.compatibleType == ClientType.DEEPSEEK
+        }
+    }
+    val isDeepSeekThinkingEnabled = deepSeekPlatformsInChat.any { platform ->
+        platform.reasoning || chatPlatformModels[platform.uid]?.equals("deepseek-reasoner", ignoreCase = true) == true
+    }
+    val currentTokenEstimate = remember(groupedMessages) {
+        estimateMessagesTokens(groupedMessages.userMessages + groupedMessages.assistantMessages.flatten())
+    }
     val context = LocalContext.current
     val lastMessageIndex = groupedMessages.userMessages.lastIndex
 
@@ -292,8 +308,14 @@ fun ChatScreen(
                 chatEnabled = canUseChat,
                 sendButtonEnabled = isIdle,
                 selectedAttachments = selectedAttachments,
+                showModelButton = chatViewModel.enabledPlatformsInChat.isNotEmpty(),
+                deepSeekThinkingAvailable = deepSeekPlatformsInChat.isNotEmpty(),
+                deepSeekThinkingEnabled = isDeepSeekThinkingEnabled,
+                tokenEstimate = currentTokenEstimate,
                 onFileSelected = { filePath -> chatViewModel.addSelectedFile(filePath) },
-                onFileRemoved = { filePath -> chatViewModel.removeSelectedFile(filePath) }
+                onFileRemoved = { filePath -> chatViewModel.removeSelectedFile(filePath) },
+                onModelButtonClick = chatViewModel::openChatModelDialog,
+                onDeepSeekThinkingToggle = chatViewModel::updateDeepSeekReasoning
             ) {
                 chatViewModel.askQuestion()
                 focusManager.clearFocus()
@@ -313,10 +335,14 @@ fun ChatScreen(
             val platformNames = chatViewModel.enabledPlatformsInChat.associateWith { uid ->
                 appAllPlatforms.find { it.uid == uid }?.name ?: stringResource(R.string.unknown)
             }
+            val platformTypes = chatViewModel.enabledPlatformsInChat.associateWith { uid ->
+                appAllPlatforms.find { it.uid == uid }?.compatibleType ?: ClientType.CUSTOM
+            }
             ChatModelDialog(
                 platformOrder = chatViewModel.enabledPlatformsInChat,
                 initialModels = chatPlatformModels,
                 platformNames = platformNames,
+                platformTypes = platformTypes,
                 onDismissRequest = chatViewModel::closeChatModelDialog,
                 onConfirmRequest = { models ->
                     chatViewModel.updateChatPlatformModels(models)
@@ -677,8 +703,14 @@ fun ChatInputBox(
     chatEnabled: Boolean = true,
     sendButtonEnabled: Boolean = true,
     selectedAttachments: List<ChatAttachmentDraft> = emptyList(),
+    showModelButton: Boolean = false,
+    deepSeekThinkingAvailable: Boolean = false,
+    deepSeekThinkingEnabled: Boolean = false,
+    tokenEstimate: Int = 0,
     onFileSelected: (String) -> Unit = {},
     onFileRemoved: (String) -> Unit = {},
+    onModelButtonClick: () -> Unit = {},
+    onDeepSeekThinkingToggle: (Boolean) -> Unit = {},
     onSendButtonClick: () -> Unit = {}
 ) {
     val localStyle = LocalTextStyle.current
@@ -711,6 +743,52 @@ fun ChatInputBox(
                 selectedAttachments = selectedAttachments,
                 onFileRemoved = onFileRemoved
             )
+        }
+        if (showModelButton || deepSeekThinkingAvailable || tokenEstimate > 0) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (deepSeekThinkingAvailable) {
+                    FilterChip(
+                        selected = deepSeekThinkingEnabled,
+                        enabled = chatEnabled && sendButtonEnabled,
+                        onClick = { onDeepSeekThinkingToggle(!deepSeekThinkingEnabled) },
+                        label = {
+                            Text(
+                                text = stringResource(
+                                    if (deepSeekThinkingEnabled) {
+                                        R.string.deepseek_thinking_on
+                                    } else {
+                                        R.string.deepseek_thinking_off
+                                    }
+                                )
+                            )
+                        }
+                    )
+                }
+                if (showModelButton) {
+                    IconButton(
+                        enabled = chatEnabled && sendButtonEnabled,
+                        onClick = onModelButtonClick
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_model),
+                            contentDescription = stringResource(R.string.chat_models)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = stringResource(R.string.estimated_tokens, tokenEstimate),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
+                )
+            }
         }
         BasicTextField(
             state = inputState,

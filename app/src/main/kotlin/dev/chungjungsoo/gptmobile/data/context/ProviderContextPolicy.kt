@@ -28,23 +28,7 @@ data class ProviderContextPolicy(
                 )
             }
 
-            ClientType.GOOGLE -> {
-                ProviderContextPolicy(
-                    recentTurnWindow = 10,
-                    historicalImageTurnWindow = 10,
-                    preferProviderFileRefs = true
-                )
-            }
-
-            ClientType.GROQ -> {
-                ProviderContextPolicy(
-                    recentTurnWindow = 8,
-                    historicalImageTurnWindow = 0,
-                    maxInlineAttachmentBytes = INLINE_ATTACHMENT_LIMIT_BYTES
-                )
-            }
-
-            ClientType.OLLAMA, ClientType.OPENROUTER, ClientType.CUSTOM -> {
+            ClientType.DEEPSEEK, ClientType.CUSTOM -> {
                 ProviderContextPolicy(
                     recentTurnWindow = 6,
                     historicalImageTurnWindow = 0,

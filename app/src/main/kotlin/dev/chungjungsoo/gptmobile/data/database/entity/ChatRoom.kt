@@ -30,7 +30,9 @@ class APITypeConverter {
     fun fromString(value: String): List<ApiType> {
         val splitted = value.split(',')
 
-        return splitted.map { s -> ApiType.valueOf(s) }
+        return splitted.mapNotNull { s ->
+            runCatching { ApiType.valueOf(s.trim()) }.getOrNull()
+        }
     }
 
     @TypeConverter

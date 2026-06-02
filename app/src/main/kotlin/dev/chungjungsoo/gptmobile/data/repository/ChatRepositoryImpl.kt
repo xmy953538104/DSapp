@@ -5,11 +5,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.chungjungsoo.gptmobile.data.context.ContextBuilder
 import dev.chungjungsoo.gptmobile.data.context.ConversationTurn
 import dev.chungjungsoo.gptmobile.data.context.ProviderContextPolicy
+import dev.chungjungsoo.gptmobile.data.database.dao.ChatCompactionPointV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatPlatformModelV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatRoomDao
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatRoomV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.MessageDao
 import dev.chungjungsoo.gptmobile.data.database.dao.MessageV2Dao
+import dev.chungjungsoo.gptmobile.data.database.entity.ChatCompactionPointV2
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatPlatformModelV2
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatRoom
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatRoomV2
@@ -26,12 +28,6 @@ import dev.chungjungsoo.gptmobile.data.dto.anthropic.common.MessageRole
 import dev.chungjungsoo.gptmobile.data.dto.anthropic.common.TextContent as AnthropicTextContent
 import dev.chungjungsoo.gptmobile.data.dto.anthropic.request.InputMessage
 import dev.chungjungsoo.gptmobile.data.dto.anthropic.request.MessageRequest
-import dev.chungjungsoo.gptmobile.data.dto.google.common.Content
-import dev.chungjungsoo.gptmobile.data.dto.google.common.Part
-import dev.chungjungsoo.gptmobile.data.dto.google.common.Role as GoogleRole
-import dev.chungjungsoo.gptmobile.data.dto.google.request.GenerateContentRequest
-import dev.chungjungsoo.gptmobile.data.dto.google.request.GenerationConfig
-import dev.chungjungsoo.gptmobile.data.dto.groq.request.GroqChatCompletionRequest
 import dev.chungjungsoo.gptmobile.data.dto.openai.common.ImageContent as OpenAIImageContent
 import dev.chungjungsoo.gptmobile.data.dto.openai.common.ImageUrl
 import dev.chungjungsoo.gptmobile.data.dto.openai.common.MessageContent as OpenAIMessageContent
@@ -44,6 +40,7 @@ import dev.chungjungsoo.gptmobile.data.dto.openai.request.ResponseContentPart
 import dev.chungjungsoo.gptmobile.data.dto.openai.request.ResponseInputContent
 import dev.chungjungsoo.gptmobile.data.dto.openai.request.ResponseInputMessage
 import dev.chungjungsoo.gptmobile.data.dto.openai.request.ResponsesRequest
+import dev.chungjungsoo.gptmobile.data.dto.openai.request.ThinkingConfig
 import dev.chungjungsoo.gptmobile.data.dto.openai.response.OutputTextDeltaEvent
 import dev.chungjungsoo.gptmobile.data.dto.openai.response.ReasoningSummaryTextDeltaEvent
 import dev.chungjungsoo.gptmobile.data.dto.openai.response.ResponseErrorEvent
@@ -51,11 +48,14 @@ import dev.chungjungsoo.gptmobile.data.dto.openai.response.ResponseFailedEvent
 import dev.chungjungsoo.gptmobile.data.model.ApiType
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.data.network.AnthropicAPI
-import dev.chungjungsoo.gptmobile.data.network.GoogleAPI
-import dev.chungjungsoo.gptmobile.data.network.GroqAPI
 import dev.chungjungsoo.gptmobile.data.network.OpenAIAPI
+import dev.chungjungsoo.gptmobile.util.AppLogger
 import dev.chungjungsoo.gptmobile.util.AttachmentPayloadCache
+import dev.chungjungsoo.gptmobile.util.ChatTokenStats
 import dev.chungjungsoo.gptmobile.util.FileUtils
+import dev.chungjungsoo.gptmobile.util.TokenUsageStats
+import dev.chungjungsoo.gptmobile.util.estimateMessagesTokens
+import dev.chungjungsoo.gptmobile.util.estimateTextTokens
 import dev.chungjungsoo.gptmobile.util.stripAssistantErrorNote
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -67,6 +67,16 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 
+private const val AUTO_CONTEXT_COMPRESSION_MIN_OMITTED_TURNS = 2
+private const val AUTO_CONTEXT_COMPRESSION_MAX_MESSAGE_CHARS = 1200
+private const val AUTO_CONTEXT_COMPRESSION_TRIGGER_TOKENS = 6000
+private const val AUTO_CONTEXT_COMPRESSION_SUMMARY_MAX_TOKENS = 1200
+
+private data class PreparedContext(
+    val turns: List<ConversationTurn>,
+    val systemPrompt: String?
+)
+
 class ChatRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val chatRoomDao: ChatRoomDao,
@@ -74,11 +84,10 @@ class ChatRepositoryImpl @Inject constructor(
     private val chatRoomV2Dao: ChatRoomV2Dao,
     private val messageV2Dao: MessageV2Dao,
     private val chatPlatformModelV2Dao: ChatPlatformModelV2Dao,
+    private val chatCompactionPointV2Dao: ChatCompactionPointV2Dao,
     private val settingRepository: SettingRepository,
     private val openAIAPI: OpenAIAPI,
-    private val groqAPI: GroqAPI,
     private val anthropicAPI: AnthropicAPI,
-    private val googleAPI: GoogleAPI,
     private val attachmentUploadCoordinator: AttachmentUploadCoordinator,
     private val contextBuilder: ContextBuilder
 ) : ChatRepository {
@@ -129,11 +138,11 @@ class ChatRepositoryImpl @Inject constructor(
             completeChatWithOpenAIResponses(userMessages, assistantMessages, platform)
         }
 
-        ClientType.GROQ -> {
-            completeChatWithGroq(userMessages, assistantMessages, platform)
+        ClientType.DEEPSEEK -> {
+            completeChatWithDeepSeek(userMessages, assistantMessages, platform)
         }
 
-        ClientType.OLLAMA, ClientType.OPENROUTER, ClientType.CUSTOM -> {
+        ClientType.CUSTOM -> {
             // Use Chat Completions API for OpenAI-compatible services
             completeChatWithOpenAIChatCompletions(userMessages, assistantMessages, platform)
         }
@@ -142,9 +151,58 @@ class ChatRepositoryImpl @Inject constructor(
             completeChatWithAnthropic(userMessages, assistantMessages, platform)
         }
 
-        ClientType.GOOGLE -> {
-            completeChatWithGoogle(userMessages, assistantMessages, platform)
+    }
+
+    private suspend fun completeChatWithDeepSeek(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platform: PlatformV2
+    ): Flow<ApiState> = try {
+        openAIAPI.setToken(platform.token)
+        openAIAPI.setAPIUrl(platform.apiUrl)
+
+        streamPreparedApiState(
+            prepare = {
+                val normalizedPlatform = platform.withDeepSeekThinkingModel()
+                val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, normalizedPlatform)
+                val contextTurns = preparedContext.turns
+                validateInlineBudgetIfNeeded(contextTurns, normalizedPlatform)
+                val messages = buildOpenAIChatMessages(contextTurns, preparedContext.systemPrompt)
+
+                createDeepSeekChatCompletionRequest(messages, normalizedPlatform)
+            },
+            stream = { request ->
+                flow {
+                    val parser = ReasoningStreamParser()
+                    openAIAPI.streamChatCompletion(request, platform.timeout).collect { chunk ->
+                        when {
+                            chunk.error != null -> {
+                                AppLogger.error(context, "ChatRepository", "DeepSeek API error for ${platform.name}: ${chunk.error.message}")
+                                emit(ApiState.Error(chunk.error.message))
+                            }
+
+                            else -> {
+                                val delta = chunk.choices?.firstOrNull()?.delta
+                                parser.append(
+                                    reasoningChunk = delta?.reasoningContent,
+                                    contentChunk = delta?.content
+                                ).forEach { emit(it) }
+                            }
+                        }
+                    }
+
+                    parser.flush().forEach { emit(it) }
+                }
+            }
+        ).catch { e ->
+            AppLogger.error(context, "ChatRepository", "DeepSeek request preparation failed for ${platform.name}", e)
+            emit(ApiState.Error(e.message ?: "Unknown error"))
+        }.onCompletion {
+            emit(ApiState.Done)
         }
+    } catch (e: Exception) {
+        AppLogger.error(context, "ChatRepository", "DeepSeek completion failed for ${platform.name}", e)
+        flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
     }
 
     private suspend fun completeChatWithOpenAIResponses(
@@ -157,14 +215,15 @@ class ChatRepositoryImpl @Inject constructor(
 
         streamPreparedApiState(
             prepare = {
-                val contextTurns = buildContextTurns(userMessages, assistantMessages, platform)
+                val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, platform)
+                val contextTurns = preparedContext.turns
                 val inputMessages = buildResponsesInputMessages(contextTurns, platform.uid)
 
                 ResponsesRequest(
                     model = platform.model,
                     input = inputMessages,
                     stream = true,
-                    instructions = platform.systemPrompt?.takeIf { it.isNotBlank() },
+                    instructions = preparedContext.systemPrompt?.takeIf { it.isNotBlank() },
                     temperature = if (platform.reasoning) null else platform.temperature,
                     topP = if (platform.reasoning) null else platform.topP,
                     reasoning = if (platform.reasoning) {
@@ -187,10 +246,14 @@ class ChatRepositoryImpl @Inject constructor(
 
                             is ResponseFailedEvent -> {
                                 val errorMessage = event.response.error?.message ?: "Response failed"
+                                AppLogger.error(context, "ChatRepository", "OpenAI response failed for ${platform.name}: $errorMessage")
                                 emit(ApiState.Error(errorMessage))
                             }
 
-                            is ResponseErrorEvent -> emit(ApiState.Error(event.message))
+                            is ResponseErrorEvent -> {
+                                AppLogger.error(context, "ChatRepository", "OpenAI API error for ${platform.name}: ${event.message}")
+                                emit(ApiState.Error(event.message))
+                            }
 
                             else -> {}
                         }
@@ -198,58 +261,13 @@ class ChatRepositoryImpl @Inject constructor(
                 }
             }
         ).catch { e ->
+            AppLogger.error(context, "ChatRepository", "OpenAI request preparation failed for ${platform.name}", e)
             emit(ApiState.Error(e.message ?: "Unknown error"))
         }.onCompletion {
             emit(ApiState.Done)
         }
     } catch (e: Exception) {
-        flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
-    }
-
-    private suspend fun completeChatWithGroq(
-        userMessages: List<MessageV2>,
-        assistantMessages: List<List<MessageV2>>,
-        platform: PlatformV2
-    ): Flow<ApiState> = try {
-        streamPreparedApiState(
-            prepare = {
-                val contextTurns = buildContextTurns(userMessages, assistantMessages, platform)
-                validateInlineBudgetIfNeeded(contextTurns, platform)
-                val messages = buildOpenAIChatMessages(contextTurns, platform.systemPrompt)
-
-                createGroqChatCompletionRequest(messages, platform)
-            },
-            stream = { request ->
-                flow {
-                    val parser = GroqReasoningParser()
-                    groqAPI.streamChatCompletion(
-                        request = request,
-                        timeoutSeconds = platform.timeout,
-                        token = platform.token,
-                        apiUrl = platform.apiUrl
-                    ).collect { chunk ->
-                        when {
-                            chunk.error != null -> emit(ApiState.Error(chunk.error.message))
-
-                            else -> {
-                                val choice = chunk.choices?.firstOrNull()
-                                parser.append(
-                                    reasoningChunk = choice?.delta?.reasoning ?: choice?.message?.reasoning,
-                                    contentChunk = choice?.delta?.content ?: choice?.message?.content
-                                ).forEach { emit(it) }
-                            }
-                        }
-                    }
-
-                    parser.flush().forEach { emit(it) }
-                }
-            }
-        ).catch { e ->
-            emit(ApiState.Error(e.message ?: "Unknown error"))
-        }.onCompletion {
-            emit(ApiState.Done)
-        }
-    } catch (e: Exception) {
+        AppLogger.error(context, "ChatRepository", "OpenAI completion failed for ${platform.name}", e)
         flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
     }
 
@@ -263,9 +281,10 @@ class ChatRepositoryImpl @Inject constructor(
 
         streamPreparedApiState(
             prepare = {
-                val contextTurns = buildContextTurns(userMessages, assistantMessages, platform)
+                val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, platform)
+                val contextTurns = preparedContext.turns
                 validateInlineBudgetIfNeeded(contextTurns, platform)
-                val messages = buildOpenAIChatMessages(contextTurns, platform.systemPrompt)
+                val messages = buildOpenAIChatMessages(contextTurns, preparedContext.systemPrompt)
 
                 ChatCompletionRequest(
                     model = platform.model,
@@ -279,7 +298,10 @@ class ChatRepositoryImpl @Inject constructor(
                 flow {
                     openAIAPI.streamChatCompletion(request, platform.timeout).collect { chunk ->
                         when {
-                            chunk.error != null -> emit(ApiState.Error(chunk.error.message))
+                            chunk.error != null -> {
+                                AppLogger.error(context, "ChatRepository", "OpenAI-compatible API error for ${platform.name}: ${chunk.error.message}")
+                                emit(ApiState.Error(chunk.error.message))
+                            }
 
                             chunk.choices?.firstOrNull()?.delta?.content != null -> {
                                 emit(ApiState.Success(chunk.choices.first().delta.content!!))
@@ -289,26 +311,307 @@ class ChatRepositoryImpl @Inject constructor(
                 }
             }
         ).catch { e ->
+            AppLogger.error(context, "ChatRepository", "OpenAI-compatible request preparation failed for ${platform.name}", e)
             emit(ApiState.Error(e.message ?: "Unknown error"))
         }.onCompletion {
             emit(ApiState.Done)
         }
     } catch (e: Exception) {
+        AppLogger.error(context, "ChatRepository", "OpenAI-compatible completion failed for ${platform.name}", e)
         flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
+    }
+
+    private suspend fun prepareContextForCompletion(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platform: PlatformV2
+    ): PreparedContext {
+        val compactionPoint = maybeRunAutoContextCompaction(userMessages, assistantMessages, platform)
+        val effectiveCompactionPoint = compactionPoint?.takeIf { point ->
+            userMessages.any { it.id == point.boundaryMessageId }
+        }
+        val contextTurns = buildContextTurns(userMessages, assistantMessages, platform, effectiveCompactionPoint)
+        return PreparedContext(
+            turns = contextTurns,
+            systemPrompt = buildSystemPromptWithCompactionSummary(platform.systemPrompt, effectiveCompactionPoint?.summary)
+        )
     }
 
     private suspend fun buildContextTurns(
         userMessages: List<MessageV2>,
         assistantMessages: List<List<MessageV2>>,
-        platform: PlatformV2
+        platform: PlatformV2,
+        compactionPoint: ChatCompactionPointV2? = null
     ): List<ConversationTurn> {
         val policy = ProviderContextPolicy.forClientType(platform.compatibleType)
-        val contextTurns = contextBuilder.build(userMessages, assistantMessages, platform, policy)
+        val boundaryIndex = compactionPoint?.boundaryMessageId
+            ?.takeIf { it > 0 }
+            ?.let { boundaryId -> userMessages.indexOfFirst { it.id == boundaryId } }
+            ?: -1
+        val dropCount = if (boundaryIndex >= 0) boundaryIndex + 1 else 0
+        val scopedUserMessages = userMessages.drop(dropCount)
+        val scopedAssistantMessages = assistantMessages.drop(dropCount)
+
+        val contextTurns = contextBuilder.build(scopedUserMessages, scopedAssistantMessages, platform, policy)
         if (!policy.preferProviderFileRefs || contextTurns.isEmpty()) {
             return contextTurns
         }
 
         return ensureProviderReferencesForTurns(contextTurns, platform)
+    }
+
+    private suspend fun maybeRunAutoContextCompaction(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platform: PlatformV2
+    ): ChatCompactionPointV2? {
+        val chatId = userMessages.firstOrNull()?.chatId ?: return null
+        val latestPoint = if (chatId > 0) {
+            chatCompactionPointV2Dao.getLatestForPlatform(chatId, platform.uid)
+        } else {
+            null
+        }
+
+        if (chatId <= 0 || !isAutoContextCompressionEnabled()) return latestPoint
+        if (userMessages.size < AUTO_CONTEXT_COMPRESSION_MIN_OMITTED_TURNS + 1) return latestPoint
+
+        val latestBoundaryIndex = latestPoint?.boundaryMessageId
+            ?.takeIf { it > 0 }
+            ?.let { boundaryId -> userMessages.indexOfFirst { it.id == boundaryId } }
+            ?: -1
+        val candidateBoundaryIndex = userMessages.lastIndex - 1
+        if (candidateBoundaryIndex <= latestBoundaryIndex) return latestPoint
+
+        val newTurnCount = candidateBoundaryIndex - latestBoundaryIndex
+        if (newTurnCount < AUTO_CONTEXT_COMPRESSION_MIN_OMITTED_TURNS) return latestPoint
+
+        val historyMessages = collectMessagesThroughBoundary(userMessages, assistantMessages, platform.uid, candidateBoundaryIndex)
+        val historyTokens = estimateMessagesTokens(historyMessages)
+        val policy = ProviderContextPolicy.forClientType(platform.compatibleType)
+        val hasMoreThanRecentWindow = candidateBoundaryIndex + 1 > policy.recentTurnWindow + AUTO_CONTEXT_COMPRESSION_MIN_OMITTED_TURNS
+        if (historyTokens < AUTO_CONTEXT_COMPRESSION_TRIGGER_TOKENS && !hasMoreThanRecentWindow) {
+            return latestPoint
+        }
+
+        val startIndex = latestBoundaryIndex + 1
+        val entries = buildCompactionEntries(userMessages, assistantMessages, platform.uid, startIndex, candidateBoundaryIndex)
+        if (entries.isBlank()) return latestPoint
+
+        val summary = try {
+            generateCompactionSummary(platform, latestPoint?.summary, entries)
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
+        } catch (e: Exception) {
+            AppLogger.error(context, "ContextCompaction", "Failed to compact chat=$chatId platform=${platform.name}", e)
+            null
+        } ?: return latestPoint
+
+        val boundaryMessage = userMessages[candidateBoundaryIndex]
+        if (boundaryMessage.id <= 0) return latestPoint
+
+        val messagesAfterBoundary = collectMessagesAfterBoundary(userMessages, assistantMessages, platform.uid, candidateBoundaryIndex)
+        val tokensAfter = estimateTextTokens(summary) + estimateMessagesTokens(messagesAfterBoundary)
+        val point = ChatCompactionPointV2(
+            chatId = chatId,
+            platformUid = platform.uid,
+            summary = summary,
+            boundaryMessageId = boundaryMessage.id,
+            tokensBefore = historyTokens,
+            tokensAfter = tokensAfter
+        )
+        chatCompactionPointV2Dao.addCompactionPoint(point)
+        return point
+    }
+
+    private fun buildSystemPromptWithCompactionSummary(
+        baseSystemPrompt: String?,
+        summary: String?
+    ): String? {
+        return listOfNotNull(
+            baseSystemPrompt?.trim()?.takeIf { it.isNotBlank() },
+            summary?.trim()?.takeIf { it.isNotBlank() }?.let {
+                "Earlier conversation summary (auto-compressed). Use this as background and prioritize recent messages:\n$it"
+            }
+        ).joinToString("\n\n").ifBlank { null }
+    }
+
+    private fun collectMessagesThroughBoundary(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platformUid: String,
+        boundaryIndex: Int
+    ): List<MessageV2> = buildList {
+        for (index in 0..boundaryIndex.coerceAtMost(userMessages.lastIndex)) {
+            add(userMessages[index])
+            assistantMessages.getOrNull(index)
+                ?.firstOrNull { it.platformType == platformUid && it.hasSendableAssistantPayload() }
+                ?.let(::add)
+        }
+    }
+
+    private fun collectMessagesAfterBoundary(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platformUid: String,
+        boundaryIndex: Int
+    ): List<MessageV2> = buildList {
+        val startIndex = (boundaryIndex + 1).coerceAtLeast(0)
+        for (index in startIndex..userMessages.lastIndex) {
+            add(userMessages[index])
+            assistantMessages.getOrNull(index)
+                ?.firstOrNull { it.platformType == platformUid && it.hasSendableAssistantPayload() }
+                ?.let(::add)
+        }
+    }
+
+    private fun buildCompactionEntries(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platformUid: String,
+        startIndex: Int,
+        boundaryIndex: Int
+    ): String = buildString {
+        for (index in startIndex..boundaryIndex) {
+            val userMessage = userMessages.getOrNull(index)
+            val assistantMessage = assistantMessages.getOrNull(index)
+                ?.firstOrNull { it.platformType == platformUid && it.hasSendableAssistantPayload() }
+            if (userMessage != null && assistantMessage != null) {
+                append("Turn ")
+                append(index + 1)
+                append(":\nUser: ")
+                append(userMessage.contentForCompaction())
+                append("\nAssistant: ")
+                append(assistantMessage.contentForCompaction())
+                append("\n\n")
+            }
+        }
+    }.trim()
+
+    private suspend fun generateCompactionSummary(
+        platform: PlatformV2,
+        previousSummary: String?,
+        entries: String
+    ): String? {
+        val instructions = "Summarize the conversation for future context. Keep durable facts, user preferences, decisions, code details, constraints, and unresolved tasks. Omit filler. Stay concise."
+        val prompt = buildString {
+            previousSummary?.takeIf { it.isNotBlank() }?.let {
+                append("Previous summary:\n")
+                append(it)
+                append("\n\n")
+            }
+            append("New conversation turns to merge into the summary:\n")
+            append(entries)
+        }
+
+        return when (platform.compatibleType) {
+            ClientType.OPENAI -> generateOpenAIResponsesSummary(platform, instructions, prompt)
+            ClientType.ANTHROPIC -> generateAnthropicSummary(platform, instructions, prompt)
+            ClientType.DEEPSEEK, ClientType.CUSTOM -> generateOpenAICompatibleSummary(platform.copy(reasoning = false), instructions, prompt)
+        }
+    }
+
+    private suspend fun generateOpenAIResponsesSummary(
+        platform: PlatformV2,
+        instructions: String,
+        prompt: String
+    ): String {
+        val output = StringBuilder()
+        val request = ResponsesRequest(
+            model = platform.model,
+            input = listOf(
+                ResponseInputMessage(
+                    role = "user",
+                    content = ResponseInputContent.text(prompt)
+                )
+            ),
+            stream = true,
+            instructions = instructions,
+            maxOutputTokens = AUTO_CONTEXT_COMPRESSION_SUMMARY_MAX_TOKENS,
+            temperature = if (platform.reasoning) null else 0.2f,
+            topP = if (platform.reasoning) null else 1.0f,
+            reasoning = null
+        )
+
+        openAIAPI.streamResponses(request, platform.timeout).collect { event ->
+            when (event) {
+                is OutputTextDeltaEvent -> output.append(event.delta)
+                is ResponseFailedEvent -> throw IllegalStateException(event.response.error?.message ?: "Summary generation failed")
+                is ResponseErrorEvent -> throw IllegalStateException(event.message)
+                else -> {}
+            }
+        }
+
+        return output.toString()
+    }
+
+    private suspend fun generateOpenAICompatibleSummary(
+        platform: PlatformV2,
+        instructions: String,
+        prompt: String
+    ): String {
+        val output = StringBuilder()
+        val request = ChatCompletionRequest(
+            model = platform.model,
+            messages = listOf(
+                ChatMessage(role = OpenAIRole.SYSTEM, content = listOf(OpenAITextContent(text = instructions))),
+                ChatMessage(role = OpenAIRole.USER, content = listOf(OpenAITextContent(text = prompt)))
+            ),
+            stream = true,
+            temperature = 0.2f,
+            topP = 1.0f
+        )
+
+        openAIAPI.streamChatCompletion(request, platform.timeout).collect { chunk ->
+            chunk.error?.let { throw IllegalStateException(it.message) }
+            chunk.choices?.firstOrNull()?.delta?.content?.let { output.append(it) }
+        }
+
+        return output.toString()
+    }
+
+    private suspend fun generateAnthropicSummary(
+        platform: PlatformV2,
+        instructions: String,
+        prompt: String
+    ): String {
+        val output = StringBuilder()
+        val request = MessageRequest(
+            model = platform.model,
+            messages = listOf(
+                InputMessage(
+                    role = MessageRole.USER,
+                    content = listOf(AnthropicTextContent(text = prompt))
+                )
+            ),
+            maxTokens = AUTO_CONTEXT_COMPRESSION_SUMMARY_MAX_TOKENS,
+            stream = true,
+            systemPrompt = instructions,
+            temperature = 0.2f,
+            topP = 1.0f,
+            thinking = null
+        )
+
+        anthropicAPI.streamChatMessage(request, platform.timeout).collect { chunk ->
+            when (chunk) {
+                is dev.chungjungsoo.gptmobile.data.dto.anthropic.response.ContentDeltaResponseChunk -> {
+                    if (chunk.delta.type == dev.chungjungsoo.gptmobile.data.dto.anthropic.response.ContentBlockType.DELTA) {
+                        chunk.delta.text?.let { output.append(it) }
+                    }
+                }
+                is dev.chungjungsoo.gptmobile.data.dto.anthropic.response.ErrorResponseChunk -> {
+                    throw IllegalStateException(chunk.error.message)
+                }
+                else -> {}
+            }
+        }
+
+        return output.toString()
+    }
+
+    private suspend fun isAutoContextCompressionEnabled(): Boolean = try {
+        settingRepository.getAutoContextCompression()
+    } catch (_: Exception) {
+        false
     }
 
     private suspend fun ensureProviderReferencesForTurns(
@@ -402,24 +705,6 @@ class ChatRepositoryImpl @Inject constructor(
         }
 
         return messages
-    }
-
-    private suspend fun buildGoogleContents(
-        contextTurns: List<ConversationTurn>,
-        platformUid: String
-    ): List<Content> {
-        val contents = mutableListOf<Content>()
-
-        contextTurns.forEach { turn ->
-            if (hasRenderableMessageContent(turn.userMessage, isUser = true)) {
-                contents.add(transformMessageV2ToGoogle(turn.userMessage, GoogleRole.USER, platformUid))
-            }
-            turn.assistantMessage?.takeIf { hasRenderableMessageContent(it, isUser = false) }?.let { assistantMessage ->
-                contents.add(transformMessageV2ToGoogle(assistantMessage, GoogleRole.MODEL, platformUid))
-            }
-        }
-
-        return contents
     }
 
     private fun hasRenderableMessageContent(message: MessageV2, isUser: Boolean): Boolean {
@@ -520,7 +805,8 @@ class ChatRepositoryImpl @Inject constructor(
 
         streamPreparedApiState(
             prepare = {
-                val contextTurns = buildContextTurns(userMessages, assistantMessages, platform)
+                val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, platform)
+                val contextTurns = preparedContext.turns
                 val messages = buildAnthropicInputMessages(contextTurns, platform.uid)
 
                 MessageRequest(
@@ -528,7 +814,7 @@ class ChatRepositoryImpl @Inject constructor(
                     messages = messages,
                     maxTokens = if (platform.reasoning) 16000 else 4096,
                     stream = platform.stream,
-                    systemPrompt = platform.systemPrompt,
+                    systemPrompt = preparedContext.systemPrompt,
                     temperature = if (platform.reasoning) null else platform.temperature,
                     topP = if (platform.reasoning) null else platform.topP,
                     thinking = if (platform.reasoning) {
@@ -560,6 +846,7 @@ class ChatRepositoryImpl @Inject constructor(
                             }
 
                             is dev.chungjungsoo.gptmobile.data.dto.anthropic.response.ErrorResponseChunk -> {
+                                AppLogger.error(context, "ChatRepository", "Claude API error for ${platform.name}: ${chunk.error.message}")
                                 emit(ApiState.Error(chunk.error.message))
                             }
 
@@ -569,11 +856,13 @@ class ChatRepositoryImpl @Inject constructor(
                 }
             }
         ).catch { e ->
+            AppLogger.error(context, "ChatRepository", "Claude request preparation failed for ${platform.name}", e)
             emit(ApiState.Error(e.message ?: "Unknown error"))
         }.onCompletion {
             emit(ApiState.Done)
         }
     } catch (e: Exception) {
+        AppLogger.error(context, "ChatRepository", "Claude completion failed for ${platform.name}", e)
         flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
     }
 
@@ -614,97 +903,6 @@ class ChatRepositoryImpl @Inject constructor(
         }
 
         return InputMessage(role = role, content = content)
-    }
-
-    private suspend fun completeChatWithGoogle(
-        userMessages: List<MessageV2>,
-        assistantMessages: List<List<MessageV2>>,
-        platform: PlatformV2
-    ): Flow<ApiState> = try {
-        googleAPI.setToken(platform.token)
-        googleAPI.setAPIUrl(platform.apiUrl)
-
-        streamPreparedApiState(
-            prepare = {
-                val contextTurns = buildContextTurns(userMessages, assistantMessages, platform)
-                val contents = buildGoogleContents(contextTurns, platform.uid)
-
-                GenerateContentRequest(
-                    contents = contents,
-                    generationConfig = GenerationConfig(
-                        temperature = platform.temperature,
-                        topP = platform.topP,
-                        thinkingConfig = if (platform.reasoning) {
-                            dev.chungjungsoo.gptmobile.data.dto.google.request.ThinkingConfig(
-                                includeThoughts = true
-                            )
-                        } else {
-                            null
-                        }
-                    ),
-                    systemInstruction = platform.systemPrompt?.takeIf { it.isNotBlank() }?.let {
-                        Content(
-                            parts = listOf(Part.text(it))
-                        )
-                    }
-                )
-            },
-            stream = { request ->
-                flow {
-                    googleAPI.streamGenerateContent(request, platform.model, platform.timeout).collect { response ->
-                        when {
-                            response.error != null -> emit(ApiState.Error(response.error.message))
-
-                            response.candidates?.firstOrNull()?.content?.parts != null -> {
-                                val parts = response.candidates.first().content.parts
-                                parts.forEach { part ->
-                                    part.text?.let { text ->
-                                        if (part.thought == true) {
-                                            emit(ApiState.Thinking(text))
-                                        } else {
-                                            emit(ApiState.Success(text))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        ).catch { e ->
-            emit(ApiState.Error(e.message ?: "Unknown error"))
-        }.onCompletion {
-            emit(ApiState.Done)
-        }
-    } catch (e: Exception) {
-        flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
-    }
-
-    private suspend fun transformMessageV2ToGoogle(message: MessageV2, role: GoogleRole, platformUid: String): Content {
-        val parts = mutableListOf<Part>()
-        val messageContent = if (role == GoogleRole.USER) message.content else message.sendableAssistantContent()
-
-        // Add text content
-        if (messageContent.isNotBlank()) {
-            parts.add(Part.text(messageContent))
-        }
-
-        // Add file content (images)
-        message.attachments.forEach { attachment ->
-            val providerRef = attachment.providerRefFor(platformUid)
-            if (providerRef?.remoteType == dev.chungjungsoo.gptmobile.data.model.AttachmentRemoteType.GOOGLE_FILE) {
-                parts.add(Part.fileData(providerRef.mimeType, providerRef.remoteId))
-            } else {
-                val filePath = attachment.preparedFilePath.ifBlank { attachment.localFilePath }
-                val mimeType = attachment.mimeType.ifBlank { FileUtils.getMimeType(context, filePath) }
-                val encodedImage = getEncodedAttachment(filePath, mimeType)
-                if (encodedImage != null) {
-                    parts.add(Part.inlineData(encodedImage.mimeType, encodedImage.base64Data))
-                }
-            }
-        }
-
-        return Content(role = role, parts = parts)
     }
 
     private suspend fun getEncodedAttachment(filePath: String, mimeType: String): FileUtils.EncodedImage? {
@@ -783,6 +981,37 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getTokenUsageStats(): TokenUsageStats {
+        val chats = chatRoomV2Dao.getChatRooms()
+        val compactionPointsByChat = chatCompactionPointV2Dao.getAll().groupBy { it.chatId }
+        val chatStats = chats.map { chat ->
+            val messages = messageV2Dao.loadMessages(chat.id)
+            val compactedTokensSaved = compactionPointsByChat[chat.id]
+                .orEmpty()
+                .groupBy { it.platformUid }
+                .values
+                .mapNotNull { points ->
+                    points.maxWithOrNull(compareBy<ChatCompactionPointV2> { it.createdAt }.thenBy { it.id })
+                }
+                .sumOf { (it.tokensBefore - it.tokensAfter).coerceAtLeast(0) }
+            ChatTokenStats(
+                chatId = chat.id,
+                title = chat.title,
+                messageCount = messages.size,
+                estimatedTokens = estimateMessagesTokens(messages),
+                compactedTokensSaved = compactedTokensSaved
+            )
+        }
+
+        return TokenUsageStats(
+            totalChats = chatStats.size,
+            totalMessages = chatStats.sumOf { it.messageCount },
+            totalEstimatedTokens = chatStats.sumOf { it.estimatedTokens },
+            totalCompactedTokensSaved = chatStats.sumOf { it.compactedTokensSaved },
+            chats = chatStats.sortedByDescending { it.estimatedTokens }
+        )
+    }
+
     override suspend fun migrateToChatRoomV2MessageV2() {
         val leftOverChatRoomV2s = chatRoomV2Dao.getChatRooms()
         leftOverChatRoomV2s.forEach { chatPlatformModelV2Dao.deleteByChatId(it.id) }
@@ -797,10 +1026,7 @@ class ChatRepositoryImpl @Inject constructor(
             modelByPlatformUid[platform.uid] = platform.model
             when (platform.name) {
                 "OpenAI" -> apiTypeMap[ApiType.OPENAI] = platform.uid
-                "Anthropic" -> apiTypeMap[ApiType.ANTHROPIC] = platform.uid
-                "Google" -> apiTypeMap[ApiType.GOOGLE] = platform.uid
-                "Groq" -> apiTypeMap[ApiType.GROQ] = platform.uid
-                "Ollama" -> apiTypeMap[ApiType.OLLAMA] = platform.uid
+                "Anthropic", "Claude" -> apiTypeMap[ApiType.ANTHROPIC] = platform.uid
             }
         }
 
@@ -882,6 +1108,9 @@ class ChatRepositoryImpl @Inject constructor(
         }
 
         chatRoomV2Dao.editChatRoom(chatRoom)
+        if (shouldBeDeleted.isNotEmpty() || shouldBeUpdated.isNotEmpty()) {
+            chatCompactionPointV2Dao.deleteByChatId(chatRoom.id)
+        }
         messageV2Dao.deleteMessages(*shouldBeDeleted.toTypedArray())
         messageV2Dao.editMessages(*shouldBeUpdated.toTypedArray())
         messageV2Dao.addMessages(*shouldBeAdded.toTypedArray())
@@ -929,37 +1158,85 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteChatsV2(chatRooms: List<ChatRoomV2>) {
+        chatRooms.forEach { chatCompactionPointV2Dao.deleteByChatId(it.id) }
         chatRoomV2Dao.deleteChatRooms(*chatRooms.toTypedArray())
     }
 }
 
-internal fun createGroqChatCompletionRequest(
+private fun MessageV2.contentForCompaction(): String {
+    val rawContent = if (platformType == null) content else sendableAssistantContent()
+    val compactedContent = rawContent
+        .trim()
+        .replace(Regex("\\s+"), " ")
+        .let { content ->
+            if (content.length <= AUTO_CONTEXT_COMPRESSION_MAX_MESSAGE_CHARS) {
+                content
+            } else {
+                content.take(AUTO_CONTEXT_COMPRESSION_MAX_MESSAGE_CHARS).trimEnd() + "..."
+            }
+        }
+
+    return when {
+        compactedContent.isNotBlank() -> compactedContent
+        attachments.isNotEmpty() -> "[attachments omitted]"
+        else -> ""
+    }
+}
+
+private fun List<String>.keepMostRecentWithin(maxChars: Int): String {
+    val selectedEntries = mutableListOf<String>()
+    var totalChars = 0
+
+    for (entry in asReversed()) {
+        val addedLength = entry.length + if (selectedEntries.isEmpty()) 0 else 2
+        if (totalChars + addedLength > maxChars) {
+            if (selectedEntries.isEmpty()) {
+                selectedEntries.add(entry.takeLast(maxChars))
+            }
+            break
+        }
+
+        selectedEntries.add(0, entry)
+        totalChars += addedLength
+    }
+
+    return selectedEntries.joinToString("\n\n")
+}
+
+internal fun createDeepSeekChatCompletionRequest(
     messages: List<ChatMessage>,
     platform: PlatformV2
-): GroqChatCompletionRequest {
-    val isGptOssModel = isGroqGptOssModel(platform.model)
+): ChatCompletionRequest {
+    val normalizedPlatform = platform.withDeepSeekThinkingModel()
+    val isThinkingEnabled = normalizedPlatform.reasoning
+    val usesV4ThinkingToggle = isDeepSeekV4Model(normalizedPlatform.model)
 
-    return GroqChatCompletionRequest(
-        model = platform.model,
+    return ChatCompletionRequest(
+        model = normalizedPlatform.model,
         messages = messages,
-        stream = platform.stream,
-        temperature = platform.temperature,
-        topP = platform.topP,
-        reasoningEffort = if (platform.reasoning && isGptOssModel) "medium" else null,
-        reasoningFormat = when {
-            platform.reasoning && !isGptOssModel -> "parsed"
-            !platform.reasoning && !isGptOssModel -> "hidden"
-            else -> null
-        },
-        includeReasoning = when {
-            platform.reasoning && isGptOssModel -> true
-            !platform.reasoning && isGptOssModel -> false
-            else -> null
+        stream = normalizedPlatform.stream,
+        temperature = if (isThinkingEnabled) null else normalizedPlatform.temperature,
+        topP = if (isThinkingEnabled) null else normalizedPlatform.topP,
+        reasoningEffort = if (isThinkingEnabled && usesV4ThinkingToggle) "high" else null,
+        thinking = if (usesV4ThinkingToggle) {
+            ThinkingConfig(type = if (isThinkingEnabled) "enabled" else "disabled")
+        } else {
+            null
         }
     )
 }
 
-internal fun isGroqGptOssModel(model: String): Boolean = model.contains("gpt-oss", ignoreCase = true)
+internal fun PlatformV2.withDeepSeekThinkingModel(): PlatformV2 {
+    if (compatibleType != ClientType.DEEPSEEK) return this
+
+    return when {
+        reasoning && model.equals("deepseek-chat", ignoreCase = true) -> copy(model = "deepseek-reasoner")
+        !reasoning && model.equals("deepseek-reasoner", ignoreCase = true) -> copy(model = "deepseek-chat")
+        else -> this
+    }
+}
+
+internal fun isDeepSeekV4Model(model: String): Boolean = model.startsWith("deepseek-v4-", ignoreCase = true)
 
 internal fun MessageV2.sendableAssistantContent(): String {
     val strippedContent = stripAssistantErrorNote(effectiveContent()).trim()

@@ -92,7 +92,7 @@ class OpenAIAPIImpl @Inject constructor(
 
     override fun streamChatCompletion(request: ChatCompletionRequest, timeoutSeconds: Int): Flow<ChatCompletionChunk> = flow {
         try {
-            val endpoint = if (apiUrl.endsWith("/")) "${apiUrl}v1/chat/completions" else "$apiUrl/v1/chat/completions"
+            val endpoint = chatCompletionsEndpoint()
 
             networkClient().preparePost(endpoint) {
                 applyPlatformStreamingTimeout(timeoutSeconds)
@@ -162,6 +162,15 @@ class OpenAIAPIImpl @Inject constructor(
             )
         }
     }.flowOn(Dispatchers.IO)
+
+    private fun chatCompletionsEndpoint(): String {
+        val baseUrl = apiUrl.trimEnd('/')
+        return when {
+            baseUrl.equals("https://api.deepseek.com", ignoreCase = true) -> "$baseUrl/chat/completions"
+            baseUrl.endsWith("/v1", ignoreCase = true) -> "$baseUrl/chat/completions"
+            else -> "$baseUrl/v1/chat/completions"
+        }
+    }
 
     override fun streamResponses(request: ResponsesRequest, timeoutSeconds: Int): Flow<ResponsesStreamEvent> = flow {
         try {

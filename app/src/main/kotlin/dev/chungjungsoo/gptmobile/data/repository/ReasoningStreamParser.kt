@@ -2,10 +2,10 @@ package dev.chungjungsoo.gptmobile.data.repository
 
 import dev.chungjungsoo.gptmobile.data.dto.ApiState
 
-private const val GROQ_THINK_OPEN = "<think>"
-private const val GROQ_THINK_CLOSE = "</think>"
+private const val THINK_OPEN = "<think>"
+private const val THINK_CLOSE = "</think>"
 
-internal class GroqReasoningParser {
+internal class ReasoningStreamParser {
     private val pendingContent = StringBuilder()
     private val pendingThought = StringBuilder()
     private var insideThinkBlock = false
@@ -35,7 +35,7 @@ internal class GroqReasoningParser {
         if (insideThinkBlock) {
             emitted += emitVisibleText(
                 buildString {
-                    append(GROQ_THINK_OPEN)
+                    append(THINK_OPEN)
                     append(pendingThought)
                     append(pendingContent)
                 }
@@ -57,10 +57,10 @@ internal class GroqReasoningParser {
         // break only when we need more data or the final flush has no more tags.
         while (pendingContent.isNotEmpty()) {
             if (insideThinkBlock) {
-                val closingIndex = pendingContent.indexOf(GROQ_THINK_CLOSE)
+                val closingIndex = pendingContent.indexOf(THINK_CLOSE)
                 if (closingIndex >= 0) {
                     pendingThought.append(pendingContent.substring(0, closingIndex))
-                    pendingContent.delete(0, closingIndex + GROQ_THINK_CLOSE.length)
+                    pendingContent.delete(0, closingIndex + THINK_CLOSE.length)
 
                     val thought = pendingThought.toString().trim()
                     if (thought.isNotEmpty()) {
@@ -79,7 +79,7 @@ internal class GroqReasoningParser {
 
                 val safeLength = pendingContent.length - partialSuffixLength(
                     pendingContent,
-                    GROQ_THINK_CLOSE
+                    THINK_CLOSE
                 )
                 if (safeLength <= 0) break
 
@@ -88,10 +88,10 @@ internal class GroqReasoningParser {
                 break
             }
 
-            val openingIndex = pendingContent.indexOf(GROQ_THINK_OPEN)
+            val openingIndex = pendingContent.indexOf(THINK_OPEN)
             if (openingIndex >= 0) {
                 emitted += emitVisibleText(pendingContent.substring(0, openingIndex))
-                pendingContent.delete(0, openingIndex + GROQ_THINK_OPEN.length)
+                pendingContent.delete(0, openingIndex + THINK_OPEN.length)
                 insideThinkBlock = true
                 continue
             }
@@ -102,7 +102,7 @@ internal class GroqReasoningParser {
 
             val safeLength = pendingContent.length - partialSuffixLength(
                 pendingContent,
-                GROQ_THINK_OPEN
+                THINK_OPEN
             )
             if (safeLength <= 0) break
 

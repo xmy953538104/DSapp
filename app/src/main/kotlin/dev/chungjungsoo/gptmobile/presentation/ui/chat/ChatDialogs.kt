@@ -2,15 +2,26 @@ package dev.chungjungsoo.gptmobile.presentation.ui.chat
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -20,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -31,6 +43,7 @@ import dev.chungjungsoo.gptmobile.R
 import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveContent
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveThoughts
+import dev.chungjungsoo.gptmobile.data.model.ClientType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,6 +53,7 @@ fun ChatModelDialog(
     platformOrder: List<String>,
     initialModels: Map<String, String>,
     platformNames: Map<String, String>,
+    platformTypes: Map<String, ClientType> = emptyMap(),
     onDismissRequest: () -> Unit,
     onConfirmRequest: (Map<String, String>) -> Unit
 ) {
@@ -64,20 +78,30 @@ fun ChatModelDialog(
                 )
                 platformOrder.forEach { platformUid ->
                     val platformName = platformNames[platformUid] ?: stringResource(R.string.unknown)
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 8.dp),
-                        value = models[platformUid].orEmpty(),
-                        onValueChange = { value ->
-                            models = models.toMutableMap().apply { put(platformUid, value) }
-                        },
-                        singleLine = true,
-                        label = { Text(text = stringResource(R.string.chat_model_for_platform, platformName)) },
-                        supportingText = {
-                            Text(stringResource(R.string.model_supporting))
-                        }
-                    )
+                    if (platformTypes[platformUid] == ClientType.DEEPSEEK) {
+                        DeepSeekModelPicker(
+                            platformName = platformName,
+                            selectedModel = models[platformUid].orEmpty(),
+                            onModelChange = { model ->
+                                models = models.toMutableMap().apply { put(platformUid, model) }
+                            }
+                        )
+                    } else {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 8.dp),
+                            value = models[platformUid].orEmpty(),
+                            onValueChange = { value ->
+                                models = models.toMutableMap().apply { put(platformUid, value) }
+                            },
+                            singleLine = true,
+                            label = { Text(text = stringResource(R.string.chat_model_for_platform, platformName)) },
+                            supportingText = {
+                                Text(stringResource(R.string.model_supporting))
+                            }
+                        )
+                    }
                 }
             }
         },
@@ -101,6 +125,88 @@ fun ChatModelDialog(
             }
         }
     )
+}
+
+private data class DeepSeekModelOption(
+    val titleResId: Int,
+    val model: String
+)
+
+private val deepSeekModelOptions = listOf(
+    DeepSeekModelOption(R.string.deepseek_model_fast, "deepseek-v4-flash"),
+    DeepSeekModelOption(R.string.deepseek_model_pro, "deepseek-v4-pro"),
+    DeepSeekModelOption(R.string.deepseek_model_chat, "deepseek-chat"),
+    DeepSeekModelOption(R.string.deepseek_model_reasoner, "deepseek-reasoner")
+)
+
+@Composable
+private fun DeepSeekModelPicker(
+    platformName: String,
+    selectedModel: String,
+    onModelChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.chat_model_for_platform, platformName),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        deepSeekModelOptions.forEach { option ->
+            val optionModel = option.model
+            val selected = selectedModel.equals(optionModel, ignoreCase = true)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onModelChange(optionModel) },
+                colors = CardDefaults.cardColors(
+                    containerColor = if (selected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainerLow
+                    }
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = selected,
+                        onClick = { onModelChange(optionModel) }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(option.titleResId),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = optionModel,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = selectedModel,
+            onValueChange = onModelChange,
+            singleLine = true,
+            label = { Text(text = stringResource(R.string.model)) },
+            supportingText = {
+                Text(stringResource(R.string.model_supporting))
+            }
+        )
+    }
 }
 
 @Composable
