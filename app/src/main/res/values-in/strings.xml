@@ -32,7 +32,7 @@
     <string name="claude_3_haiku_description">Model Anthropic tercepat dan paling kompak.</string>
 
 
-<string name="setup_complete">Anda siap!</string>
+    <string name="setup_complete">Anda siap!</string>
     <string name="done">Selesai</string>
     <string name="setup_complete_logo">Siapkan Logo Lengkap</string>
     <string name="chats">Obrolan</string>
@@ -61,7 +61,7 @@
     <string name="get_started">Mulai Sekarang</string>
     <string name="platform_select_description">Pilih platform yang ingin Anda gunakan. Anda dapat mengubah ini nanti di pengaturan. Platform-platform lain akan didukung.</string>
     <string name="anthropic_description">Claude lahir di sini.</string>
-<string name="token_input_description">Masukkan kunci API platform yang Anda pilih. Aplikasi ini tidak pernah mengumpulkan data ini. Kunci dan data obrolan ini hanya akan disimpan di perangkat Anda, dan tidak akan dikirim ke server lain selain titik akhir API.</string>
+    <string name="token_input_description">Masukkan kunci API platform yang Anda pilih. Aplikasi ini tidak pernah mengumpulkan data ini. Kunci dan data obrolan ini hanya akan disimpan di perangkat Anda, dan tidak akan dikirim ke server lain selain titik akhir API.</string>
     <string name="select_openai_model_description">Pilih model obrolan OpenAI. Bahkan jika model yang dipilih bersifat multimodal, aplikasi saat ini hanya mendukung input teks saja. Mungkin dapat didukung di masa depan.</string>
 
 
@@ -100,28 +100,23 @@
     <string name="user_message">Pesan Pengguna</string>
     <string name="export_chat">Ekspor Obrolan</string>
     <string name="temperature_setting">Pengaturan Suhu</string>
-    <string name="about_description">Versi, Lisensi, Masukan</string>
+    <string name="about_description">Versi, lisensi, diagnostik</string>
     <string name="version">Versi</string>
     <string name="license">Lisensi</string>
-    <string name="feedback">Masukan</string>
     <string name="license_description">Lisensi Sumber Terbuka</string>
-    <string name="feedback_description">Kami terbuka terhadap semua jenis masukan!</string>
     <string name="version_icon">Ikon Versi</string>
     <string name="license_icon">Ikon Lisensi</string>
-    <string name="feedback_icon">Ikon Masukan</string>
     <string name="github_icon">Ikon GitHub</string>
-    <string name="f_droid_icon">Ikon F-Droid</string>
-    <string name="play_store_icon">Ikon Play Store</string>
     <string name="api_url">Tautan API</string>
     <string name="url_icon">Ikon Tautan</string>
     <string name="invalid_api_url">Silakan masukkan tautan yang valid.</string>
 
-<string name="system_prompt_icon">Ikon Perintah Sistem</string>
+    <string name="system_prompt_icon">Ikon Perintah Sistem</string>
     <string name="temperature_setting_description">Suhu adalah jumlah keacakan yang dimasukkan ke dalam respons. Nilai bawaan biasanya adalah 1.0.\nAtur suhu rendah untuk jawaban yang lebih terfokus dan deterministik; suhu tinggi untuk jawaban yang lebih acak.</string>
     <string name="top_p_setting">Pengaturan Sampling Nukleus</string>
     <string name="top_p_setting_description">Dalam sampling nukleus, kita menghitung distribusi kumulatif di semua opsi untuk setiap token berikutnya dalam urutan probabilitas menurun, lalu menghentikannya setelah mencapai probabilitas tertentu yang ditentukan oleh nilai ini.\nKebanyakan model biasanya menyarankan untuk mengubah nilai sampling nukleus atau temperatur, tetapi tidak keduanya.</string>
     <string name="about">Tentang</string>
-<string name="custom_description">Gunakan model yang tidak ada di daftar.</string>
+    <string name="custom_description">Gunakan model yang tidak ada di daftar.</string>
     <string name="model_name">Nama Model</string>
     <string name="model_custom_example">contoh: llama3.2, llava, llama3:latest, …</string>
     <string name="custom_model_warning">Perhatikan bahwa nama model harus didukung oleh API.</string>
@@ -130,9 +125,6 @@
     <string name="reset">Atur Ulang</string>
 
     <string name="api_url_cautions">Tautan harus diakhiri dengan \'/\'.</string>
-    <string name="bug_report">Laporan Bug</string>
-    <string name="bug_report_description">Ada masalah?</string>
-    <string name="bug_report_icon">Ikon Laporan Bug</string>
     <string name="scroll_to_bottom_icon">Ikon gulir ke bawah</string>
 
 

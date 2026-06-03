@@ -10,14 +10,14 @@
     <string name="sample_item_description">項目の説明</string>
     <string name="openai_description">ChatGPTの制作元。</string>
     <string name="anthropic_description">Claudeはここから生まれました。</string>
-<string name="next">次へ</string>
+    <string name="next">次へ</string>
     <string name="enter_api_key">APIキーを入力</string>
     <string name="token_input_description">選択したプラットフォームのAPIキーを入力してください。このアプリはこれらの情報を収集しません。キーおよび会話履歴はデバイス上にのみ保存され、APIエンドポイント以外のサーバーへ送信されることはありません。</string>
     <string name="clear_token">トークンのクリア</string>
     <string name="need_help">助けが必要ですか？</string>
     <string name="openai_api_key">OpenAI APIキー</string>
     <string name="anthropic_api_key">Anthropic APIキー</string>
-<string name="select_openai_model">OpenAI Chat Modelを選択</string>
+    <string name="select_openai_model">OpenAI Chat Modelを選択</string>
     <string name="select_openai_model_description">OpenAI chat modelを選択してください。選択したモデルがマルチモーダルであっても、現在このアプリではテキスト入力のみが利用できます。将来的にはマルチモーダルに対応するかも知れません。</string>
     <string name="gpt_4o_description">最速かつもっとも手頃な価格のフラグシップモデル。</string>
     <string name="gpt_4o_mini_description">高速で軽量なタスクに最適な、手頃な価格でインテリジェントな小型モデル</string>
@@ -56,7 +56,7 @@
     <string name="theme_description">ダイナミックテーマ、 ダークモード</string>
     <string name="openai_setting">OpenAI設定</string>
     <string name="anthropic_setting">Anthropic設定</string>
-<string name="platform_setting_description">APIキー、モデル、システム プロンプト</string>
+    <string name="platform_setting_description">APIキー、モデル、システム プロンプト</string>
     <string name="enable_api">APIを有効にする</string>
     <string name="api_key">APIキー</string>
     <string name="api_model">APIモデル</string>
@@ -89,35 +89,27 @@
     <string name="temperature_setting_description">Temperatureは、応答に注入されるランダムネスの量です。 一般的に 1.0が基本です。\n低いTemperatureを設定すると集中的かつ決定論的な回答、高いTemperatureはランダムな回答となります。</string>
     <string name="top_p_setting">Nucleus Sampling 設定</string>
     <string name="about">このアプリについて</string>
-    <string name="about_description">バージョン、ライセンス、フィードバック</string>
+    <string name="about_description">バージョン、ライセンス、診断</string>
     <string name="version">バージョン</string>
     <string name="license">ライセンス</string>
-    <string name="feedback">フィードバック</string>
     <string name="license_description">オープンソースライセンス</string>
-    <string name="feedback_description">あらゆるフィードバックにお応えします!</string>
     <string name="version_icon">バージョンアイコン</string>
     <string name="license_icon">ライセンスアイコン</string>
-    <string name="feedback_icon">フィードバックアイコン</string>
     <string name="github_icon">GitHub アイコン</string>
-    <string name="f_droid_icon">F-Droid アイコン</string>
-    <string name="play_store_icon">Play Storeアイコン</string>
     <string name="api_url">API URL</string>
     <string name="url_icon">URL アイコン</string>
     <string name="invalid_api_url">有効なURLを入力してください.</string>
 
 
-<string name="custom">カスタム</string>
+    <string name="custom">カスタム</string>
     <string name="custom_description">リストにないモデルを使用。</string>
     <string name="model_name">モデル名</string>
     <string name="model_custom_example">例:llama3.2、llava、llama3:latest…</string>
     <string name="custom_model_warning">API でモデル名がサポートされている必要があります.</string>
     <string name="enter_api_address">API アドレスを入力</string>
 
-<string name="reset">リセット</string>
-<string name="api_url_cautions">Url は \'/\' で終わる必要があります.</string>
-    <string name="bug_report">バグ報告</string>
-    <string name="bug_report_description">なにかうまく動かないですか？</string>
-    <string name="bug_report_icon">バグ報告アイコン</string>
+    <string name="reset">リセット</string>
+    <string name="api_url_cautions">Url は \'/\' で終わる必要があります.</string>
     <string name="scroll_to_bottom_icon">下にスクロール アイコン</string>
 
 

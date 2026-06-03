@@ -10,14 +10,14 @@
     <string name="sample_item_description">Описание элемента</string>
     <string name="openai_description">Создатель ChatGPT.</string>
     <string name="anthropic_description">Здесь появился Claude.</string>
-<string name="next">Далее</string>
+    <string name="next">Далее</string>
     <string name="enter_api_key">Введите ключ API</string>
     <string name="token_input_description">Введите ключ API выбранной платформы. Это приложение никогда не собирает эти данные. Эти ключи и данные чата будут храниться только на вашем устройстве и не будут отправляться на другие серверы, кроме конечных точек API.</string>
     <string name="clear_token">Очистить токен</string>
     <string name="need_help">Нужна помощь?</string>
     <string name="openai_api_key">Ключ API OpenAI</string>
     <string name="anthropic_api_key">Ключ API Anthropic</string>
-<string name="select_openai_model">Выберите модель чата OpenAI</string>
+    <string name="select_openai_model">Выберите модель чата OpenAI</string>
     <string name="select_openai_model_description">Выберите модель чата OpenAI. Даже если выбранная модель мультимодальна, в настоящее время приложение поддерживает только текстовые запросы. Поддержка может быть добавлена в будущем.</string>
     <string name="gpt_4o_description">Самая быстрая и доступная флагманская модель.</string>
     <string name="gpt_4o_mini_description">Доступная и интеллектуальная компактная модель для быстрых и несложных задач</string>
@@ -56,7 +56,7 @@
     <string name="theme_description">Динамическая тема, Тёмный режим</string>
     <string name="openai_setting">Настройки OpenAI</string>
     <string name="anthropic_setting">Настройки Anthropic</string>
-<string name="platform_setting_description">API-ключ, Модель, Системный промпт</string>
+    <string name="platform_setting_description">API-ключ, Модель, Системный промпт</string>
     <string name="enable_api">Активировать API</string>
     <string name="api_key">API-ключ</string>
     <string name="api_model">Модель API</string>
@@ -90,18 +90,13 @@
     <string name="top_p_setting">Настройка ядерной выборки</string>
     <string name="top_p_setting_description">При ядерном сэмплировании (nucleus sampling) мы вычисляем кумулятивное распределение по всем вариантам для каждого последующего токена в порядке убывания вероятности и отсекаем его, как только оно достигает определённого значения вероятности, заданного этим параметром.\nБольшинство моделей обычно рекомендуют изменять либо этот параметр, либо температуру (temperature), но не оба сразу.</string>
     <string name="about">О приложении</string>
-    <string name="about_description">Версия, Лицензия, Обратная связь</string>
+    <string name="about_description">Версия, лицензия, диагностика</string>
     <string name="version">Версия</string>
     <string name="license">Лицензия</string>
-    <string name="feedback">Обратная связь</string>
     <string name="license_description">Лицензии с открытым исходным кодом</string>
-    <string name="feedback_description">Мы открыты для любых предложений и замечаний!</string>
     <string name="version_icon">Значок версии</string>
     <string name="license_icon">Значок лицензии</string>
-    <string name="feedback_icon">Значок обратной связи</string>
     <string name="github_icon">Значок GitHub</string>
-    <string name="f_droid_icon">Значок F-Droid</string>
-    <string name="play_store_icon">Значок Play Store</string>
     <string name="api_url">API URL</string>
     <string name="url_icon">Значок URL</string>
     <string name="invalid_api_url">Пожалуйста, введите корректный URL-адрес.</string>
@@ -117,14 +112,11 @@
     <string name="reset">Сброс</string>
 
     <string name="api_url_cautions">URL должен заканчиваться символом \'/\'.</string>
-    <string name="bug_report">Отчёт об ошибке</string>
-    <string name="bug_report_description">Что-то работает неправильно?</string>
-    <string name="bug_report_icon">Значок отчёта об ошибке</string>
     <string name="scroll_to_bottom_icon">Значок перехода вниз</string>
 
 
 
-<string name="chat_title_dialog_description">Генерация заголовка с помощью ИИ доступна только на устройствах с поддержкой AICore.</string>
+    <string name="chat_title_dialog_description">Генерация заголовка с помощью ИИ доступна только на устройствах с поддержкой AICore.</string>
     <string name="edit_question">Редактировать сообщение пользователя</string>
     <string name="token_input_warning">ПРИМЕЧАНИЕ: OpenAI и Anthropic используют систему предоплаты, поэтому перед использованием необходимо ПОПОЛНИТЬ БАЛАНС на каждом аккаунте. В противном случае запрос вернёт ошибку.</string>
 
@@ -201,10 +193,10 @@
     <string name="api_key_description">Введите ваш API-ключ. Данные хранятся локально на вашем устройстве.</string>
 
     <string name="model_description">Введите идентификатор модели, которую вы хотите использовать</string>
-    <string name="model_examples">Примеры: gpt-4o, claude-sonnet-4-20250514, gemini-1.5-pro</string>
+    <string name="model_examples">Примеры: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.7-flash</string>
     <string name="back">Назад</string>
     <string name="finish">Готово</string>
-<string name="custom_provider">Пользовательский поставщик</string>
+    <string name="custom_provider">Пользовательский поставщик</string>
     <string name="custom_provider_description">Подключение к любому API, совместимому с OpenAI</string>
     <string name="platform_added_successfully">Платформа успешно добавлена</string>
     <string name="at_least_one_platform_required">Добавьте хотя бы одну платформу, чтобы продолжить</string>

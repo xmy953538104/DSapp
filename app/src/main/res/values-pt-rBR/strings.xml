@@ -8,7 +8,7 @@
     <string name="need_help">Necessita de ajuda?</string>
     <string name="openai_api_key">OpenAI Chave API</string>
     <string name="anthropic_api_key">Chave API Anthropic</string>
-<string name="select_openai_model">Selecione o modelo de bate-papo OpenAI</string>
+    <string name="select_openai_model">Selecione o modelo de bate-papo OpenAI</string>
     <string name="select_openai_model_description">Selecione o modelo de chat OpenAI. Mesmo que o modelo selecionado seja multimodal, o aplicativo atualmente suporta apenas entradas de texto. Pode ser suportado mais tarde no futuro.</string>
     <string name="gpt_4o_description">O modelo principal mais rápido e acessível.</string>
     <string name="gpt_4o_mini_description">Modelo pequeno, acessível e inteligente para tarefas rápidas e leves</string>
@@ -41,7 +41,7 @@
     <string name="theme_description">Tema dinâmico, modo escuro</string>
     <string name="openai_setting">Configurações OpenAI</string>
     <string name="anthropic_setting">Configuração Anthropic</string>
-<string name="platform_setting_description">Chave API, Modelo, Prompt do sistema</string>
+    <string name="platform_setting_description">Chave API, Modelo, Prompt do sistema</string>
     <string name="api_model">Modelo API</string>
     <string name="dynamic_theme">Tema Dinâmico</string>
     <string name="model_icon">Ícone Modelo</string>
@@ -68,18 +68,16 @@
     <string name="top_p_setting">Configuração de amostragem de núcleo</string>
     <string name="top_p_setting_description">Na amostragem de núcleo, calculamos a distribuição cumulativa sobre todas as opções para cada token subsequente em ordem decrescente de probabilidade e a cortamos quando atinge uma determinada probabilidade específica.</string>
     <string name="about">Sobre</string>
-    <string name="about_description">Versão, Licença, Feedback</string>
+    <string name="about_description">Versão, licença, diagnósticos</string>
     <string name="version">Versão</string>
     <string name="license">Licença</string>
     <string name="license_description">Licenças de código aberto</string>
-    <string name="feedback_description">Estamos abertos a todos os tipos de feedback!</string>
-    <string name="feedback_icon">Ícone de Feedback</string>
     <string name="github_icon">Ícone do GitHub</string>
     <string name="api_url">URL da API</string>
     <string name="url_icon">Ícone de URL</string>
     <string name="invalid_api_url">Insira um URL válido.</string>
 
-<string name="custom">Personalizado</string>
+    <string name="custom">Personalizado</string>
     <string name="custom_description">Use um modelo que não esteja na lista.</string>
     <string name="model_name">Nome do modelo</string>
     <string name="model_custom_example">por exemplo lhama3.2, lhava, lhama3:mais recente,…</string>
@@ -87,20 +85,16 @@
     <string name="enter_api_address">Insira o endereço da API</string>
 
     <string name="api_url_cautions">A URL deve terminar com \'/\'.</string>
-    <string name="bug_report_icon">Ícone de relatório de bug</string>
-
-
-
-<string name="app_name">Chat-AI</string>
+    <string name="app_name">Chat-AI</string>
     <string name="welcome_title">O melhor assistente de IA\nque você pode ter no seu\nsmartphone.</string>
     <string name="openai_description">Criador do ChatGPT.</string>
     <string name="next">Próximo</string>
     <string name="anthropic_description">Claude nasceu aqui.</string>
-<string name="enter_api_key">Insira a chave API</string>
+    <string name="enter_api_key">Insira a chave API</string>
     <string name="clear_token">Token limpo</string>
 
 
-<string name="enable_at_leat_one_platform">Por favor, habilite pelo menos uma plataforma para criar um bate-papo.</string>
+    <string name="enable_at_leat_one_platform">Por favor, habilite pelo menos uma plataforma para criar um bate-papo.</string>
     <string name="off">Desligado</string>
     <string name="system_default">Padrão do sistema</string>
     <string name="enable_api">Ativar API</string>
@@ -110,20 +104,14 @@
     <string name="close">Fechar</string>
     <string name="temperature">Temperatura</string>
     <string name="system_prompt">Prompt do sistema</string>
-    <string name="f_droid_icon">Ícone do F-Droid</string>
     <string name="reset">Reiniciar</string>
     <string name="scroll_to_bottom_icon">Ícone de rolagem para baixo</string>
-    <string name="bug_report_description">Algo não está funcionando corretamente?</string>
-
     <string name="version_icon">Ícone da versão</string>
     <string name="license_icon">Ícone de licença</string>
-    <string name="play_store_icon">Ícone da Play Store</string>
     <string name="platform_select_description">Selecione a plataforma que você quer usar. Você pode alterar isso mais tarde nas configurações. Mais plataformas serão suportadas.</string>
     <string name="token_input_description">Insira a chave API da plataforma que você selecionou. Este aplicativo nunca coleta esses dados. Essas chaves e dados de bate-papo serão armazenados apenas no seu dispositivo e não serão enviados para outros servidores além do ponto de extremidade da API.</string>
     <string name="on">Ligar</string>
 
-<string name="bug_report">Relatório de erro</string>
-    <string name="feedback">Opinião</string>
     <string name="untitled_chat">Chat sem Título</string>
     <string name="update_chat_title">Atualizar titulo do chat</string>
     <string name="apply_generated_title">Aplicar título gerado</string>

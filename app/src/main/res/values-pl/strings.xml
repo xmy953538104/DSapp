@@ -28,7 +28,7 @@
     <string name="theme_settings">Ustawienie motywu</string>
     <string name="theme_description">Motyw dynamiczny, tryb ciemny</string>
     <string name="openai_setting">Ustawienia OpenAI</string>
-<string name="api_key">Klucz API</string>
+    <string name="api_key">Klucz API</string>
     <string name="api_model">Model API</string>
     <string name="dynamic_theme">Motyw dynamiczny</string>
     <string name="dark_mode">Tryb ciemny</string>
@@ -53,7 +53,7 @@
     <string name="select_openai_model_description">Wybierz jeden z modeli językowych OpenAI. Uwaga - aplikacja obecnie wspiera tylko prompt tekstowy, również dla modeli multimodalnych. Być może kiedyś to się zmieni.</string>
     <string name="select_anthropic_model_description">Proszę wybrać jeden z dostępnych modeli od Anthropic. Obecnie rodzina modeli Claude 3 dostępna jest wyłącznie w trybie tekstowym.</string>
     <string name="claude_3_5_sonnet_description">Najbardziej inteligentny z modeli Anthropic.</string>
-<string name="setup_complete_logo">Logo ukończenia ustawień</string>
+    <string name="setup_complete_logo">Logo ukończenia ustawień</string>
     <string name="chats">Rozmowy</string>
     <string name="settings">Ustawienia</string>
     <string name="select_platform">Wybór platformy</string>
@@ -72,22 +72,20 @@
     <string name="sample_item_title">Pozycja 1</string>
     <string name="sample_item_description">Opis pozycji</string>
     <string name="anthropic_description">Tu narodził się Claude.</string>
-<string name="next">Dalej</string>
+    <string name="next">Dalej</string>
     <string name="clear_token">Wyczyść token</string>
     <string name="need_help">Potrzebujesz pomocy?</string>
     <string name="openai_api_key">Klucz API OpenAI</string>
     <string name="anthropic_api_key">Klucz API Anthropic</string>
-<string name="system_prompt_description">Prompt systemowy to zestaw poleceń, wytycznych i informacji kontekstowych, które otrzymuje model zanim użytkownik wyda mu właściwe polecenie.</string>
+    <string name="system_prompt_description">Prompt systemowy to zestaw poleceń, wytycznych i informacji kontekstowych, które otrzymuje model zanim użytkownik wyda mu właściwe polecenie.</string>
     <string name="temperature_icon">Ikona temperatury</string>
     <string name="top_p_icon">Ikona próbkowania jądrowego</string>
     <string name="system_prompt_icon">Ikona promptu systemowego</string>
     <string name="temperature_setting">Ustawienia temperatury</string>
     <string name="top_p_setting">Ustawienia próbkowania jądrowego</string>
-    <string name="f_droid_icon">Ikona F-Droid</string>
-    <string name="play_store_icon">Ikona Sklepu Play</string>
     <string name="api_url">Link do API</string>
 
-<string name="custom">Własny</string>
+    <string name="custom">Własny</string>
     <string name="custom_description">Użyj modelu spoza listy.</string>
     <string name="model_name">Nazwa modelu</string>
     <string name="model_custom_example">Np. llama-3.2-1B-instruct, Qwen2.5, …</string>
@@ -96,13 +94,11 @@
 
     <string name="reset">Wyczyść</string>
 
-    <string name="bug_report">Powiadom o błędzie</string>
-    <string name="bug_report_icon">Ikona zgłoszenia błędu</string>
     <string name="scroll_to_bottom_icon">Ikona przewiń do dołu</string>
 
 
 
-<string name="options">Opcje</string>
+    <string name="options">Opcje</string>
     <string name="update_chat_title">Zmień nagłówek czatu</string>
     <string name="chat_title">Naglowek czatu</string>
     <string name="chat_title_dialog_description">Tworzenie nagłówków przez AI dostępne jest tylko na urządzeniach ze wsparciem AICore.</string>
@@ -123,21 +119,17 @@
 
     <string name="api_url_cautions">Adres musi kończyć się ukośnikiem \'/\'.</string>
     <string name="temperature_setting_description">Temperatura to poziom losowości w odpowiedzi modelu\n Zazwyczaj domyslnie 1.0 - niższa oznacza bardziej zdecydowane i jednoznaczne odpowiedzi, z kolei wyższa - bardziej przypadkowe i różnorodne.</string>
-    <string name="feedback_icon">Symbol feedbacku</string>
     <string name="top_p_setting_description">Próbkowanie jądrowe (Nucleus Sampling) polega na obliczaniu skumulowanego rozkładu prawdopodobieństw dla każdego kolejnego tokena z malejącym prawdopodobieństwem, dopóki osiągnie poziom określony przez tę wartość. \nDla większości modeli zaleca się zmianę albo Nucleus Sampling, albo temperatury - ale nie obu.</string>
     <string name="about">Informacje</string>
-    <string name="feedback">Informacja zwrotna</string>
-    <string name="about_description">Wersja, licencja, opinie</string>
+    <string name="about_description">Wersja, licencja, diagnostyka</string>
     <string name="version">Wersja</string>
     <string name="license">Licencja</string>
     <string name="license_description">Licencje Open Source</string>
-    <string name="feedback_description">Jesteśmy otwarci na Wasze opinie!</string>
     <string name="url_icon">Symbol linku</string>
     <string name="github_icon">Ikona GitHub</string>
 
     <string name="invalid_api_url">Proszę podać prawidłowy link.</string>
-    <string name="bug_report_description">Coś nie działa tak, jak powinno?</string>
-<string name="token_input_warning">Uwaga: OpenAI i Anthropic wymagają płatności z góry przed użyciem API, więc musisz WPŁACIĆ ŚRODKI ZANIM je wykorzystasz. W przeciwnym razie, zapytanie przez API zwróci w odpowiedzi komunikat błędu.</string>
+    <string name="token_input_warning">Uwaga: OpenAI i Anthropic wymagają płatności z góry przed użyciem API, więc musisz WPŁACIĆ ŚRODKI ZANIM je wykorzystasz. W przeciwnym razie, zapytanie przez API zwróci w odpowiedzi komunikat błędu.</string>
     <string name="openai_description">Twórca Chata GPT.</string>
     <string name="enter_api_key">Podaj klucz API</string>
     <string name="token_input_description">Wprowadź klucz API wybranej przez Ciebie platformy. Nasza aplikacja nie zbiera tych danych. Klucze API i historia czatów są zapisywane tylko na Twoim urządzeniu, i nie zostaną nigdzie wysłane, z wyjątkiem serwerów odbiorczych API.</string>

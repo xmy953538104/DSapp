@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Chat-AI</string>
     <string name="gpt_mobile_introduction_logo">GPT Mobile Tanıtım Logosu</string>
@@ -8,7 +8,7 @@
     <string name="platform_select_description">Kullanmak istediğiniz platformu seçin. Bunu daha sonra ayarlardan değiştirebilirsiniz. Daha fazla platform desteklenecek.</string>
     <string name="sample_item_title">Öğe 1</string>
     <string name="sample_item_description">Öğe açıklaması</string>
-<string name="openai_description">ChatGPT’nin yaratıcısı.</string>
+    <string name="openai_description">ChatGPT’nin yaratıcısı.</string>
     <string name="anthropic_description">Claude burada doğdu.</string>
 
     <string name="next">İleri</string>
@@ -19,7 +19,7 @@
     <string name="openai_api_key">OpenAI API Anahtarı</string>
     <string name="anthropic_api_key">Anthropic API Anahtarı</string>
 
-<string name="select_openai_model">OpenAI Sohbet Modelini Seçin</string>
+    <string name="select_openai_model">OpenAI Sohbet Modelini Seçin</string>
     <string name="select_openai_model_description">Lütfen OpenAI sohbet modelini seçin. Seçilen model çok modlu olsa bile, uygulama şu anda yalnızca metin girişlerini destekliyor. İleride desteklenebilir.</string>
     <string name="gpt_4o_description">En hızlı ve en uygun fiyatlı amiral gemisi model.</string>
     <string name="gpt_4o_mini_description">Hızlı, hafif görevler için uygun fiyatlı ve akıllı küçük model.</string>
@@ -35,7 +35,7 @@
 
 
 
-<string name="setup_complete">Her şey hazır!</string>
+    <string name="setup_complete">Her şey hazır!</string>
     <string name="setup_complete_description">GPT Mobile’ı kullanmaya başlayalım!</string>
     <string name="done">Tamam</string>
     <string name="setup_complete_logo">Kurulum Tamamlandı Logosu</string>
@@ -95,18 +95,13 @@
     <string name="top_p_setting">Çekirdek Örnekleme Ayarı</string>
     <string name="top_p_setting_description">Çekirdek örneklemede, her bir sonraki token için tüm seçenekler üzerinde azalan olasılık sırasına göre kümülatif dağılım hesaplanır ve bu değerle belirtilen belirli bir olasılığa ulaşıldığında kesilir.\nÇoğu model genellikle bunu veya sıcaklığı değiştirmeyi önerir, ancak ikisini birden değil.</string>
     <string name="about">Hakkında</string>
-    <string name="about_description">Sürüm, Lisans, Geri Bildirim</string>
+    <string name="about_description">Sürüm, lisans, tanılama</string>
     <string name="version">Sürüm</string>
     <string name="license">Lisans</string>
-    <string name="feedback">Geri Bildirim</string>
     <string name="license_description">Açık Kaynak Lisansları</string>
-    <string name="feedback_description">Her türlü geri bildirime açığız!</string>
     <string name="version_icon">Sürüm Simgesi</string>
     <string name="license_icon">Lisans Simgesi</string>
-    <string name="feedback_icon">Geri Bildirim Simgesi</string>
     <string name="github_icon">GitHub Simgesi</string>
-    <string name="f_droid_icon">F-Droid Simgesi</string>
-    <string name="play_store_icon">Play Store Simgesi</string>
     <string name="api_url">API URL’si</string>
     <string name="url_icon">URL Simgesi</string>
     <string name="invalid_api_url">Lütfen geçerli bir URL girin.</string>
@@ -120,11 +115,8 @@
     <string name="custom_model_warning">Model adının API tarafından desteklenmesi gerektiğini unutmayın.</string>
     <string name="enter_api_address">API Adresini Girin</string>
 
-<string name="reset">Sıfırla</string>
-<string name="api_url_cautions">URL bir ‘/’ ile bitmelidir.</string>
-    <string name="bug_report">Hata Raporu</string>
-    <string name="bug_report_description">Bir şey doğru çalışmıyor mu?</string>
-    <string name="bug_report_icon">Hata Raporu Simgesi</string>
+    <string name="reset">Sıfırla</string>
+    <string name="api_url_cautions">URL bir ‘/’ ile bitmelidir.</string>
     <string name="scroll_to_bottom_icon">Aşağı kaydır simgesi</string>
 
 

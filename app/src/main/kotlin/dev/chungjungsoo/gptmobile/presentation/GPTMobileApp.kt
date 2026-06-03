@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class GPTMobileApp : Application() {
-    // TODO Delete when https://github.com/google/dagger/issues/3601 is resolved.
+    // TODO Remove when the upstream Dagger ApplicationContext issue is resolved.
     @Inject
     @ApplicationContext
     lateinit var context: Context

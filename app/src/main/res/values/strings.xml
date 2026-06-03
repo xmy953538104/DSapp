@@ -144,14 +144,8 @@
     <string name="estimated_tokens">&#32422; %1$d tokens</string>
     <string name="deepseek_thinking_on">&#28145;&#24230;&#24605;&#32771;</string>
     <string name="deepseek_thinking_off">&#24555;&#36895;&#22238;&#31572;</string>
-    <string name="deepseek_model_fast">日常使用</string>
-    <string name="deepseek_model_thinking">专业应用</string>
     <string name="qwen" translatable="false">千问</string>
     <string name="qwen_description">使用通义千问模型，支持图片理解和思考模型。</string>
-    <string name="qwen_model_vision_fast">图片理解</string>
-    <string name="qwen_model_vision_max">高级视觉</string>
-    <string name="qwen_model_chat">普通对话</string>
-    <string name="qwen_model_thinking">深度思考</string>
     <string name="update_chat_title">Update chat title</string>
     <string name="chat_title">Chat Title</string>
     <string name="chat_title_dialog_description">AI generated title is only available with AICore supported devices.</string>

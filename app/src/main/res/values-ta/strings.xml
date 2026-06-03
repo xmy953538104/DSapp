@@ -4,7 +4,7 @@
     <string name="system_prompt">கணினி வரியில்</string>
     <string name="version">பதிப்பு</string>
     <string name="api_url">பநிஇ முகவரி</string>
-<string name="enter_api_address">பநிஇ முகவரியை உள்ளிடவும்</string>
+    <string name="enter_api_address">பநிஇ முகவரியை உள்ளிடவும்</string>
     <string name="app_name">Chat-AI</string>
     <string name="gpt_mobile_introduction_logo">சிபிடி மொபைல் அறிமுகம் லோகோ</string>
     <string name="welcome_title">சிறந்த AI உதவியாளர்\n நீங்கள் பெறலாம்\n ச்மார்ட்போன்.</string>
@@ -96,22 +96,17 @@
     <string name="top_p_setting">கரு மாதிரி அமைப்பு</string>
     <string name="top_p_setting_description">நியூக்ளியச் மாதிரியில், நிகழ்தகவு வரிசையைக் குறைப்பதில் ஒவ்வொரு அடுத்த டோக்கனுக்கும் அனைத்து விருப்பங்களுக்கும் மேலாக ஒட்டுமொத்த விநியோகத்தை கணக்கிடுகிறோம், மேலும் இந்த மதிப்பால் குறிப்பிடப்பட்ட ஒரு குறிப்பிட்ட நிகழ்தகவை அடைந்தவுடன் அதை துண்டித்துவிட்டோம்.\n பெரும்பாலான மாதிரிகள் பொதுவாக இந்த அல்லது வெப்பநிலையை மாற்ற பரிந்துரைக்கின்றன, ஆனால் இரண்டுமே இல்லை.</string>
     <string name="about">பற்றி</string>
-    <string name="about_description">பதிப்பு, உரிமம், கருத்து</string>
+    <string name="about_description">பதிப்பு, உரிமம், கண்டறிதல்</string>
     <string name="license">உரிமம்</string>
-    <string name="feedback">கருத்து</string>
     <string name="license_description">திறந்த மூல உரிமங்கள்</string>
-    <string name="feedback_description">எல்லா வகையான பின்னூட்டங்களுக்கும் நாங்கள் திறந்திருக்கிறோம்!</string>
     <string name="version_icon">பதிப்பு படவுரு</string>
     <string name="license_icon">உரிம படவுரு</string>
-    <string name="feedback_icon">கருத்து படவுரு</string>
     <string name="github_icon">அறிவிலிமையம் படவுரு</string>
-    <string name="f_droid_icon">எஃப்-டிராய்டு படவுரு</string>
-    <string name="play_store_icon">கடை படவுரு விளையாடுங்கள்</string>
     <string name="url_icon">முகவரி படவுரு</string>
 
     <string name="invalid_api_url">செல்லுபடியாகும் முகவரி ஐ உள்ளிடவும்.</string>
 
-<string name="custom">தனிப்பயன்</string>
+    <string name="custom">தனிப்பயன்</string>
     <string name="custom_description">பட்டியலில் இல்லாத மாதிரியைப் பயன்படுத்தவும்.</string>
     <string name="model_name">மாதிரி பெயர்</string>
     <string name="model_custom_example">எ.கா. slama3.2, தூக்கி, லேசாக,…</string>
@@ -119,16 +114,12 @@
 
     <string name="reset">மீட்டமை</string>
     <string name="api_url_cautions">முகவரி ஒரு \'/\' உடன் முடிவடைய வேண்டும்.</string>
-    <string name="bug_report">பிழை அறிக்கை</string>
-
-    <string name="bug_report_description">ஏதோ சரியாக வேலை செய்யவில்லையா?</string>
-    <string name="bug_report_icon">பிழை அறிக்கை படவுரு</string>
     <string name="scroll_to_bottom_icon">கீழே ஐகானுக்கு உருட்டவும்</string>
 
 
 
 
-<string name="options">விருப்பங்கள்</string>
+    <string name="options">விருப்பங்கள்</string>
     <string name="update_chat_title">அரட்டை தலைப்பைப் புதுப்பிக்கவும்</string>
     <string name="chat_title">அரட்டை தலைப்பு</string>
     <string name="untitled_chat">பெயரிடப்படாத அரட்டை</string>

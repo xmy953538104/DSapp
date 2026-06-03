@@ -6,7 +6,7 @@
     <string name="platform_select_description">اختر النظام الأساسي الذي تريد استخدامه. يمكنك تغيير هذا لاحقًا في الإعدادات. سيتم دعم المزيد من المنصات.</string>
     <string name="openai_description">مُنشئ ChatGPT.</string>
     <string name="anthropic_description">وُلد Claude هنا.</string>
-<string name="welcome_title">أفضل مساعد ذكاء اصطناعي\nيمكنك الحصول عليه في هاتفك\nالذكي.</string>
+    <string name="welcome_title">أفضل مساعد ذكاء اصطناعي\nيمكنك الحصول عليه في هاتفك\nالذكي.</string>
     <string name="welcome_description">استخدم النموذج الذي يناسبك\nأكثر. اسأل أي شيء تريده!</string>
     <string name="sample_item_title">العنصر 1</string>
     <string name="sample_item_description">وصف العنصر</string>
@@ -17,7 +17,7 @@
     <string name="need_help">هل تحتاج مساعدة؟</string>
     <string name="openai_api_key">مفتاح OpenAI API</string>
     <string name="anthropic_api_key">مفتاح Anthropic API</string>
-<string name="select_openai_model">حدد نموذج دردشة OpenAI</string>
+    <string name="select_openai_model">حدد نموذج دردشة OpenAI</string>
     <string name="gpt_4o_description">النموذج الرئيسي الأسرع والأكثر تكلفة.</string>
     <string name="gpt_4o_mini_description">نموذج صغير بأسعار معقولة وذكي للمهام السريعة والخفيفة</string>
     <string name="gpt_4_turbo_description">موثوقية جيدة، أرخص بثلاث مرات من GPT-4.</string>
@@ -25,7 +25,7 @@
     <string name="select_anthropic_model">حدد نموذج دردشة Anthropic</string>
     <string name="select_anthropic_model_description">يرجى تحديد نموذج دردشة Anthropic. نحن ندعم حاليًا عائلة نماذج Claude 3 مع المدخلات النصية فقط.</string>
 
-<string name="setup_complete">أنت جاهز!</string>
+    <string name="setup_complete">أنت جاهز!</string>
     <string name="setup_complete_description">لنبدأ باستخدام GPT Mobile!</string>
     <string name="token_not_set">لم يتم تعيين الرمز المميز</string>
     <string name="token_set">تم تعيين الرمز المميز كـ %s*****</string>
@@ -42,20 +42,16 @@
     <string name="temperature_setting">إعداد درجة الحرارة</string>
     <string name="top_p_setting">إعداد أخذ العينات الأساسية</string>
     <string name="about">حول</string>
-    <string name="about_description">الإصدار، الترخيص، الملاحظات</string>
+    <string name="about_description">الإصدار، الترخيص، التشخيصات</string>
     <string name="version">الإصدار</string>
     <string name="github_icon">أيقونة GitHub</string>
-    <string name="f_droid_icon">أيقونة F-Droid</string>
-    <string name="play_store_icon">أيقونة متجر Play</string>
 
-<string name="custom">مخصص</string>
+    <string name="custom">مخصص</string>
     <string name="custom_description">استخدم نموذجًا غير موجود في القائمة.</string>
     <string name="model_name">اسم النموذج</string>
     <string name="model_custom_example">على سبيل المثال llama3.2، llava، llama3:latest، …</string>
     <string name="custom_model_warning">لاحظ أن اسم النموذج يجب أن تدعمه واجهة برمجة التطبيقات.</string>
     <string name="enter_api_address">أدخل عنوان API</string>
-    <string name="bug_report_description">شيء ما لا يعمل بشكل صحيح؟</string>
-
     <string name="options">خيارات</string>
     <string name="update_chat_title">تحديث عنوان الدردشة</string>
     <string name="chat_title">عنوان الدردشة</string>
@@ -82,7 +78,7 @@
     <string name="claude_3_sonnet_description">نموذج متوازن بين الذكاء والسرعة.</string>
     <string name="claude_3_haiku_description">نموذج Anthropic الأسرع والأكثر إحكاما.</string>
 
-<string name="done">تم</string>
+    <string name="done">تم</string>
     <string name="setup_complete_logo">شعار اكتمال الإعداد</string>
     <string name="chats">الدردشات</string>
     <string name="settings">الإعدادات</string>
@@ -117,26 +113,21 @@
     <string name="temperature_setting_description">درجة الحرارة هي مقدار العشوائية التي يتم حقنها في الاستجابة. عادةً ما تكون افتراضية 1.0.\nعيّن درجة حرارة منخفضة للحصول على إجابات أكثر تركيزًا وحتمية، ودرجة حرارة عالية للإجابات العشوائية.</string>
     <string name="top_p_setting_description">في أخذ العينات الأساسية، نحسب التوزيع التراكمي على جميع الخيارات لكل رمز لاحق بترتيب تنازلي للاحتمالية ونقطعه بمجرد أن يصل إلى احتمال معين محدد بهذه القيمة.\nتوصي معظم النماذج عادةً بتغيير هذا أو درجة الحرارة ولكن ليس كليهما.</string>
     <string name="license">الترخيص</string>
-    <string name="feedback">ملاحظات</string>
     <string name="license_description">تراخيص مفتوحة المصدر</string>
-    <string name="feedback_description">نحن منفتحون على جميع أنواع الملاحظات!</string>
     <string name="version_icon">أيقونة الإصدار</string>
     <string name="license_icon">أيقونة الترخيص</string>
-    <string name="feedback_icon">أيقونة الملاحظات</string>
     <string name="api_url">عنوان URL لواجهة برمجة التطبيقات</string>
     <string name="url_icon">أيقونة URL</string>
     <string name="invalid_api_url">الرجاء إدخال عنوان URL صالح.</string>
 
 
-<string name="reset">إعادة تعيين</string>
-<string name="api_url_cautions">يجب أن ينتهي عنوان URL بـ \'/\'.</string>
-    <string name="bug_report">الإبلاغ عن خطأ</string>
-    <string name="bug_report_icon">أيقونة الإبلاغ عن خطأ</string>
+    <string name="reset">إعادة تعيين</string>
+    <string name="api_url_cautions">يجب أن ينتهي عنوان URL بـ \'/\'.</string>
     <string name="scroll_to_bottom_icon">أيقونة التمرير إلى الأسفل</string>
 
 
 
-<string name="default_mode">افتراضي</string>
+    <string name="default_mode">افتراضي</string>
     <string name="ai_generated">تم إنشاؤه بواسطة الذكاء الاصطناعي (تجريبي)</string>
     <string name="update">تحديث</string>
 </resources>

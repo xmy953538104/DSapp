@@ -294,17 +294,3 @@ private fun getClientTypeDescription(clientType: ClientType): String = when (cli
     ClientType.QWEN -> stringResource(R.string.client_type_qwen_desc)
     ClientType.CUSTOM -> stringResource(R.string.client_type_custom_desc)
 }
-
-@Composable
-private fun getModelPlaceholder(clientType: ClientType): String = when (clientType) {
-    ClientType.CUSTOM -> stringResource(R.string.model_name)
-    else -> getDefaultModel(clientType)
-}
-
-private fun getDefaultModel(clientType: ClientType): String = when (clientType) {
-    ClientType.OPENAI -> ModelConstants.getDefaultModel(clientType)
-    ClientType.ANTHROPIC -> ModelConstants.getDefaultModel(clientType)
-    ClientType.DEEPSEEK -> ModelConstants.getDefaultModel(clientType)
-    ClientType.QWEN -> ModelConstants.getDefaultModel(clientType)
-    ClientType.CUSTOM -> ""
-}

@@ -10,14 +10,14 @@
     <string name="sample_item_description">아이템 설명</string>
     <string name="openai_description">ChatGPT의 창시자입니다.</string>
     <string name="anthropic_description">Claude는 여기서 태어났어요.</string>
-<string name="next">다음</string>
+    <string name="next">다음</string>
     <string name="enter_api_key">API 키 입력</string>
     <string name="token_input_description">선택한 플랫폼의 API 키를 각각 입력해 주세요. 이 앱은 해당 데이터를 수집하지 않습니다. API 키 및 채팅 데이터는 오로지 디바이스에만 저장되고, API 서버 외에 다른 서버로 절대 전송되지 않습니다.</string>
     <string name="clear_token">토큰 지우기</string>
     <string name="need_help">도움말</string>
     <string name="openai_api_key">OpenAI API 키</string>
     <string name="anthropic_api_key">Anthropic API 키</string>
-<string name="select_openai_model">OpenAI 모델 선택</string>
+    <string name="select_openai_model">OpenAI 모델 선택</string>
     <string name="select_openai_model_description">OpenAI 채팅 모델을 선택해 주세요. 멀티모달 모델을 선택하더라도, 현재 텍스트 입력만 지원합니다.</string>
     <string name="gpt_4o_description">가장 빠르고 합리적인 가격의 플래그십 모델입니다.</string>
     <string name="gpt_4o_mini_description">빠르고 가벼운 작업을 위한 경제적이고 지능적인 소형 모델</string>
@@ -30,7 +30,7 @@
     <string name="claude_3_haiku_description">Anthropic의 가장 빠르고 컴팩트한 모델입니다.</string>
 
 
-<string name="setup_complete">설정 완료!</string>
+    <string name="setup_complete">설정 완료!</string>
     <string name="setup_complete_description">이제 GPT Mobile을 사용할 수 있습니다!</string>
     <string name="done">완료</string>
     <string name="setup_complete_logo">설정 완료 로고</string>
@@ -90,18 +90,13 @@
     <string name="top_p_setting">Nucleus sampling 설정</string>
     <string name="top_p_setting_description">Nucleus sampling이란 모델이 특정 확률 값(p)에 따라 단어를 선택하는 설정입니다.\n대부분의 모델은 일반적으로 이 값 또는 Temperature 중 하나를 변경할 것을 권장하지만 둘 다 변경하는건 권장하지 않습니다.</string>
     <string name="about">앱 정보</string>
-    <string name="about_description">버전, 라이선스, 피드백</string>
+    <string name="about_description">버전, 라이선스, 진단</string>
     <string name="version">버전</string>
     <string name="license">라이선스</string>
-    <string name="feedback">피드백</string>
     <string name="license_description">오픈 소스 라이선스</string>
-    <string name="feedback_description">다양한 피드백에 열려 있습니다!</string>
     <string name="version_icon">버전 아이콘</string>
     <string name="license_icon">라이선스 아이콘</string>
-    <string name="feedback_icon">피드백 아이콘</string>
     <string name="github_icon">GitHub 아이콘</string>
-    <string name="f_droid_icon">F-Droid 아이콘</string>
-    <string name="play_store_icon">Play Store 아이콘</string>
     <string name="api_url">API 주소</string>
     <string name="url_icon">주소 아이콘</string>
     <string name="invalid_api_url">유효한 주소를 입력해 주세요.</string>
@@ -117,15 +112,12 @@
 
 
     <string name="api_url_cautions">URL이 \'/\'로 끝나야 합니다.</string>
-    <string name="bug_report">버그 제보</string>
-    <string name="bug_report_description">정상적으로 작동되지 않는 부분이 있어요.</string>
-    <string name="bug_report_icon">버그 제보 아이콘</string>
     <string name="scroll_to_bottom_icon">맨 아래로 이동 아이콘</string>
 
 
 
 
-<string name="update_chat_title">채팅 제목 변경</string>
+    <string name="update_chat_title">채팅 제목 변경</string>
     <string name="chat_title">채팅 제목</string>
     <string name="default_mode">기본값</string>
     <string name="ai_generated">AI로 생성 (베타)</string>

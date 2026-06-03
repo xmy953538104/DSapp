@@ -5,12 +5,6 @@ import dev.chungjungsoo.gptmobile.data.model.ApiType
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 
 object ModelConstants {
-    // LinkedHashSet should be used to guarantee item order
-    val openaiModels = linkedSetOf("gpt-5.2", "gpt-5-mini")
-    val anthropicModels = linkedSetOf("claude-sonnet-4-5-20250929", "claude-3-5-haiku-20241022")
-    val deepSeekModels = linkedSetOf("deepseek-v4-flash", "deepseek-v4-pro")
-    val qwenModels = linkedSetOf("qwen3.7-flash", "qwen3.7-plus")
-
     const val OPENAI_API_URL = "https://api.openai.com/"
     const val ANTHROPIC_API_URL = "https://api.anthropic.com/"
     const val DEEPSEEK_API_URL = "https://api.deepseek.com/"
