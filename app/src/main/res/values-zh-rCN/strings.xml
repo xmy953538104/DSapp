@@ -42,7 +42,7 @@
     <string name="select_platform">选择提供商</string>
     <string name="select_platform_description">选择您在本会话中使用的提供商，会话创建后无法更改。如果您想更改此设置，请重新创建会话。</string>
     <string name="enable_at_leat_one_platform">请先启用一个提供商再创建会话</string>
-    <string name="chat_icon">会话的图标</string>
+    <string name="chat_icon">图标</string>
     <string name="using_certain_platform">使用 %s</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
@@ -195,7 +195,7 @@
     <string name="api_key_description">请输入你的 API 密钥，它只存储在您的设备上。</string>
 
     <string name="model_description">请输入您使用模型的标识符</string>
-    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.6-flash</string>
+    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.7-flash</string>
     <string name="back">返回</string>
     <string name="finish">完成</string>
 <string name="custom_provider">自定义提供商</string>
@@ -265,11 +265,13 @@
     <string name="chat_icon_study">学习</string>
     <string name="chat_icon_food">饮食</string>
     <string name="import_backup_start">备份导入</string>
+    <string name="backup_settings">备份</string>
+    <string name="backup_settings_description">导出或导入本地配置与会话。</string>
     <string name="export_local_backup">导出本地备份</string>
     <string name="export_local_backup_description">保存提供商、模型、会话、消息和分组到 Download 目录。</string>
     <string name="import_local_backup">导入本地备份</string>
     <string name="import_local_backup_description">从 JSON 文件恢复提供商，并追加导入备份会话。</string>
-    <string name="webdav_settings">WebDAV 设置</string>
+    <string name="webdav_settings">WebDAV 配置</string>
     <string name="webdav_settings_description">配置用于同步供应商 API 和模型标识符的账号。</string>
     <string name="webdav_username">WebDAV 账号</string>
     <string name="webdav_url">WebDAV 地址</string>

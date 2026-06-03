@@ -203,22 +203,28 @@ class SettingRepositoryImpl @Inject constructor(
             ?: normalizedPresets.first().model
 
         return copy(
+            name = normalizeLegacyPlatformName(name, compatibleType),
             model = normalizedModel,
             modelPresets = normalizedPresets,
             reasoning = false.takeIf { reasoning && compatibleType == ClientType.CUSTOM } ?: reasoning
         )
     }
 
+    private fun normalizeLegacyPlatformName(name: String, clientType: ClientType): String = when {
+        clientType == ClientType.QWEN && (name.isBlank() || name.trim() == "鍗冮棶") -> "千问"
+        else -> name
+    }
+
     private fun normalizeLegacyModel(model: String): String = when {
         model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
         model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
-        model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.6-flash"
+        model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-flash"
         model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-plus"
-        model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.6-flash"
+        model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-flash"
         model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-plus"
-        model.equals("qwen-flash", ignoreCase = true) -> "qwen3.6-flash"
+        model.equals("qwen-flash", ignoreCase = true) -> "qwen3.7-flash"
         model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-plus"
-        model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.6-flash"
+        model.equals("qwen3.6-flash", ignoreCase = true) -> "qwen3.7-flash"
         else -> model
     }
 

@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -28,6 +29,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -102,6 +104,7 @@ import dev.chungjungsoo.gptmobile.data.database.entity.DEFAULT_CHAT_GROUP_NAME
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.presentation.common.PlatformCheckBoxItem
+import dev.chungjungsoo.gptmobile.presentation.common.providerIconResId
 import dev.chungjungsoo.gptmobile.util.getPlatformName
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -128,9 +131,7 @@ fun HomeScreen(
 
     LaunchedEffect(lifecycleState) {
         if (lifecycleState == Lifecycle.State.RESUMED && !chatListState.isSelectionMode && !chatListState.isSearchMode) {
-            homeViewModel.fetchChats()
-            homeViewModel.fetchPlatformStatus()
-            homeViewModel.fetchGroups()
+            homeViewModel.refreshHomeData()
         }
     }
 
@@ -307,31 +308,48 @@ private fun ChatListAvatar(
         platforms.firstOrNull { it.uid == uid }
     }
     val iconResId = platform?.compatibleType?.let(::providerIconResId)
+    val isQwen = platform?.compatibleType == ClientType.QWEN
     val categoryIcon = chatIconVector(chatRoom.icon)
+    val categoryColors = chatIconColors(chatRoom.icon)
 
     Box(
         modifier = Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(categoryColors.container),
         contentAlignment = Alignment.Center
     ) {
         if (chatRoom.icon == CHAT_ICON_PROVIDER && iconResId != null) {
             Image(
                 painter = painterResource(iconResId),
                 contentDescription = stringResource(R.string.chat_icon),
-                modifier = Modifier.size(40.dp),
-                contentScale = ContentScale.Crop
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(if (isQwen) 6.dp else 0.dp),
+                contentScale = ContentScale.Fit
             )
         } else {
             Icon(
                 categoryIcon ?: ImageVector.vectorResource(id = R.drawable.ic_rounded_chat),
                 contentDescription = stringResource(R.string.chat_icon),
                 modifier = Modifier.size(22.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = categoryColors.content
             )
         }
     }
+}
+
+private data class ChatIconColors(
+    val container: Color,
+    val content: Color
+)
+
+private fun chatIconColors(icon: String): ChatIconColors = when (icon) {
+    CHAT_ICON_LIFE -> ChatIconColors(Color(0xFFF7D8C6), Color(0xFF8A2E20))
+    CHAT_ICON_WORK -> ChatIconColors(Color(0xFFDDE8F5), Color(0xFF285C91))
+    CHAT_ICON_STUDY -> ChatIconColors(Color(0xFFE8DDF4), Color(0xFF674694))
+    CHAT_ICON_FOOD -> ChatIconColors(Color(0xFFE4F0D8), Color(0xFF49682E))
+    else -> ChatIconColors(Color(0xFFFFFFFF), Color(0xFF151312))
 }
 
 private fun chatIconVector(icon: String): ImageVector? = when (icon) {
@@ -340,14 +358,6 @@ private fun chatIconVector(icon: String): ImageVector? = when (icon) {
     CHAT_ICON_STUDY -> Icons.Filled.School
     CHAT_ICON_FOOD -> Icons.Filled.Restaurant
     else -> null
-}
-
-private fun providerIconResId(clientType: ClientType): Int? = when (clientType) {
-    ClientType.OPENAI -> R.drawable.provider_openai
-    ClientType.ANTHROPIC -> R.drawable.provider_claude
-    ClientType.DEEPSEEK -> R.drawable.provider_deepseek
-    ClientType.QWEN -> R.drawable.provider_qwen
-    ClientType.CUSTOM -> null
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -611,6 +621,7 @@ fun SelectPlatformDialog(
         modifier = Modifier
             .widthIn(max = screenWidth - 40.dp)
             .heightIn(max = screenHeight - 80.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest,
         title = {
             Column {
@@ -650,15 +661,10 @@ fun SelectPlatformDialog(
                         style = MaterialTheme.typography.titleSmall
                     )
                     groups.forEach { group ->
-                        ListItem(
-                            headlineContent = { Text(group) },
-                            leadingContent = {
-                                RadioButton(
-                                    selected = group == selectedGroup,
-                                    onClick = { onGroupSelect(group) }
-                                )
-                            },
-                            modifier = Modifier.clickable { onGroupSelect(group) }
+                        GroupRadioOption(
+                            text = group,
+                            selected = group == selectedGroup,
+                            onClick = { onGroupSelect(group) }
                         )
                     }
                 }
@@ -699,19 +705,15 @@ fun MoveToGroupDialog(
         mutableStateOf(groups.firstOrNull { it != selectedGroup } ?: selectedGroup)
     }
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         title = { Text(stringResource(R.string.move_to_group)) },
         text = {
             Column {
                 groups.forEach { group ->
-                    ListItem(
-                        headlineContent = { Text(group) },
-                        leadingContent = {
-                            RadioButton(
-                                selected = targetGroup == group,
-                                onClick = { targetGroup = group }
-                            )
-                        },
-                        modifier = Modifier.clickable { targetGroup = group }
+                    GroupRadioOption(
+                        text = group,
+                        selected = targetGroup == group,
+                        onClick = { targetGroup = group }
                     )
                 }
             }
@@ -728,6 +730,44 @@ fun MoveToGroupDialog(
             }
         }
     )
+}
+
+@Composable
+private fun GroupRadioOption(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val containerColor = if (selected) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceContainerLow
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(containerColor)
+            .border(
+                width = 1.dp,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                shape = RoundedCornerShape(14.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+        Text(
+            text = text,
+            modifier = Modifier.padding(start = 8.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
 
 @Preview

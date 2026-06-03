@@ -1,6 +1,5 @@
 package dev.chungjungsoo.gptmobile.presentation.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -208,12 +207,27 @@ class HomeViewModel @Inject constructor(
         _chatListState.update { it.copy(isSearchMode = true) }
     }
 
+    fun refreshHomeData() {
+        viewModelScope.launch {
+            val groups = settingRepository.getChatGroups()
+            val platforms = settingRepository.fetchPlatformV2s()
+            _chatGroups.update { groups }
+            if (_selectedGroup.value !in groups) {
+                _selectedGroup.update { groups.firstOrNull() ?: DEFAULT_CHAT_GROUP_NAME }
+            }
+            _platformState.update { platforms }
+            if (_chatListState.value.selectedPlatforms.size != platforms.size) {
+                _chatListState.update { it.copy(selectedPlatforms = List(platforms.size) { false }) }
+            }
+            allChats = chatRepository.fetchChatListV2()
+            updateVisibleChats(resetSelection = true)
+        }
+    }
+
     fun fetchChats() {
         viewModelScope.launch {
             allChats = chatRepository.fetchChatListV2()
             updateVisibleChats(resetSelection = true)
-
-            Log.d("chats", "${_chatListState.value.chats}")
         }
     }
 
@@ -224,8 +238,6 @@ class HomeViewModel @Inject constructor(
             if (_selectedGroup.value !in groups) {
                 _selectedGroup.update { groups.firstOrNull() ?: DEFAULT_CHAT_GROUP_NAME }
             }
-            chatRepository.normalizeChatGroups(groups, groups.firstOrNull() ?: DEFAULT_CHAT_GROUP_NAME)
-            allChats = chatRepository.fetchChatListV2()
             updateVisibleChats(resetSelection = true)
         }
     }

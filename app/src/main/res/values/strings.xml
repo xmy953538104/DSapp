@@ -52,7 +52,7 @@
     <string name="select_platform">Select Platform</string>
     <string name="select_platform_description">Select platforms that you want to use in this chat. Once the chat is created, you can not change this settings. If you would like to change this, please create a new chat.</string>
     <string name="enable_at_leat_one_platform">Please enable at least one platform to create a chat.</string>
-    <string name="chat_icon">Chat Icon</string>
+    <string name="chat_icon">Icon</string>
     <string name="using_certain_platform">Using %s</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
@@ -237,7 +237,7 @@
     <string name="platform_basics_description">Give your platform a name and verify the API URL</string>
     <string name="api_key_description">Enter your API key. This is stored locally on your device.</string>
     <string name="model_description">Enter the model identifier you want to use</string>
-    <string name="model_examples">Examples: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.6-flash</string>
+    <string name="model_examples">Examples: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.7-flash</string>
     <string name="back">Back</string>
     <string name="finish">Finish</string>
     <string name="deepseek" translatable="false">DeepSeek</string>
@@ -272,6 +272,8 @@
     <string name="chat_icon_study">Study</string>
     <string name="chat_icon_food">Food</string>
     <string name="import_backup_start">Import Backup</string>
+    <string name="backup_settings">Backup</string>
+    <string name="backup_settings_description">Export or import local app configuration and chats.</string>
     <string name="export_local_backup">Export local backup</string>
     <string name="export_local_backup_description">Save providers, models, chats, messages, and groups to Downloads.</string>
     <string name="import_local_backup">Import local backup</string>

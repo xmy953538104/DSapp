@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import dev.chungjungsoo.gptmobile.R
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.model.ClientType
+import dev.chungjungsoo.gptmobile.presentation.common.providerIconResId
 import dev.chungjungsoo.gptmobile.presentation.theme.GPTMobileTheme
 import java.io.File
 
@@ -217,13 +218,7 @@ fun ProviderAvatar(
     loading: Boolean
 ) {
     val providerType = platform?.compatibleType ?: ClientType.CUSTOM
-    val iconResId = when (providerType) {
-        ClientType.OPENAI -> R.drawable.provider_openai
-        ClientType.ANTHROPIC -> R.drawable.provider_claude
-        ClientType.DEEPSEEK -> R.drawable.provider_deepseek
-        ClientType.QWEN -> R.drawable.provider_qwen
-        else -> null
-    }
+    val iconResId = providerIconResId(providerType)
     val fallback = remember(platform?.name, providerType) { providerAvatarFallback(platform, providerType) }
 
     Box(
@@ -243,8 +238,10 @@ fun ProviderAvatar(
                 Image(
                     painter = painterResource(iconResId),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(if (providerType == ClientType.QWEN) 6.dp else 0.dp),
+                    contentScale = ContentScale.Fit
                 )
             } else {
                 Text(

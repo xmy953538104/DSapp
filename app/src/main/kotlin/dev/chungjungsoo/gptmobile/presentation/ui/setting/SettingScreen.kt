@@ -3,12 +3,20 @@ package dev.chungjungsoo.gptmobile.presentation.ui.setting
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,8 +29,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -36,10 +46,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -151,17 +165,9 @@ fun SettingScreen(
             )
 
             SettingItem(
-                title = stringResource(R.string.export_local_backup),
-                description = stringResource(R.string.export_local_backup_description),
-                onItemClick = { settingViewModel.exportLocalBackup(context) },
-                showTrailingIcon = true,
-                showLeadingIcon = false
-            )
-
-            SettingItem(
-                title = stringResource(R.string.import_local_backup),
-                description = stringResource(R.string.import_local_backup_description),
-                onItemClick = { backupImportLauncher.launch("application/json") },
+                title = stringResource(R.string.backup_settings),
+                description = stringResource(R.string.backup_settings_description),
+                onItemClick = settingViewModel::openBackupDialog,
                 showTrailingIcon = true,
                 showLeadingIcon = false
             )
@@ -170,30 +176,6 @@ fun SettingScreen(
                 title = stringResource(R.string.webdav_settings),
                 description = stringResource(R.string.webdav_settings_description),
                 onItemClick = settingViewModel::openWebDavDialog,
-                showTrailingIcon = true,
-                showLeadingIcon = false
-            )
-
-            SettingItem(
-                title = stringResource(R.string.webdav_pull),
-                description = stringResource(R.string.webdav_pull_description),
-                onItemClick = settingViewModel::downloadWebDavConfig,
-                showTrailingIcon = true,
-                showLeadingIcon = false
-            )
-
-            SettingItem(
-                title = stringResource(R.string.webdav_upload),
-                description = stringResource(R.string.webdav_upload_description),
-                onItemClick = settingViewModel::uploadWebDavConfig,
-                showTrailingIcon = true,
-                showLeadingIcon = false
-            )
-
-            SettingItem(
-                title = stringResource(R.string.webdav_clear),
-                description = stringResource(R.string.webdav_clear_description),
-                onItemClick = settingViewModel::clearWebDavConfig,
                 showTrailingIcon = true,
                 showLeadingIcon = false
             )
@@ -253,13 +235,31 @@ fun SettingScreen(
                 )
             }
 
+            if (dialogState.isBackupDialogOpen) {
+                BackupDialog(
+                    onDismissRequest = settingViewModel::closeBackupDialog,
+                    onExport = {
+                        settingViewModel.closeBackupDialog()
+                        settingViewModel.exportLocalBackup(context)
+                    },
+                    onImport = {
+                        settingViewModel.closeBackupDialog()
+                        backupImportLauncher.launch("application/json")
+                    }
+                )
+            }
+
             if (dialogState.isWebDavDialogOpen) {
                 WebDavConfigDialog(
                     configUsername = webDavConfig.username,
                     configUrl = webDavConfig.url,
                     configPassword = webDavConfig.password,
+                    readOnly = webDavConfig.readOnly,
                     onDismissRequest = settingViewModel::closeWebDavDialog,
-                    onConfirm = settingViewModel::updateWebDavConfig
+                    onConfirm = settingViewModel::updateWebDavConfig,
+                    onPull = settingViewModel::downloadWebDavConfig,
+                    onUpload = settingViewModel::uploadWebDavConfig,
+                    onClear = settingViewModel::clearWebDavConfig
                 )
             }
         }
@@ -339,7 +339,8 @@ fun AutoContextCompressionSetting(
                 onCheckedChange = onCheckedChange
             )
         },
-        modifier = Modifier.padding(horizontal = 8.dp)
+        modifier = Modifier.padding(horizontal = 8.dp),
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background)
     )
 }
 
@@ -381,36 +382,48 @@ fun ChatGroupDialog(
         mutableStateOf(groups.ifEmpty { listOf(defaultGroup) })
     }
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         title = { Text(stringResource(R.string.chat_groups)) },
         text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 420.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 editingGroups.forEachIndexed { index, group ->
-                    ListItem(
-                        headlineContent = {
-                            OutlinedTextField(
-                                value = group,
-                                onValueChange = { value ->
-                                    editingGroups = editingGroups.toMutableList().also { list ->
-                                        list[index] = value.take(16)
-                                    }
-                                },
-                                singleLine = true,
-                                label = { Text(stringResource(R.string.chat_group_index, index + 1)) }
-                            )
-                        },
-                        trailingContent = {
-                            IconButton(
-                                enabled = editingGroups.size > 1,
-                                onClick = {
-                                    editingGroups = editingGroups.toMutableList().also { list ->
-                                        list.removeAt(index)
-                                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = group,
+                            onValueChange = { value ->
+                                editingGroups = editingGroups.toMutableList().also { list ->
+                                    list[index] = value.take(16)
                                 }
-                            ) {
-                                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete))
+                            },
+                            singleLine = true,
+                            label = { Text(stringResource(R.string.chat_group_index, index + 1)) },
+                            shape = RoundedCornerShape(14.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            enabled = editingGroups.size > 1,
+                            onClick = {
+                                editingGroups = editingGroups.toMutableList().also { list ->
+                                    list.removeAt(index)
+                                }
                             }
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete))
                         }
-                    )
+                    }
                 }
                 TextButton(
                     enabled = editingGroups.size < 5,
@@ -439,25 +452,74 @@ fun ChatGroupDialog(
 }
 
 @Composable
+fun BackupDialog(
+    onDismissRequest: () -> Unit,
+    onExport: () -> Unit,
+    onImport: () -> Unit
+) {
+    AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = { Text(stringResource(R.string.backup_settings)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                DialogActionRow(
+                    title = stringResource(R.string.export_local_backup),
+                    description = stringResource(R.string.export_local_backup_description),
+                    enabled = true,
+                    onClick = onExport
+                )
+                DialogActionRow(
+                    title = stringResource(R.string.import_local_backup),
+                    description = stringResource(R.string.import_local_backup_description),
+                    enabled = true,
+                    onClick = onImport
+                )
+            }
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.confirm))
+            }
+        }
+    )
+}
+
+@Composable
 fun WebDavConfigDialog(
     configUsername: String,
     configUrl: String,
     configPassword: String,
+    readOnly: Boolean,
     onDismissRequest: () -> Unit,
-    onConfirm: (String, String, String) -> Unit
+    onConfirm: (String, String, String) -> Unit,
+    onPull: (String, String, String) -> Unit,
+    onUpload: (String, String, String) -> Unit,
+    onClear: () -> Unit
 ) {
     var username by remember(configUsername) { mutableStateOf(configUsername) }
     var url by remember(configUrl) { mutableStateOf(configUrl) }
     var password by remember(configPassword) { mutableStateOf(configPassword) }
+    val configComplete = username.isNotBlank() && url.isNotBlank() && password.isNotBlank()
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         title = { Text(stringResource(R.string.webdav_settings)) },
         text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 520.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
                     singleLine = true,
                     label = { Text(stringResource(R.string.webdav_username)) },
+                    shape = RoundedCornerShape(14.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
@@ -467,6 +529,11 @@ fun WebDavConfigDialog(
                     onValueChange = { url = it },
                     singleLine = true,
                     label = { Text(stringResource(R.string.webdav_url)) },
+                    shape = RoundedCornerShape(14.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
@@ -477,16 +544,40 @@ fun WebDavConfigDialog(
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     label = { Text(stringResource(R.string.webdav_password)) },
+                    shape = RoundedCornerShape(14.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
+                )
+                HorizontalDivider(Modifier.padding(vertical = 10.dp))
+                DialogActionRow(
+                    title = stringResource(R.string.webdav_pull),
+                    description = stringResource(R.string.webdav_pull_description),
+                    enabled = configComplete,
+                    onClick = { onPull(username.trim(), url.trim(), password) }
+                )
+                DialogActionRow(
+                    title = stringResource(R.string.webdav_upload),
+                    description = stringResource(R.string.webdav_upload_description),
+                    enabled = configComplete && !readOnly,
+                    onClick = { onUpload(username.trim(), url.trim(), password) }
+                )
+                DialogActionRow(
+                    title = stringResource(R.string.webdav_clear),
+                    description = stringResource(R.string.webdav_clear_description),
+                    enabled = true,
+                    onClick = onClear
                 )
             }
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
-                enabled = username.isNotBlank() && url.isNotBlank() && password.isNotBlank(),
+                enabled = configComplete,
                 onClick = { onConfirm(username.trim(), url.trim(), password) }
             ) {
                 Text(stringResource(R.string.confirm))
@@ -498,6 +589,46 @@ fun WebDavConfigDialog(
             }
         }
     )
+}
+
+@Composable
+private fun DialogActionRow(
+    title: String,
+    description: String,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    val contentAlpha = if (enabled) 1f else 0.38f
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha)
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = contentAlpha)
+            )
+        }
+        Icon(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_round_arrow_right),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = contentAlpha)
+        )
+    }
 }
 
 @Composable

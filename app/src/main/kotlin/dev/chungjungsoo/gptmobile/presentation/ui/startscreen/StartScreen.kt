@@ -4,9 +4,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -150,21 +147,15 @@ private fun OwnerWebDavDialog(
 @Preview
 @Composable
 fun StartScreenLogo(modifier: Modifier = Modifier) {
-    Box(
+    Image(
+        painter = painterResource(R.drawable.ic_chat_ai),
+        contentDescription = stringResource(R.string.gpt_mobile_introduction_logo),
         modifier = modifier
             .padding(top = 54.dp)
             .size(172.dp)
-            .clip(RoundedCornerShape(34.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(R.drawable.ic_chat_ai_mark),
-            contentDescription = stringResource(R.string.gpt_mobile_introduction_logo),
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(138.dp)
-        )
-    }
+            .clip(RoundedCornerShape(34.dp)),
+        contentScale = ContentScale.Fit
+    )
 }
 
 @Preview

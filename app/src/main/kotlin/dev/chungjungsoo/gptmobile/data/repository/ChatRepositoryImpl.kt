@@ -240,18 +240,19 @@ class ChatRepositoryImpl @Inject constructor(
 
         streamPreparedApiState(
             prepare = {
-                val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, platform)
+                val normalizedPlatform = platform.withSupportedQwenModel()
+                val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, normalizedPlatform)
                 val contextTurns = preparedContext.turns
-                validateInlineBudgetIfNeeded(contextTurns, platform)
+                validateInlineBudgetIfNeeded(contextTurns, normalizedPlatform)
                 val messages = buildOpenAIChatMessages(contextTurns, preparedContext.systemPrompt)
 
                 ChatCompletionRequest(
-                    model = platform.model,
+                    model = normalizedPlatform.model,
                     messages = messages,
-                    stream = platform.stream,
-                    temperature = if (platform.reasoning) null else platform.temperature,
-                    topP = if (platform.reasoning) null else platform.topP,
-                    enableThinking = platform.reasoning
+                    stream = normalizedPlatform.stream,
+                    temperature = if (normalizedPlatform.reasoning) null else normalizedPlatform.temperature,
+                    topP = if (normalizedPlatform.reasoning) null else normalizedPlatform.topP,
+                    enableThinking = normalizedPlatform.reasoning
                 )
             },
             stream = { request ->
@@ -1378,6 +1379,21 @@ internal fun PlatformV2.withSupportedDeepSeekModel(): PlatformV2 {
     return when {
         model.equals("deepseek-chat", ignoreCase = true) -> copy(model = "deepseek-v4-flash")
         model.equals("deepseek-reasoner", ignoreCase = true) -> copy(model = "deepseek-v4-pro")
+        else -> this
+    }
+}
+
+internal fun PlatformV2.withSupportedQwenModel(): PlatformV2 {
+    if (compatibleType != ClientType.QWEN) return this
+
+    return when {
+        model.equals("qwen-vl-plus", ignoreCase = true) -> copy(model = "qwen3.7-flash")
+        model.equals("qwen-vl-max", ignoreCase = true) -> copy(model = "qwen3.7-plus")
+        model.equals("qwen3.5-plus", ignoreCase = true) -> copy(model = "qwen3.7-flash")
+        model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> copy(model = "qwen3.7-plus")
+        model.equals("qwen-flash", ignoreCase = true) -> copy(model = "qwen3.7-flash")
+        model.equals("qwen-plus", ignoreCase = true) -> copy(model = "qwen3.7-plus")
+        model.equals("qwen3.6-flash", ignoreCase = true) -> copy(model = "qwen3.7-flash")
         else -> this
     }
 }

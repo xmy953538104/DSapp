@@ -120,6 +120,13 @@ class ChatRepositoryImplTest {
         assertNull(chatRequest.reasoningEffort)
     }
 
+    @Test
+    fun `qwen legacy aliases normalize to configured presets`() {
+        assertEquals("qwen3.7-flash", qwenPlatform("qwen3.6-flash").withSupportedQwenModel().model)
+        assertEquals("qwen3.7-flash", qwenPlatform("qwen-vl-plus").withSupportedQwenModel().model)
+        assertEquals("qwen3.7-plus", qwenPlatform("qwen-plus").withSupportedQwenModel().model)
+    }
+
     private fun createRepository(
         openAIAPI: OpenAIAPI = RecordingOpenAIAPI()
     ): ChatRepositoryImpl = ChatRepositoryImpl(
@@ -150,6 +157,16 @@ class ChatRepositoryImplTest {
         topP = 1.0f,
         stream = true,
         reasoning = reasoning
+    )
+
+    private fun qwenPlatform(model: String) = PlatformV2(
+        uid = "qwen-platform",
+        name = "千问",
+        compatibleType = ClientType.QWEN,
+        apiUrl = "https://dashscope.aliyuncs.com/compatible-mode/v1/",
+        model = model,
+        stream = true,
+        reasoning = false
     )
 
     @Suppress("UNCHECKED_CAST")

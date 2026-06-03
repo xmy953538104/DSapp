@@ -111,6 +111,10 @@ class SettingViewModelV2 @Inject constructor(
 
     fun closeChatGroupDialog() = _dialogState.update { it.copy(isChatGroupDialogOpen = false) }
 
+    fun openBackupDialog() = _dialogState.update { it.copy(isBackupDialogOpen = true) }
+
+    fun closeBackupDialog() = _dialogState.update { it.copy(isBackupDialogOpen = false) }
+
     fun openWebDavDialog() = _dialogState.update { it.copy(isWebDavDialogOpen = true) }
 
     fun closeWebDavDialog() = _dialogState.update { it.copy(isWebDavDialogOpen = false) }
@@ -138,14 +142,7 @@ class SettingViewModelV2 @Inject constructor(
 
     fun updateWebDavConfig(username: String, url: String, password: String) {
         viewModelScope.launch {
-            val config = _webDavConfig.value.copy(
-                username = username,
-                url = url,
-                password = password,
-                readOnly = false
-            )
-            settingRepository.updateWebDavConfig(config)
-            _webDavConfig.update { settingRepository.getWebDavConfig() }
+            saveWebDavConfig(username, url, password)
             closeWebDavDialog()
             _operationNotice.update { "WebDAV settings saved." }
         }
@@ -157,6 +154,7 @@ class SettingViewModelV2 @Inject constructor(
                 WebDavConfig(username = "", url = "", password = "", readOnly = false, lastSyncAt = 0L)
             )
             _webDavConfig.update { settingRepository.getWebDavConfig() }
+            closeWebDavDialog()
             _operationNotice.update { "WebDAV settings cleared." }
         }
     }
@@ -231,6 +229,19 @@ class SettingViewModelV2 @Inject constructor(
         }
     }
 
+    fun uploadWebDavConfig(username: String, url: String, password: String) {
+        viewModelScope.launch {
+            val config = saveWebDavConfig(username, url, password)
+            val notice = runCatching { appBackupRepository.uploadWebDavConfig(config) }
+                .fold(
+                    onSuccess = { "WebDAV provider config uploaded." },
+                    onFailure = { "WebDAV upload failed: ${it.message ?: "unknown"}" }
+                )
+            fetchWebDavConfig()
+            _operationNotice.update { notice }
+        }
+    }
+
     fun downloadWebDavConfig() {
         viewModelScope.launch {
             val notice = runCatching { appBackupRepository.downloadWebDavConfig() }
@@ -239,6 +250,20 @@ class SettingViewModelV2 @Inject constructor(
                     onFailure = { "WebDAV pull failed: ${it.message ?: "unknown"}" }
                 )
             fetchPlatforms()
+            _operationNotice.update { notice }
+        }
+    }
+
+    fun downloadWebDavConfig(username: String, url: String, password: String) {
+        viewModelScope.launch {
+            val config = saveWebDavConfig(username, url, password)
+            val notice = runCatching { appBackupRepository.downloadWebDavConfig(config) }
+                .fold(
+                    onSuccess = { "WebDAV pulled $it provider configs." },
+                    onFailure = { "WebDAV pull failed: ${it.message ?: "unknown"}" }
+                )
+            fetchPlatforms()
+            fetchWebDavConfig()
             _operationNotice.update { notice }
         }
     }
@@ -302,9 +327,27 @@ class SettingViewModelV2 @Inject constructor(
         val isDeleteDialogOpen: Boolean = false,
         val isTokenStatsDialogOpen: Boolean = false,
         val isChatGroupDialogOpen: Boolean = false,
+        val isBackupDialogOpen: Boolean = false,
         val isWebDavDialogOpen: Boolean = false,
         val platformToDelete: Int? = null
     )
+
+    private suspend fun saveWebDavConfig(username: String, url: String, password: String): WebDavConfig {
+        val previous = _webDavConfig.value
+        val trimmedUsername = username.trim()
+        val trimmedUrl = url.trim()
+        val keepReadOnly = previous.readOnly && previous.username == trimmedUsername && previous.url == trimmedUrl
+        val config = previous.copy(
+            username = trimmedUsername,
+            url = trimmedUrl,
+            password = password,
+            readOnly = keepReadOnly
+        )
+        settingRepository.updateWebDavConfig(config)
+        val savedConfig = settingRepository.getWebDavConfig()
+        _webDavConfig.update { savedConfig }
+        return savedConfig
+    }
 
     private companion object {
         private const val MAX_CHAT_GROUPS = 5
