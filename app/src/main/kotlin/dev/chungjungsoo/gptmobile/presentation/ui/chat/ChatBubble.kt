@@ -1,4 +1,4 @@
-package dev.chungjungsoo.gptmobile.presentation.ui.chat
+﻿package dev.chungjungsoo.gptmobile.presentation.ui.chat
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -51,6 +52,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
+import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.presentation.theme.GPTMobileTheme
 import java.io.File
 
@@ -137,7 +140,7 @@ fun OpponentChatBubble(
                 colors = cardColor
             ) {
                 Column {
-                    val displayText = if (isLoading) text + "●" else text
+                    val displayText = if (isLoading) "$text..." else text
 
                     ChatMarkdown(
                         content = displayText,
@@ -209,26 +212,69 @@ fun OpponentChatBubble(
 }
 
 @Composable
-fun GPTMobileIcon(loading: Boolean) {
+fun ProviderAvatar(
+    platform: PlatformV2?,
+    loading: Boolean
+) {
+    val providerType = platform?.compatibleType ?: ClientType.CUSTOM
+    val iconResId = when (providerType) {
+        ClientType.OPENAI -> R.drawable.provider_openai
+        ClientType.ANTHROPIC -> R.drawable.provider_claude
+        ClientType.DEEPSEEK -> R.drawable.provider_deepseek
+        ClientType.QWEN -> R.drawable.provider_qwen
+        else -> null
+    }
+    val fallback = remember(platform?.name, providerType) { providerAvatarFallback(platform, providerType) }
+
     Box(
         modifier = Modifier
             .padding(start = 8.dp)
             .size(40.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(color = Color(0xFFF5F0E3)),
+            .clip(CircleShape)
+            .background(color = fallback.containerColor),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_chat_ai),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-        if (loading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(40.dp)
+        if (iconResId != null) {
+            Image(
+                painter = painterResource(iconResId),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Text(
+                text = fallback.label,
+                style = MaterialTheme.typography.titleMedium,
+                color = fallback.contentColor
             )
         }
+        if (loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(40.dp),
+                strokeWidth = 2.dp
+            )
+        }
+    }
+}
+
+private data class ProviderAvatarFallback(
+    val label: String,
+    val containerColor: Color,
+    val contentColor: Color
+)
+
+private fun providerAvatarFallback(platform: PlatformV2?, providerType: ClientType): ProviderAvatarFallback {
+    return when (providerType) {
+        ClientType.CUSTOM -> {
+            val label = platform?.name
+                ?.trim()
+                ?.firstOrNull()
+                ?.uppercaseChar()
+                ?.toString()
+                ?: "AI"
+            ProviderAvatarFallback(label, Color(0xFFFDE9D9), Color(0xFF5D4037))
+        }
+        else -> ProviderAvatarFallback("AI", Color(0xFFFDE9D9), Color(0xFF5D4037))
     }
 }
 

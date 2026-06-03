@@ -48,6 +48,7 @@ class SettingDataSourceImpl @Inject constructor(
     private val dynamicThemeKey = intPreferencesKey("dynamic_mode")
     private val themeModeKey = intPreferencesKey("theme_mode")
     private val autoContextCompressionKey = booleanPreferencesKey("auto_context_compression")
+    private val appTestModeKey = booleanPreferencesKey("app_test_mode")
 
     override suspend fun updateDynamicTheme(theme: DynamicTheme) {
         dataStore.edit { pref ->
@@ -109,6 +110,12 @@ class SettingDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateAppTestMode(enabled: Boolean) {
+        dataStore.edit { pref ->
+            pref[appTestModeKey] = enabled
+        }
+    }
+
     override suspend fun getDynamicTheme(): DynamicTheme? {
         val mode = dataStore.data.map { pref ->
             pref[dynamicThemeKey]
@@ -155,5 +162,9 @@ class SettingDataSourceImpl @Inject constructor(
 
     override suspend fun getAutoContextCompression(): Boolean? = dataStore.data.map { pref ->
         pref[autoContextCompressionKey]
+    }.first()
+
+    override suspend fun getAppTestMode(): Boolean? = dataStore.data.map { pref ->
+        pref[appTestModeKey]
     }.first()
 }

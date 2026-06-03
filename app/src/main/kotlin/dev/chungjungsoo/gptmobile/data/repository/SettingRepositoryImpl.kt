@@ -50,9 +50,10 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun fetchPlatformV2s(): List<PlatformV2> = platformV2Dao.getPlatforms()
         .filter { it.compatibleType in ClientType.SUPPORTED }
+        .map { it.withDefaultModelPresets() }
 
     override suspend fun fetchThemes(): ThemeSetting = ThemeSetting(
-        dynamicTheme = settingDataSource.getDynamicTheme() ?: DynamicTheme.ON,
+        dynamicTheme = settingDataSource.getDynamicTheme() ?: DynamicTheme.OFF,
         themeMode = settingDataSource.getThemeMode() ?: ThemeMode.SYSTEM
     )
 
@@ -90,7 +91,13 @@ class SettingRepositoryImpl @Inject constructor(
                     topP = platform.topP,
                     systemPrompt = platform.systemPrompt,
                     stream = true,
-                    reasoning = false
+                    reasoning = false,
+                    modelPresets = ModelConstants.getDefaultModelPresets(
+                        when (platform.name) {
+                            ApiType.OPENAI -> ClientType.OPENAI
+                            ApiType.ANTHROPIC -> ClientType.ANTHROPIC
+                        }
+                    )
                 )
             )
         }
@@ -121,12 +128,19 @@ class SettingRepositoryImpl @Inject constructor(
         settingDataSource.updateAutoContextCompression(enabled)
     }
 
+    override suspend fun getAppTestMode(): Boolean =
+        settingDataSource.getAppTestMode() ?: true
+
+    override suspend fun updateAppTestMode(enabled: Boolean) {
+        settingDataSource.updateAppTestMode(enabled)
+    }
+
     override suspend fun addPlatformV2(platform: PlatformV2) {
-        platformV2Dao.addPlatform(platform)
+        platformV2Dao.addPlatform(platform.withDefaultModelPresets())
     }
 
     override suspend fun updatePlatformV2(platform: PlatformV2) {
-        platformV2Dao.editPlatform(platform)
+        platformV2Dao.editPlatform(platform.withDefaultModelPresets())
     }
 
     override suspend fun deletePlatformV2(platform: PlatformV2) {
@@ -137,4 +151,37 @@ class SettingRepositoryImpl @Inject constructor(
 
     override suspend fun getPlatformV2ById(id: Int): PlatformV2? = platformV2Dao.getPlatform(id)
         ?.takeIf { it.compatibleType in ClientType.SUPPORTED }
+        ?.withDefaultModelPresets()
+
+    private fun PlatformV2.withDefaultModelPresets(): PlatformV2 {
+        if (compatibleType == ClientType.CUSTOM) return this
+        val defaults = ModelConstants.getDefaultModelPresets(compatibleType)
+        if (defaults.isEmpty()) return this
+
+        val normalizedPresets = modelPresets
+            .map { preset -> preset.copy(model = preset.model.trim(), remark = preset.remark.trim()) }
+            .filter { it.model.isNotBlank() }
+            .ifEmpty { defaults }
+
+        val normalizedModel = model.takeIf { it.isNotBlank() }
+            ?.let(::normalizeLegacyModel)
+            ?.takeIf { normalized -> normalizedPresets.any { it.model == normalized } || modelPresets.isNotEmpty() }
+            ?: normalizedPresets.first().model
+
+        return copy(
+            model = normalizedModel,
+            modelPresets = normalizedPresets,
+            reasoning = false.takeIf { reasoning && compatibleType == ClientType.CUSTOM } ?: reasoning
+        )
+    }
+
+    private fun normalizeLegacyModel(model: String): String = when {
+        model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
+        model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
+        model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-flash"
+        model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-flash"
+        model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-plus"
+        else -> model
+    }
 }

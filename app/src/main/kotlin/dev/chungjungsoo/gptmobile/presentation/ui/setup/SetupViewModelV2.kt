@@ -1,13 +1,15 @@
-package dev.chungjungsoo.gptmobile.presentation.ui.setup
+﻿package dev.chungjungsoo.gptmobile.presentation.ui.setup
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.chungjungsoo.gptmobile.data.ModelConstants
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.data.repository.SettingRepository
+import dev.chungjungsoo.gptmobile.presentation.ui.setting.sanitizeModelPresets
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +51,9 @@ class SetupViewModelV2 @Inject constructor(
     private val _model = MutableStateFlow("")
     val model: StateFlow<String> = _model.asStateFlow()
 
+    private val _modelPresets = MutableStateFlow<List<PlatformModelPreset>>(emptyList())
+    val modelPresets: StateFlow<List<PlatformModelPreset>> = _modelPresets.asStateFlow()
+
     private val _saveStatus = MutableStateFlow<SaveStatus>(SaveStatus.Idle)
     val saveStatus: StateFlow<SaveStatus> = _saveStatus.asStateFlow()
 
@@ -68,7 +73,9 @@ class SetupViewModelV2 @Inject constructor(
         _platformName.value = getDefaultPlatformName(clientType)
         _apiUrl.value = getDefaultApiUrl(clientType)
         _apiKey.value = ""
-        _model.value = getDefaultModel(clientType)
+        val presets = ModelConstants.getDefaultModelPresets(clientType)
+        _modelPresets.value = presets
+        _model.value = presets.firstOrNull()?.model ?: getDefaultModel(clientType)
         _wizardStep.value = 0
     }
 
@@ -88,6 +95,11 @@ class SetupViewModelV2 @Inject constructor(
         _model.value = modelName
     }
 
+    fun updateModelPresets(presets: List<PlatformModelPreset>) {
+        _modelPresets.value = presets
+        _model.value = sanitizeModelPresets(presets).firstOrNull()?.model.orEmpty()
+    }
+
     fun nextWizardStep() {
         _wizardStep.update { it + 1 }
     }
@@ -103,6 +115,7 @@ class SetupViewModelV2 @Inject constructor(
         _apiUrl.value = ""
         _apiKey.value = ""
         _model.value = ""
+        _modelPresets.value = emptyList()
     }
 
     fun savePlatform() {
@@ -111,18 +124,21 @@ class SetupViewModelV2 @Inject constructor(
         viewModelScope.launch {
             _saveStatus.value = SaveStatus.Saving
             try {
+                val presets = sanitizeModelPresets(_modelPresets.value)
+                val selectedModel = presets.firstOrNull()?.model ?: _model.value.trim()
                 val platform = PlatformV2(
                     name = _platformName.value.trim(),
                     compatibleType = clientType,
                     enabled = true,
                     apiUrl = _apiUrl.value.trim(),
                     token = _apiKey.value.trim().takeIf { it.isNotEmpty() },
-                    model = _model.value.trim(),
+                    model = selectedModel,
                     temperature = 1.0f,
                     topP = 1.0f,
                     systemPrompt = ModelConstants.DEFAULT_PROMPT,
                     stream = true,
                     reasoning = false,
+                    modelPresets = presets,
                     timeout = 30
                 )
                 settingRepository.addPlatformV2(platform)
@@ -158,7 +174,7 @@ class SetupViewModelV2 @Inject constructor(
         1 -> true
 
         // API key is optional for some custom OpenAI-compatible providers.
-        2 -> _model.value.isNotBlank()
+        2 -> sanitizeModelPresets(_modelPresets.value).isNotEmpty() || _model.value.isNotBlank()
 
         else -> false
     }
@@ -169,10 +185,9 @@ class SetupViewModelV2 @Inject constructor(
         ClientType.OPENAI -> "OpenAI"
         ClientType.ANTHROPIC -> "Claude"
         ClientType.DEEPSEEK -> "DeepSeek"
-        ClientType.QWEN -> "千问"
+        ClientType.QWEN -> "\u5343\u95ee"
         ClientType.CUSTOM -> ""
     }
-
     private fun getDefaultApiUrl(clientType: ClientType): String = when (clientType) {
         ClientType.OPENAI -> ModelConstants.OPENAI_API_URL
         ClientType.ANTHROPIC -> ModelConstants.ANTHROPIC_API_URL
@@ -182,10 +197,10 @@ class SetupViewModelV2 @Inject constructor(
     }
 
     private fun getDefaultModel(clientType: ClientType): String = when (clientType) {
-        ClientType.OPENAI -> "gpt-5.2"
-        ClientType.ANTHROPIC -> "claude-sonnet-4-5-20250929"
-        ClientType.DEEPSEEK -> "deepseek-v4-flash"
-        ClientType.QWEN -> "qwen-vl-plus"
+        ClientType.OPENAI -> ModelConstants.getDefaultModel(clientType)
+        ClientType.ANTHROPIC -> ModelConstants.getDefaultModel(clientType)
+        ClientType.DEEPSEEK -> ModelConstants.getDefaultModel(clientType)
+        ClientType.QWEN -> ModelConstants.getDefaultModel(clientType)
         ClientType.CUSTOM -> ""
     }
 

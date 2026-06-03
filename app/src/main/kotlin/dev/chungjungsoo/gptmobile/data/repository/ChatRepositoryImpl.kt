@@ -132,29 +132,49 @@ class ChatRepositoryImpl @Inject constructor(
         userMessages: List<MessageV2>,
         assistantMessages: List<List<MessageV2>>,
         platform: PlatformV2
-    ): Flow<ApiState> = when (platform.compatibleType) {
-        ClientType.OPENAI -> {
-            // Use Responses API for OpenAI (supports reasoning/thinking)
-            completeChatWithOpenAIResponses(userMessages, assistantMessages, platform)
-        }
+    ): Flow<ApiState> {
+        logDetailedCompletionRequest(userMessages, assistantMessages, platform)
+        return when (platform.compatibleType) {
+            ClientType.OPENAI -> {
+                // Use Responses API for OpenAI (supports reasoning/thinking)
+                completeChatWithOpenAIResponses(userMessages, assistantMessages, platform)
+            }
 
-        ClientType.DEEPSEEK -> {
-            completeChatWithDeepSeek(userMessages, assistantMessages, platform)
-        }
+            ClientType.DEEPSEEK -> {
+                completeChatWithDeepSeek(userMessages, assistantMessages, platform)
+            }
 
-        ClientType.QWEN -> {
-            completeChatWithQwen(userMessages, assistantMessages, platform)
-        }
+            ClientType.QWEN -> {
+                completeChatWithQwen(userMessages, assistantMessages, platform)
+            }
 
-        ClientType.CUSTOM -> {
-            // Use Chat Completions API for OpenAI-compatible services
-            completeChatWithOpenAIChatCompletions(userMessages, assistantMessages, platform)
-        }
+            ClientType.CUSTOM -> {
+                // Use Chat Completions API for OpenAI-compatible services
+                completeChatWithOpenAIChatCompletions(userMessages, assistantMessages, platform)
+            }
 
-        ClientType.ANTHROPIC -> {
-            completeChatWithAnthropic(userMessages, assistantMessages, platform)
+            ClientType.ANTHROPIC -> {
+                completeChatWithAnthropic(userMessages, assistantMessages, platform)
+            }
         }
+    }
 
+    private suspend fun logDetailedCompletionRequest(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platform: PlatformV2
+    ) {
+        if (!settingRepository.getAppTestMode()) return
+        val allMessages = userMessages + assistantMessages.flatten()
+        AppLogger.info(
+            context = context,
+            tag = "ChatRepository",
+            message = "request platform=${platform.name} type=${platform.compatibleType} " +
+                "model=${platform.model} reasoning=${platform.reasoning} stream=${platform.stream} " +
+                "turns=${userMessages.size} assistantRows=${assistantMessages.size} " +
+                "attachments=${allMessages.sumOf { it.attachments.size }} " +
+                "estimatedTokens=${estimateMessagesTokens(allMessages)}"
+        )
     }
 
     private suspend fun completeChatWithDeepSeek(
@@ -229,7 +249,8 @@ class ChatRepositoryImpl @Inject constructor(
                     messages = messages,
                     stream = platform.stream,
                     temperature = if (platform.reasoning) null else platform.temperature,
-                    topP = if (platform.reasoning) null else platform.topP
+                    topP = if (platform.reasoning) null else platform.topP,
+                    enableThinking = platform.reasoning
                 )
             },
             stream = { request ->

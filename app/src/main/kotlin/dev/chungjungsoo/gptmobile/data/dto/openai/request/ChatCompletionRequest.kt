@@ -41,6 +41,10 @@ data class ChatCompletionRequest(
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     val thinking: ThinkingConfig? = null,
 
+    @SerialName("enable_thinking")
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val enableThinking: Boolean? = null,
+
     @SerialName("presence_penalty")
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     val presencePenalty: Float? = null,

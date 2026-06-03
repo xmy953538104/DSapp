@@ -8,7 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chungjungsoo.gptmobile.data.model.DynamicTheme
 import dev.chungjungsoo.gptmobile.data.model.ThemeMode
 
-val LocalDynamicTheme = compositionLocalOf { DynamicTheme.ON }
+val LocalDynamicTheme = compositionLocalOf { DynamicTheme.OFF }
 val LocalThemeMode = compositionLocalOf { ThemeMode.SYSTEM }
 val LocalThemeViewModel = compositionLocalOf<ThemeViewModel> {
     error("CompositionLocal LocalThemeViewModel is not present")

@@ -99,7 +99,7 @@ class ChatRepositoryImplTest {
     }
 
     @Test
-    fun `deepseek legacy aliases switch between chat and reasoner`() {
+    fun `deepseek legacy aliases normalize to v4 presets`() {
         val thinkingRequest = createDeepSeekChatCompletionRequest(
             messages = emptyList(),
             platform = deepSeekPlatform(reasoning = true, model = "deepseek-chat")
@@ -109,10 +109,15 @@ class ChatRepositoryImplTest {
             platform = deepSeekPlatform(reasoning = false, model = "deepseek-reasoner")
         )
 
-        assertEquals("deepseek-reasoner", thinkingRequest.model)
-        assertNull(thinkingRequest.thinking)
-        assertEquals("deepseek-chat", chatRequest.model)
-        assertNull(chatRequest.thinking)
+        assertEquals("deepseek-v4-flash", thinkingRequest.model)
+        assertEquals("enabled", thinkingRequest.thinking?.type)
+        assertEquals("high", thinkingRequest.reasoningEffort)
+        assertNull(thinkingRequest.temperature)
+        assertNull(thinkingRequest.topP)
+
+        assertEquals("deepseek-v4-pro", chatRequest.model)
+        assertEquals("disabled", chatRequest.thinking?.type)
+        assertNull(chatRequest.reasoningEffort)
     }
 
     private fun createRepository(
@@ -150,6 +155,10 @@ class ChatRepositoryImplTest {
     @Suppress("UNCHECKED_CAST")
     private inline fun <reified T> proxy(): T {
         val handler = InvocationHandler { _, method, _ ->
+            if (method.name == "getAppTestMode") {
+                return@InvocationHandler false
+            }
+
             when (method.returnType) {
                 Boolean::class.javaPrimitiveType -> false
                 Int::class.javaPrimitiveType -> 0

@@ -15,6 +15,7 @@ interface SettingDataSource {
     suspend fun updateTopP(apiType: ApiType, topP: Float)
     suspend fun updateSystemPrompt(apiType: ApiType, prompt: String)
     suspend fun updateAutoContextCompression(enabled: Boolean)
+    suspend fun updateAppTestMode(enabled: Boolean)
     suspend fun getDynamicTheme(): DynamicTheme?
     suspend fun getThemeMode(): ThemeMode?
     suspend fun getStatus(apiType: ApiType): Boolean?
@@ -25,4 +26,5 @@ interface SettingDataSource {
     suspend fun getTopP(apiType: ApiType): Float?
     suspend fun getSystemPrompt(apiType: ApiType): String?
     suspend fun getAutoContextCompression(): Boolean?
+    suspend fun getAppTestMode(): Boolean?
 }

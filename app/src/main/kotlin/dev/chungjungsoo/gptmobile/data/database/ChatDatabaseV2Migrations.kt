@@ -281,6 +281,12 @@ object ChatDatabaseV2Migrations {
         }
     }
 
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `platform_v2` ADD COLUMN `model_presets` TEXT NOT NULL DEFAULT '[]'")
+        }
+    }
+
     internal fun legacyFilesToAttachmentsJson(filesValue: String): String {
         val attachments = filesValue
             .split(",")

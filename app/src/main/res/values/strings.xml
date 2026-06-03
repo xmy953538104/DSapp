@@ -115,26 +115,15 @@
     <string name="timeout_setting_description">Maximum idle time between streamed response chunks. Set to 0 to disable the timeout.</string>
     <string name="timeout_invalid">Enter 0 or a positive number of seconds.</string>
     <string name="about">About</string>
-    <string name="about_description">Version, License, Feedback</string>
+    <string name="about_description">Version, license, diagnostics</string>
     <string name="version">Version</string>
     <string name="license">License</string>
     <string name="github" translatable="false">GitHub</string>
-    <string name="f_droid" translatable="false">F-Droid</string>
-    <string name="play_store" translatable="false">Play Store</string>
-    <string name="feedback">Feedback</string>
     <string name="license_description">Open Source Licenses</string>
-    <string name="feedback_description">We are open to all kinds of feedback!</string>
     <string name="version_icon">Version Icon</string>
     <string name="license_icon">License Icon</string>
-    <string name="feedback_icon">Feedback Icon</string>
     <string name="github_icon">GitHub Icon</string>
-    <string name="f_droid_icon">F-Droid Icon</string>
-    <string name="play_store_icon">Play Store Icon</string>
-    <string name="github_link" translatable="false">https://github.com/Taewan-P/gpt_mobile</string>
-    <string name="f_droid_link" translatable="false">https://f-droid.org/packages/dev.chungjungsoo.gptmobile/</string>
-    <string name="play_store_link" translatable="false">https://play.google.com/store/apps/details?id=dev.chungjungsoo.gptmobile</string>
-    <string name="bug_report_link" translatable="false">https://github.com/Taewan-P/gpt_mobile/issues/new/choose</string>
-    <string name="feedback_link" translatable="false">https://github.com/Taewan-P/gpt_mobile/discussions/new/choose</string>
+    <string name="github_link" translatable="false">https://github.com/xmy953538104/DSapp</string>
     <string name="api_url">API URL</string>
     <string name="url_icon">URL Icon</string>
     <string name="invalid_api_url">Please enter a valid URL.</string>
@@ -146,9 +135,6 @@
     <string name="enter_api_address">Enter API Address</string>
     <string name="reset">Reset</string>
     <string name="api_url_cautions">The url must end with a \'/\'.</string>
-    <string name="bug_report">Bug Report</string>
-    <string name="bug_report_description">Something isn\'t working correctly?</string>
-    <string name="bug_report_icon">Bug Report Icon</string>
     <string name="scroll_to_bottom_icon">Scroll to bottom icon</string>
     <string name="options">Options</string>
     <string name="chat_models">聊天模型</string>
@@ -257,7 +243,7 @@
     <string name="platform_basics_description">Give your platform a name and verify the API URL</string>
     <string name="api_key_description">Enter your API key. This is stored locally on your device.</string>
     <string name="model_description">Enter the model identifier you want to use</string>
-    <string name="model_examples">例如：gpt-4o、claude-sonnet-4-20250514、deepseek-v4-flash、qwen-vl-plus</string>
+    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.7-flash</string>
     <string name="back">Back</string>
     <string name="finish">Finish</string>
     <string name="deepseek" translatable="false">DeepSeek</string>
@@ -270,4 +256,13 @@
     <string name="revision_counter">第 %1$d/%2$d 页</string>
     <string name="previous_revision" translatable="false">Previous revision</string>
     <string name="next_revision" translatable="false">Next revision</string>
+    <string name="model_remark">Remark</string>
+    <string name="model_preset_index">Model %1$d</string>
+    <string name="add_model_preset">Add model</string>
+    <string name="model_presets_description">Edit the built-in model identifiers and the labels shown in chat.</string>
+    <string name="settings_general_section">General</string>
+    <string name="settings_providers_section">Providers</string>
+    <string name="settings_about_section">About</string>
+    <string name="app_test_mode">App testing</string>
+    <string name="app_test_mode_description">Keep detailed runtime logs enabled for troubleshooting.</string>
 </resources>

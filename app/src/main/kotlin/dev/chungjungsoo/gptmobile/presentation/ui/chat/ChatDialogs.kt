@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import dev.chungjungsoo.gptmobile.R
 import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveContent
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveThoughts
 import dev.chungjungsoo.gptmobile.data.model.ClientType
@@ -54,21 +55,18 @@ fun ChatModelDialog(
     initialModels: Map<String, String>,
     platformNames: Map<String, String>,
     platformTypes: Map<String, ClientType> = emptyMap(),
+    platformModelPresets: Map<String, List<PlatformModelPreset>> = emptyMap(),
     onDismissRequest: () -> Unit,
     onConfirmRequest: (Map<String, String>) -> Unit
 ) {
     val configuration = LocalWindowInfo.current
     val screenWidth = with(LocalDensity.current) { configuration.containerSize.width.toDp() }
     val screenHeight = with(LocalDensity.current) { configuration.containerSize.height.toDp() }
-    var models by rememberSaveable(platformOrder, initialModels, platformTypes) {
+    var models by rememberSaveable(platformOrder, initialModels, platformTypes, platformModelPresets) {
         mutableStateOf(
             platformOrder.associateWith { uid ->
                 val initialModel = initialModels[uid].orEmpty()
-                if (platformTypes[uid] == ClientType.DEEPSEEK) {
-                    normalizeDeepSeekPickerModel(initialModel)
-                } else {
-                    initialModel
-                }
+                normalizePickerModel(platformTypes[uid] ?: ClientType.CUSTOM, initialModel)
             }
         )
     }
@@ -87,18 +85,12 @@ fun ChatModelDialog(
                 )
                 platformOrder.forEach { platformUid ->
                     val platformName = platformNames[platformUid] ?: stringResource(R.string.unknown)
-                    if (platformTypes[platformUid] == ClientType.DEEPSEEK) {
-                        DeepSeekModelPicker(
+                    val presets = platformModelPresets[platformUid].orEmpty()
+                    if (presets.isNotEmpty()) {
+                        ProviderModelPicker(
                             platformName = platformName,
                             selectedModel = models[platformUid].orEmpty(),
-                            onModelChange = { model ->
-                                models = models.toMutableMap().apply { put(platformUid, model) }
-                            }
-                        )
-                    } else if (platformTypes[platformUid] == ClientType.QWEN) {
-                        QwenModelPicker(
-                            platformName = platformName,
-                            selectedModel = models[platformUid].orEmpty(),
+                            presets = presets,
                             onModelChange = { model ->
                                 models = models.toMutableMap().apply { put(platformUid, model) }
                             }
@@ -144,34 +136,13 @@ fun ChatModelDialog(
     )
 }
 
-private data class ProviderModelOption(
-    val titleResId: Int,
-    val model: String
-)
-
-private val deepSeekModelOptions = listOf(
-    ProviderModelOption(R.string.deepseek_model_fast, "deepseek-v4-flash"),
-    ProviderModelOption(R.string.deepseek_model_thinking, "deepseek-v4-pro")
-)
-
-private val qwenModelOptions = listOf(
-    ProviderModelOption(R.string.qwen_model_vision_fast, "qwen-vl-plus"),
-    ProviderModelOption(R.string.qwen_model_vision_max, "qwen-vl-max"),
-    ProviderModelOption(R.string.qwen_model_chat, "qwen3.5-plus"),
-    ProviderModelOption(R.string.qwen_model_thinking, "qwen3-next-80b-a3b-thinking")
-)
-
 @Composable
-private fun DeepSeekModelPicker(
+private fun ProviderModelPicker(
     platformName: String,
     selectedModel: String,
+    presets: List<PlatformModelPreset>,
     onModelChange: (String) -> Unit
 ) {
-    val effectiveSelectedModel = when {
-        selectedModel.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
-        selectedModel.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
-        else -> selectedModel
-    }
     Column(
         modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -181,69 +152,38 @@ private fun DeepSeekModelPicker(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        deepSeekModelOptions.forEach { option ->
-            val optionModel = option.model
+        presets.forEach { preset ->
             ProviderModelOptionCard(
-                option = option,
-                selected = effectiveSelectedModel.equals(optionModel, ignoreCase = true),
+                title = preset.remark.ifBlank { preset.model },
+                model = preset.model,
+                selected = selectedModel.equals(preset.model, ignoreCase = true),
                 onModelChange = onModelChange
             )
         }
     }
 }
 
-private fun normalizeDeepSeekPickerModel(model: String): String = when {
-    model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
-    model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
+private fun normalizePickerModel(clientType: ClientType, model: String): String = when {
+    clientType == ClientType.DEEPSEEK && model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
+    clientType == ClientType.DEEPSEEK && model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-flash"
+    clientType == ClientType.QWEN && model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-plus"
     else -> model
 }
 
 @Composable
-private fun QwenModelPicker(
-    platformName: String,
-    selectedModel: String,
-    onModelChange: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.chat_model_for_platform, platformName),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        qwenModelOptions.forEach { option ->
-            val optionModel = option.model
-            ProviderModelOptionCard(
-                option = option,
-                selected = selectedModel.equals(optionModel, ignoreCase = true),
-                onModelChange = onModelChange
-            )
-        }
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = selectedModel,
-            onValueChange = onModelChange,
-            singleLine = true,
-            label = { Text(text = stringResource(R.string.model)) },
-            supportingText = {
-                Text(stringResource(R.string.model_supporting))
-            }
-        )
-    }
-}
-
-@Composable
 private fun ProviderModelOptionCard(
-    option: ProviderModelOption,
+    title: String,
+    model: String,
     selected: Boolean,
     onModelChange: (String) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onModelChange(option.model) },
+            .clickable { onModelChange(model) },
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {
                 MaterialTheme.colorScheme.primaryContainer
@@ -261,17 +201,17 @@ private fun ProviderModelOptionCard(
         ) {
             RadioButton(
                 selected = selected,
-                onClick = { onModelChange(option.model) }
+                onClick = { onModelChange(model) }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(option.titleResId),
+                    text = title,
                     style = MaterialTheme.typography.titleLarge
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = option.model,
+                    text = model,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

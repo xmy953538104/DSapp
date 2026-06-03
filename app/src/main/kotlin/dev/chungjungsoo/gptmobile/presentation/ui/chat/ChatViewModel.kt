@@ -241,60 +241,34 @@ class ChatViewModel @Inject constructor(
             .mapValues { (_, model) -> model.trim() }
 
         _chatPlatformModels.update { it + sanitizedModels }
-        val reasoningUpdates = sanitizedModels.mapNotNull { (platformUid, model) ->
-            val platform = _platformsInApp.value.firstOrNull { it.uid == platformUid }
-                ?: return@mapNotNull null
-            val reasoning = when (platform.compatibleType) {
-                ClientType.QWEN -> isQwenReasoningModel(model)
-                else -> return@mapNotNull null
-            }
-            platformUid to reasoning
-        }.toMap()
-
-        if (reasoningUpdates.isNotEmpty()) {
-            _platformsInApp.update { platforms ->
-                platforms.map { platform ->
-                    reasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
-                }
-            }
-            _enabledPlatformsInApp.update { platforms ->
-                platforms.map { platform ->
-                    reasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
-                }
-            }
-        }
 
         if (_chatRoom.value.id > 0) {
             viewModelScope.launch {
-                reasoningUpdates.forEach { (platformUid, reasoning) ->
-                    _platformsInApp.value.firstOrNull { it.uid == platformUid }
-                        ?.let { settingRepository.updatePlatformV2(it.copy(reasoning = reasoning)) }
-                }
                 chatRepository.saveChatPlatformModels(_chatRoom.value.id, _chatPlatformModels.value)
             }
         }
     }
 
-    fun updateDeepSeekReasoning(enabled: Boolean) {
-        val deepSeekPlatforms = _platformsInApp.value.filter { platform ->
-            platform.uid in enabledPlatformsInChat && platform.compatibleType == ClientType.DEEPSEEK
+    fun updateReasoningMode(enabled: Boolean) {
+        val reasoningPlatforms = _platformsInApp.value.filter { platform ->
+            platform.uid in enabledPlatformsInChat && platform.compatibleType.supportsReasoningMode()
         }
-        if (deepSeekPlatforms.isEmpty()) return
+        if (reasoningPlatforms.isEmpty()) return
 
-        val deepSeekPlatformUids = deepSeekPlatforms.map { it.uid }.toSet()
+        val reasoningPlatformUids = reasoningPlatforms.map { it.uid }.toSet()
         _platformsInApp.update { platforms ->
             platforms.map { platform ->
-                if (platform.uid in deepSeekPlatformUids) platform.copy(reasoning = enabled) else platform
+                if (platform.uid in reasoningPlatformUids) platform.copy(reasoning = enabled) else platform
             }
         }
         _enabledPlatformsInApp.update { platforms ->
             platforms.map { platform ->
-                if (platform.uid in deepSeekPlatformUids) platform.copy(reasoning = enabled) else platform
+                if (platform.uid in reasoningPlatformUids) platform.copy(reasoning = enabled) else platform
             }
         }
 
         viewModelScope.launch {
-            deepSeekPlatforms.forEach { platform ->
+            reasoningPlatforms.forEach { platform ->
                 settingRepository.updatePlatformV2(platform.copy(reasoning = enabled))
             }
         }
@@ -956,13 +930,9 @@ class ChatViewModel @Inject constructor(
         val chatModel = _chatPlatformModels.value[platform.uid]?.trim().orEmpty()
         if (chatModel.isBlank()) return platform
 
-        val reasoning = when {
-            platform.compatibleType == ClientType.QWEN -> isQwenReasoningModel(chatModel)
-            else -> platform.reasoning
-        }
-        if (chatModel == platform.model && reasoning == platform.reasoning) return platform
+        if (chatModel == platform.model) return platform
 
-        return platform.copy(model = chatModel, reasoning = reasoning)
+        return platform.copy(model = chatModel)
     }
 
     private fun persistCurrentChatSnapshot() {
@@ -1009,11 +979,12 @@ internal fun createEmptyAssistantMessage(chatId: Int, platformUid: String): Mess
     platformType = platformUid
 )
 
-internal fun isQwenReasoningModel(model: String): Boolean {
-    val normalized = model.lowercase()
-    return normalized.contains("thinking") ||
-        normalized.startsWith("qwq") ||
-        normalized.startsWith("qvq")
+internal fun ClientType.supportsReasoningMode(): Boolean = when (this) {
+    ClientType.OPENAI,
+    ClientType.ANTHROPIC,
+    ClientType.DEEPSEEK,
+    ClientType.QWEN -> true
+    ClientType.CUSTOM -> false
 }
 
 internal fun createRetryAssistantMessage(

@@ -151,7 +151,9 @@ fun PlatformSettingScreen(
                 SettingItem(
                     modifier = Modifier.height(64.dp),
                     title = stringResource(R.string.api_model),
-                    description = platformData.model,
+                    description = platformData.modelPresets.joinToString(" / ") { preset ->
+                        if (preset.remark.isBlank()) preset.model else "${preset.remark}: ${preset.model}"
+                    }.ifBlank { platformData.model },
                     enabled = platformData.enabled,
                     onItemClick = settingViewModel::openApiModelDialog,
                     showTrailingIcon = false,
@@ -165,7 +167,12 @@ fun PlatformSettingScreen(
                 )
                 val isReasoningDisabled =
                     platformData.reasoning &&
-                        (platformData.compatibleType == ClientType.OPENAI || platformData.compatibleType == ClientType.DEEPSEEK || platformData.compatibleType == ClientType.QWEN)
+                        (
+                            platformData.compatibleType == ClientType.OPENAI ||
+                                platformData.compatibleType == ClientType.ANTHROPIC ||
+                                platformData.compatibleType == ClientType.DEEPSEEK ||
+                                platformData.compatibleType == ClientType.QWEN
+                            )
                 val notSetText = stringResource(R.string.not_set)
                 SettingItem(
                     modifier = Modifier.height(64.dp),
@@ -237,7 +244,7 @@ fun PlatformSettingScreen(
                 PlatformNameDialog(dialogState, platformData.name, settingViewModel)
                 APIUrlDialog(dialogState, platformData.apiUrl, settingViewModel)
                 APIKeyDialog(dialogState, settingViewModel)
-                ModelDialog(dialogState, platformData.model, settingViewModel)
+                ModelPresetsDialog(dialogState, platformData, settingViewModel)
                 TemperatureDialog(dialogState, platformData.temperature, settingViewModel)
                 TopPDialog(dialogState, platformData.topP, settingViewModel)
                 SystemPromptDialog(dialogState, platformData.systemPrompt ?: "", settingViewModel)

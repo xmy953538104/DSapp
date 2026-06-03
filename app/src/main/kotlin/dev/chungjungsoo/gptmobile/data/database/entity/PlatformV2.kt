@@ -3,8 +3,18 @@ package dev.chungjungsoo.gptmobile.data.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import java.util.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class PlatformModelPreset(
+    val model: String,
+    val remark: String
+)
 
 @Entity(tableName = "platform_v2")
 data class PlatformV2(
@@ -48,6 +58,29 @@ data class PlatformV2(
     @ColumnInfo(name = "reasoning")
     val reasoning: Boolean = false,
 
+    @ColumnInfo(name = "model_presets")
+    val modelPresets: List<PlatformModelPreset> = emptyList(),
+
     @ColumnInfo(name = "timeout")
     val timeout: Int = 30
 )
+
+class PlatformModelPresetListConverter {
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
+
+    @TypeConverter
+    fun fromString(value: String?): List<PlatformModelPreset> {
+        if (value.isNullOrBlank()) return emptyList()
+        return runCatching {
+            json.decodeFromString(ListSerializer(PlatformModelPreset.serializer()), value)
+        }.getOrDefault(emptyList())
+    }
+
+    @TypeConverter
+    fun fromList(value: List<PlatformModelPreset>?): String {
+        return json.encodeToString(ListSerializer(PlatformModelPreset.serializer()), value.orEmpty())
+    }
+}

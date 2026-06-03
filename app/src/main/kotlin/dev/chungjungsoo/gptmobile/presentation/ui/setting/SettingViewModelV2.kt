@@ -26,6 +26,9 @@ class SettingViewModelV2 @Inject constructor(
     private val _autoContextCompression = MutableStateFlow(true)
     val autoContextCompression: StateFlow<Boolean> = _autoContextCompression.asStateFlow()
 
+    private val _appTestMode = MutableStateFlow(true)
+    val appTestMode: StateFlow<Boolean> = _appTestMode.asStateFlow()
+
     private val _tokenUsageStats = MutableStateFlow<TokenUsageStats?>(null)
     val tokenUsageStats: StateFlow<TokenUsageStats?> = _tokenUsageStats.asStateFlow()
 
@@ -35,6 +38,7 @@ class SettingViewModelV2 @Inject constructor(
     init {
         fetchPlatforms()
         fetchAutoContextCompression()
+        fetchAppTestMode()
     }
 
     fun fetchPlatforms() {
@@ -54,6 +58,19 @@ class SettingViewModelV2 @Inject constructor(
         _autoContextCompression.update { enabled }
         viewModelScope.launch {
             settingRepository.updateAutoContextCompression(enabled)
+        }
+    }
+
+    private fun fetchAppTestMode() {
+        viewModelScope.launch {
+            _appTestMode.update { settingRepository.getAppTestMode() }
+        }
+    }
+
+    fun updateAppTestMode(enabled: Boolean) {
+        _appTestMode.update { enabled }
+        viewModelScope.launch {
+            settingRepository.updateAppTestMode(enabled)
         }
     }
 
@@ -91,6 +108,10 @@ class SettingViewModelV2 @Inject constructor(
                     appendLine("- compactedTokensSaved=${tokenStats.totalCompactedTokensSaved}")
                 }
                 .onFailure { appendLine("- failed: ${it.message}") }
+            appendLine()
+            appendLine("Settings:")
+            appendLine("- autoContextCompression=${settingRepository.getAutoContextCompression()}")
+            appendLine("- appTestMode=${settingRepository.getAppTestMode()}")
             appendLine()
             appendLine("Recent app log:")
             appendLine(appLog.ifBlank { "(empty)" })

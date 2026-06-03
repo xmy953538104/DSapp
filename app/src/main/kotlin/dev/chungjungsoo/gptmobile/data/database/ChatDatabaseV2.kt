@@ -14,18 +14,20 @@ import dev.chungjungsoo.gptmobile.data.database.entity.ChatAttachmentListConvert
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatPlatformModelV2
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatRoomV2
 import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPresetListConverter
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.database.entity.StringListConverter
 
 @Database(
     entities = [ChatRoomV2::class, MessageV2::class, PlatformV2::class, ChatPlatformModelV2::class, ChatCompactionPointV2::class],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(
     StringListConverter::class,
     ChatAttachmentListConverter::class,
-    AssistantRevisionListConverter::class
+    AssistantRevisionListConverter::class,
+    PlatformModelPresetListConverter::class
 )
 abstract class ChatDatabaseV2 : RoomDatabase() {
 

@@ -1,13 +1,15 @@
 package dev.chungjungsoo.gptmobile.data
 
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset
 import dev.chungjungsoo.gptmobile.data.model.ApiType
+import dev.chungjungsoo.gptmobile.data.model.ClientType
 
 object ModelConstants {
     // LinkedHashSet should be used to guarantee item order
-    val openaiModels = linkedSetOf("gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4")
-    val anthropicModels = linkedSetOf("claude-3-5-sonnet-20240620", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307")
+    val openaiModels = linkedSetOf("gpt-5.2", "gpt-5-mini")
+    val anthropicModels = linkedSetOf("claude-sonnet-4-5-20250929", "claude-3-5-haiku-20241022")
     val deepSeekModels = linkedSetOf("deepseek-v4-flash", "deepseek-v4-pro")
-    val qwenModels = linkedSetOf("qwen-vl-plus", "qwen-vl-max", "qwen3.5-plus", "qwen3-next-80b-a3b-thinking")
+    val qwenModels = linkedSetOf("qwen3.7-flash", "qwen3.7-plus")
 
     const val OPENAI_API_URL = "https://api.openai.com/"
     const val ANTHROPIC_API_URL = "https://api.anthropic.com/"
@@ -17,6 +19,35 @@ object ModelConstants {
     fun getDefaultAPIUrl(apiType: ApiType) = when (apiType) {
         ApiType.OPENAI -> OPENAI_API_URL
         ApiType.ANTHROPIC -> ANTHROPIC_API_URL
+    }
+
+    fun getDefaultModel(clientType: ClientType): String = getDefaultModelPresets(clientType)
+        .firstOrNull()
+        ?.model
+        .orEmpty()
+
+    fun getDefaultModelPresets(clientType: ClientType): List<PlatformModelPreset> = when (clientType) {
+        ClientType.OPENAI -> listOf(
+            PlatformModelPreset("gpt-5-mini", DAILY_USE_REMARK),
+            PlatformModelPreset("gpt-5.2", PROFESSIONAL_USE_REMARK)
+        )
+
+        ClientType.ANTHROPIC -> listOf(
+            PlatformModelPreset("claude-3-5-haiku-20241022", DAILY_USE_REMARK),
+            PlatformModelPreset("claude-sonnet-4-5-20250929", PROFESSIONAL_USE_REMARK)
+        )
+
+        ClientType.DEEPSEEK -> listOf(
+            PlatformModelPreset("deepseek-v4-flash", DAILY_USE_REMARK),
+            PlatformModelPreset("deepseek-v4-pro", PROFESSIONAL_USE_REMARK)
+        )
+
+        ClientType.QWEN -> listOf(
+            PlatformModelPreset("qwen3.7-flash", DAILY_USE_REMARK),
+            PlatformModelPreset("qwen3.7-plus", PROFESSIONAL_USE_REMARK)
+        )
+
+        ClientType.CUSTOM -> emptyList()
     }
 
     const val ANTHROPIC_MAXIMUM_TOKEN = 4096
@@ -33,4 +64,7 @@ object ModelConstants {
             "The output must match the language that the user and the opponent is using, and should be less than 50 letters. " +
             "The output should only include the sentence in plain text without bullets or double asterisks. Do not use markdown syntax.\n" +
             "[Chat Content]\n"
+
+    private const val DAILY_USE_REMARK = "\u65e5\u5e38\u4f7f\u7528"
+    private const val PROFESSIONAL_USE_REMARK = "\u4e13\u4e1a\u5e94\u7528"
 }

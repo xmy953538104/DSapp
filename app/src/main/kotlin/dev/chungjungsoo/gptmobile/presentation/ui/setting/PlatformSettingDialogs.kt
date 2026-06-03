@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.util.isValidUrl
 import kotlin.math.roundToInt
 
@@ -94,6 +95,21 @@ fun ModelDialog(
         ) { m ->
             settingViewModel.updateApiModel(m)
         }
+    }
+}
+
+@Composable
+fun ModelPresetsDialog(
+    dialogState: PlatformSettingViewModel.DialogState,
+    platform: PlatformV2,
+    settingViewModel: PlatformSettingViewModel
+) {
+    if (dialogState.isApiModelDialogOpen) {
+        ModelPresetsDialog(
+            platform = platform,
+            onDismissRequest = settingViewModel::closeApiModelDialog,
+            onConfirmRequest = settingViewModel::updateModelPresets
+        )
     }
 }
 
@@ -411,6 +427,61 @@ private fun ModelDialog(
             TextButton(
                 onClick = onDismissRequest
             ) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+@Composable
+private fun ModelPresetsDialog(
+    platform: PlatformV2,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: (List<dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset>) -> Unit
+) {
+    val configuration = LocalWindowInfo.current
+    val screenWidth = with(LocalDensity.current) { configuration.containerSize.width.toDp() }
+    val screenHeight = with(LocalDensity.current) { configuration.containerSize.height.toDp() }
+    var presets by remember(platform.uid, platform.modelPresets, platform.model) {
+        mutableStateOf(
+            platform.modelPresets.ifEmpty {
+                listOf(dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset(platform.model, ""))
+            }
+        )
+    }
+    val sanitizedPresets = sanitizeModelPresets(presets)
+
+    AlertDialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        modifier = Modifier
+            .widthIn(max = screenWidth - 40.dp)
+            .heightIn(max = screenHeight - 80.dp),
+        title = { Text(text = stringResource(R.string.api_model)) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                Text(stringResource(R.string.model_presets_description))
+                ModelPresetEditor(
+                    presets = presets,
+                    onPresetsChange = { presets = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                )
+            }
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(
+                enabled = sanitizedPresets.isNotEmpty(),
+                onClick = { onConfirmRequest(sanitizedPresets) }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }

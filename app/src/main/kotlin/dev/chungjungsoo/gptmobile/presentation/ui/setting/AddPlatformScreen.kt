@@ -40,6 +40,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import dev.chungjungsoo.gptmobile.R
 import dev.chungjungsoo.gptmobile.data.ModelConstants
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 
@@ -53,9 +54,9 @@ fun AddPlatformScreen(
     var platformName by remember { mutableStateOf("") }
     var selectedClientType by remember { mutableStateOf(ClientType.OPENAI) }
     var clientTypeExpanded by remember { mutableStateOf(false) }
-    var apiUrl by remember { mutableStateOf("") }
+    var apiUrl by remember { mutableStateOf(ModelConstants.OPENAI_API_URL) }
     var apiKey by remember { mutableStateOf("") }
-    var model by remember { mutableStateOf("") }
+    var modelPresets by remember { mutableStateOf(ModelConstants.getDefaultModelPresets(ClientType.OPENAI)) }
     var reasoningEnabled by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -161,7 +162,9 @@ fun AddPlatformScreen(
                                     ClientType.QWEN -> ModelConstants.QWEN_API_URL
                                     ClientType.CUSTOM -> ""
                                 }
-                                model = getDefaultModel(clientType)
+                                modelPresets = ModelConstants.getDefaultModelPresets(clientType)
+                                    .ifEmpty { listOf(PlatformModelPreset("", "")) }
+                                reasoningEnabled = false
                                 clientTypeExpanded = false
                             }
                         )
@@ -199,17 +202,10 @@ fun AddPlatformScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Model
-            OutlinedTextField(
-                value = model,
-                onValueChange = { model = it },
-                label = { Text(stringResource(R.string.model)) },
-                placeholder = { Text(getModelPlaceholder(selectedClientType)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                supportingText = {
-                    Text(stringResource(R.string.model_supporting))
-                }
+            ModelPresetEditor(
+                presets = modelPresets,
+                onPresetsChange = { modelPresets = it },
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -243,24 +239,26 @@ fun AddPlatformScreen(
             // Action buttons
             Button(
                 onClick = {
+                    val presets = sanitizeModelPresets(modelPresets)
                     val platform = PlatformV2(
                         name = platformName.trim(),
                         compatibleType = selectedClientType,
                         enabled = true,
                         apiUrl = apiUrl.trim(),
                         token = apiKey.trim().takeIf { it.isNotEmpty() },
-                        model = model.trim(),
+                        model = presets.firstOrNull()?.model ?: ModelConstants.getDefaultModel(selectedClientType),
                         temperature = 1.0f,
                         topP = 1.0f,
                         systemPrompt = ModelConstants.DEFAULT_PROMPT,
                         stream = true,
                         reasoning = reasoningEnabled,
+                        modelPresets = presets,
                         timeout = 30
                     )
                     onSave(platform)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = platformName.isNotBlank() && apiUrl.isNotBlank() && model.isNotBlank()
+                enabled = platformName.isNotBlank() && apiUrl.isNotBlank() && sanitizeModelPresets(modelPresets).isNotEmpty()
             ) {
                 Text(stringResource(R.string.save))
             }
@@ -304,9 +302,9 @@ private fun getModelPlaceholder(clientType: ClientType): String = when (clientTy
 }
 
 private fun getDefaultModel(clientType: ClientType): String = when (clientType) {
-    ClientType.OPENAI -> "gpt-5.2"
-    ClientType.ANTHROPIC -> "claude-sonnet-4-5-20250929"
-    ClientType.DEEPSEEK -> "deepseek-v4-flash"
-    ClientType.QWEN -> "qwen-vl-plus"
+    ClientType.OPENAI -> ModelConstants.getDefaultModel(clientType)
+    ClientType.ANTHROPIC -> ModelConstants.getDefaultModel(clientType)
+    ClientType.DEEPSEEK -> ModelConstants.getDefaultModel(clientType)
+    ClientType.QWEN -> ModelConstants.getDefaultModel(clientType)
     ClientType.CUSTOM -> ""
 }

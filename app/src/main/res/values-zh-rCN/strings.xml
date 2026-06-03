@@ -90,18 +90,13 @@
     <string name="top_p_setting">核心采样</string>
     <string name="top_p_setting_description">在核心采样中，我们按递减概率顺序计算每个后续令牌的所有选项的累积分布，并在达到该值指定的特定概率后将其截断。大多数模型通常建议改变这个或温度，但不是两者都改变。</string>
     <string name="about">关于</string>
-    <string name="about_description">版本、许可证、反馈</string>
+    <string name="about_description">版本、许可证、诊断日志</string>
     <string name="version">版本</string>
     <string name="license">许可证</string>
-    <string name="feedback">反馈</string>
     <string name="license_description">开源许可证</string>
-    <string name="feedback_description">我们欢迎您的任何意见！</string>
     <string name="version_icon">版本的图标</string>
     <string name="license_icon">许可证的图标</string>
-    <string name="feedback_icon">反馈的图标</string>
     <string name="github_icon">Github 的图标</string>
-    <string name="f_droid_icon">F-droid 的图标</string>
-    <string name="play_store_icon">Play 商店的图标</string>
     <string name="api_url">API 网址</string>
     <string name="url_icon">URL 的图标</string>
     <string name="invalid_api_url">请输入一个有效的网址</string>
@@ -117,9 +112,6 @@
     <string name="reset">重置</string>
 
     <string name="api_url_cautions">网址的结尾必须有一个\"/\"</string>
-    <string name="bug_report">错误报告</string>
-    <string name="bug_report_description">有什么无法工作了吗？</string>
-    <string name="bug_report_icon">错误报告的图标</string>
     <string name="scroll_to_bottom_icon">滚动到底部的图标</string>
 
 
@@ -203,7 +195,7 @@
     <string name="api_key_description">请输入你的 API 密钥，它只存储在您的设备上。</string>
 
     <string name="model_description">请输入您使用模型的标识符</string>
-    <string name="model_examples">例如：gpt-4o、claude-sonnet-4-20250514、deepseek-v4-flash、qwen-vl-plus</string>
+    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.7-flash</string>
     <string name="back">返回</string>
     <string name="finish">完成</string>
 <string name="custom_provider">自定义提供商</string>
@@ -256,4 +248,14 @@
     <string name="timeout_seconds_label">超时（秒）</string>
     <string name="timeout_setting_description">流式响应两段内容之间允许等待的最长时间。设为 0 可关闭超时。</string>
     <string name="timeout_invalid">请输入 0 或正整数秒。</string>
+    <string name="qwen" translatable="false">千问</string>
+    <string name="model_remark">备注</string>
+    <string name="model_preset_index">模型 %1$d</string>
+    <string name="add_model_preset">添加模型</string>
+    <string name="model_presets_description">编辑内置模型标识符和聊天里显示的中文备注。</string>
+    <string name="settings_general_section">通用</string>
+    <string name="settings_providers_section">提供商</string>
+    <string name="settings_about_section">关于</string>
+    <string name="app_test_mode">应用测试</string>
+    <string name="app_test_mode_description">开启完整运行日志，方便导出后定位问题。</string>
 </resources>

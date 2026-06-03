@@ -44,11 +44,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.presentation.ui.setup.SetupViewModelV2.Companion.WIZARD_STEP_API_KEY
 import dev.chungjungsoo.gptmobile.presentation.ui.setup.SetupViewModelV2.Companion.WIZARD_STEP_BASICS
 import dev.chungjungsoo.gptmobile.presentation.ui.setup.SetupViewModelV2.Companion.WIZARD_STEP_MODEL
 import dev.chungjungsoo.gptmobile.presentation.ui.setup.SetupViewModelV2.Companion.WIZARD_TOTAL_STEPS
+import dev.chungjungsoo.gptmobile.presentation.ui.setting.ModelPresetEditor
+import dev.chungjungsoo.gptmobile.presentation.ui.setting.sanitizeModelPresets
 
 @Composable
 fun SetupPlatformWizardScreen(
@@ -64,6 +67,7 @@ fun SetupPlatformWizardScreen(
     val apiUrlState = setupViewModel.apiUrl.collectAsStateWithLifecycle()
     val apiKeyState = setupViewModel.apiKey.collectAsStateWithLifecycle()
     val modelState = setupViewModel.model.collectAsStateWithLifecycle()
+    val modelPresetsState = setupViewModel.modelPresets.collectAsStateWithLifecycle()
 
     // Extract values for use in composables
     val wizardStep = wizardStepState.value
@@ -82,7 +86,7 @@ fun SetupPlatformWizardScreen(
                 WIZARD_STEP_API_KEY -> true
 
                 // API key is optional for some custom OpenAI-compatible providers.
-                WIZARD_STEP_MODEL -> modelState.value.isNotBlank()
+                WIZARD_STEP_MODEL -> sanitizeModelPresets(modelPresetsState.value).isNotEmpty() || modelState.value.isNotBlank()
 
                 else -> false
             }
@@ -167,10 +171,10 @@ fun SetupPlatformWizardScreen(
 
                     WIZARD_STEP_MODEL -> {
                         // Collect model state directly inside AnimatedContent for proper recomposition
-                        val currentModel by setupViewModel.model.collectAsStateWithLifecycle()
+                        val currentModelPresets by setupViewModel.modelPresets.collectAsStateWithLifecycle()
                         ModelStep(
-                            model = currentModel,
-                            onModelChange = setupViewModel::updateModel
+                            modelPresets = currentModelPresets,
+                            onModelPresetsChange = setupViewModel::updateModelPresets
                         )
                     }
                 }
@@ -414,8 +418,8 @@ private fun ApiKeyStep(
 
 @Composable
 private fun ModelStep(
-    model: String,
-    onModelChange: (String) -> Unit,
+    modelPresets: List<PlatformModelPreset>,
+    onModelPresetsChange: (List<PlatformModelPreset>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -440,26 +444,10 @@ private fun ModelStep(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Model
-        OutlinedTextField(
-            value = model,
-            onValueChange = onModelChange,
-            label = { Text(stringResource(R.string.model)) },
-            placeholder = { Text(stringResource(R.string.model_name)) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            supportingText = {
-                Text(stringResource(R.string.model_supporting))
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Examples
-        Text(
-            text = stringResource(R.string.model_examples),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+        ModelPresetEditor(
+            presets = modelPresets,
+            onPresetsChange = onModelPresetsChange,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

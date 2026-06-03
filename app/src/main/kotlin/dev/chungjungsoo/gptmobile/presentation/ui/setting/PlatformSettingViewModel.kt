@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.repository.SettingRepository
 import javax.inject.Inject
@@ -109,6 +110,20 @@ class PlatformSettingViewModel @Inject constructor(
     fun updateApiModel(model: String) {
         _platformState.value?.let { platform ->
             updatePlatform(platform.copy(model = model.trim()))
+            closeApiModelDialog()
+        }
+    }
+
+    fun updateModelPresets(presets: List<PlatformModelPreset>) {
+        _platformState.value?.let { platform ->
+            val sanitizedPresets = sanitizeModelPresets(presets)
+            val selectedModel = sanitizedPresets.firstOrNull()?.model ?: platform.model
+            updatePlatform(
+                platform.copy(
+                    model = selectedModel,
+                    modelPresets = sanitizedPresets
+                )
+            )
             closeApiModelDialog()
         }
     }

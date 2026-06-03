@@ -144,12 +144,12 @@ fun ChatScreen(
     val chatPlatformSet = chatViewModel.enabledPlatformsInChat.toSet()
     val canUseChat = chatPlatformSet.isNotEmpty() && (chatPlatformSet - appEnabledPlatforms.map { it.uid }.toSet()).isEmpty()
     val isIdle = loadingStates.all { it == ChatViewModel.LoadingState.Idle }
-    val deepSeekPlatformsInChat = remember(appEnabledPlatforms, chatViewModel.enabledPlatformsInChat) {
+    val reasoningPlatformsInChat = remember(appEnabledPlatforms, chatViewModel.enabledPlatformsInChat) {
         appEnabledPlatforms.filter { platform ->
-            platform.uid in chatViewModel.enabledPlatformsInChat && platform.compatibleType == ClientType.DEEPSEEK
+            platform.uid in chatViewModel.enabledPlatformsInChat && platform.compatibleType.supportsReasoningMode()
         }
     }
-    val isDeepSeekThinkingEnabled = deepSeekPlatformsInChat.any { platform ->
+    val isReasoningModeEnabled = reasoningPlatformsInChat.any { platform ->
         platform.reasoning
     }
     val currentTokenEstimate = remember(groupedMessages) {
@@ -313,12 +313,12 @@ fun ChatScreen(
                 chatEnabled = canUseChat,
                 sendButtonEnabled = isIdle,
                 selectedAttachments = selectedAttachments,
-                deepSeekThinkingAvailable = deepSeekPlatformsInChat.isNotEmpty(),
-                deepSeekThinkingEnabled = isDeepSeekThinkingEnabled,
+                reasoningModeAvailable = reasoningPlatformsInChat.isNotEmpty(),
+                reasoningModeEnabled = isReasoningModeEnabled,
                 tokenEstimate = currentTokenEstimate,
                 onFileSelected = { filePath -> chatViewModel.addSelectedFile(filePath) },
                 onFileRemoved = { filePath -> chatViewModel.removeSelectedFile(filePath) },
-                onDeepSeekThinkingToggle = chatViewModel::updateDeepSeekReasoning
+                onReasoningModeToggle = chatViewModel::updateReasoningMode
             ) {
                 chatViewModel.askQuestion()
                 focusManager.clearFocus()
@@ -341,11 +341,15 @@ fun ChatScreen(
             val platformTypes = chatViewModel.enabledPlatformsInChat.associateWith { uid ->
                 appAllPlatforms.find { it.uid == uid }?.compatibleType ?: ClientType.CUSTOM
             }
+            val platformModelPresets = chatViewModel.enabledPlatformsInChat.associateWith { uid ->
+                appAllPlatforms.find { it.uid == uid }?.modelPresets.orEmpty()
+            }
             ChatModelDialog(
                 platformOrder = chatViewModel.enabledPlatformsInChat,
                 initialModels = chatPlatformModels,
                 platformNames = platformNames,
                 platformTypes = platformTypes,
+                platformModelPresets = platformModelPresets,
                 onDismissRequest = chatViewModel::closeChatModelDialog,
                 onConfirmRequest = { models ->
                     chatViewModel.updateChatPlatformModels(models)
@@ -480,7 +484,10 @@ private fun ChatMessagePair(
                     .padding(top = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                GPTMobileIcon(loading = isActiveMessage && !isIdle)
+                ProviderAvatar(
+                    platform = enabledPlatformLookup[selectedPlatformUid],
+                    loading = isActiveMessage && isCurrentPlatformLoading
+                )
                 if (enabledPlatformsInChat.size > 1) {
                     Row(
                         modifier = Modifier
@@ -706,12 +713,12 @@ fun ChatInputBox(
     chatEnabled: Boolean = true,
     sendButtonEnabled: Boolean = true,
     selectedAttachments: List<ChatAttachmentDraft> = emptyList(),
-    deepSeekThinkingAvailable: Boolean = false,
-    deepSeekThinkingEnabled: Boolean = false,
+    reasoningModeAvailable: Boolean = false,
+    reasoningModeEnabled: Boolean = false,
     tokenEstimate: Int = 0,
     onFileSelected: (String) -> Unit = {},
     onFileRemoved: (String) -> Unit = {},
-    onDeepSeekThinkingToggle: (Boolean) -> Unit = {},
+    onReasoningModeToggle: (Boolean) -> Unit = {},
     onSendButtonClick: () -> Unit = {}
 ) {
     val localStyle = LocalTextStyle.current
@@ -825,15 +832,15 @@ fun ChatInputBox(
                     contentDescription = stringResource(R.string.take_photo)
                 )
             }
-            if (deepSeekThinkingAvailable) {
+            if (reasoningModeAvailable) {
                 FilterChip(
-                    selected = deepSeekThinkingEnabled,
+                    selected = reasoningModeEnabled,
                     enabled = chatEnabled && sendButtonEnabled,
-                    onClick = { onDeepSeekThinkingToggle(!deepSeekThinkingEnabled) },
+                    onClick = { onReasoningModeToggle(!reasoningModeEnabled) },
                     label = {
                         Text(
                             text = stringResource(
-                                if (deepSeekThinkingEnabled) {
+                                if (reasoningModeEnabled) {
                                     R.string.deepseek_thinking_on
                                 } else {
                                     R.string.deepseek_thinking_off
