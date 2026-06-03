@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GPTMobile</string>
-    <string name="gpt_mobile_introduction_logo">GPT Mobile 的介绍图标</string>
+    <string name="app_name">Chat-AI</string>
+    <string name="gpt_mobile_introduction_logo">Chat-AI 图标</string>
     <string name="welcome_title">卓越的 AI 助理：\n 文明之智，尽收股掌。</string>
     <string name="welcome_description">选择最适合你的模型，畅所欲问！</string>
     <string name="get_started">开始使用</string>
@@ -33,7 +33,7 @@
 
 
     <string name="setup_complete">已经配置完毕！</string>
-    <string name="setup_complete_description">开始使用GPT Mobile吧！</string>
+    <string name="setup_complete_description">开始使用 Chat-AI 吧！</string>
     <string name="done">完成</string>
     <string name="setup_complete_logo">设置完整的图标</string>
     <string name="chats">会话</string>
@@ -203,7 +203,7 @@
     <string name="api_key_description">请输入你的 API 密钥，它只存储在您的设备上。</string>
 
     <string name="model_description">请输入您使用模型的标识符</string>
-    <string name="model_examples">例如：gpt-4o、claude-sonnet-4-20250514、gemini-1.5-pro</string>
+    <string name="model_examples">例如：gpt-4o、claude-sonnet-4-20250514、deepseek-v4-flash、qwen-vl-plus</string>
     <string name="back">返回</string>
     <string name="finish">完成</string>
 <string name="custom_provider">自定义提供商</string>
@@ -211,4 +211,49 @@
     <string name="platform_added_successfully">提供商添加成功</string>
     <string name="at_least_one_platform_required">请至少启用一个提供商</string>
     <string name="remove">移除</string>
+    <string name="chat_models">聊天模型</string>
+    <string name="chat_models_description">仅为当前对话设置每个接入点使用的模型。</string>
+    <string name="chat_model_for_platform">%1$s 的模型</string>
+    <string name="update_chat_models">更新模型</string>
+    <string name="estimated_tokens">约 %1$d tokens</string>
+    <string name="deepseek_thinking_on">深度思考</string>
+    <string name="deepseek_thinking_off">快速回答</string>
+    <string name="deepseek_model_fast">日常使用</string>
+    <string name="deepseek_model_thinking">专业应用</string>
+    <string name="qwen_description">使用通义千问模型，支持图片理解和思考模型。</string>
+    <string name="qwen_model_vision_fast">图片理解</string>
+    <string name="qwen_model_vision_max">高级视觉</string>
+    <string name="qwen_model_chat">普通对话</string>
+    <string name="qwen_model_thinking">深度思考</string>
+    <string name="take_photo">拍照</string>
+    <string name="camera_permission_required">需要相机权限才能拍照。</string>
+    <string name="camera_capture_failed">拍照失败。</string>
+    <string name="client_type_deepseek_desc">DeepSeek OpenAI 兼容 API</string>
+    <string name="client_type_qwen_desc">通义千问 DashScope OpenAI 兼容 API</string>
+    <string name="deepseek_description">使用 DeepSeek V4 模型，并支持深度思考切换</string>
+    <string name="token_usage">Token 统计</string>
+    <string name="token_usage_description">查看全部对话的 token 估算与压缩节省</string>
+    <string name="total_chats_tokens">共 %1$d 个对话，约 %2$d tokens</string>
+    <string name="total_messages_tokens">共 %1$d 条消息</string>
+    <string name="compacted_tokens_saved">自动压缩已节省约 %1$d tokens</string>
+    <string name="chat_compacted_saved">该对话压缩节省约 %1$d tokens</string>
+    <string name="export_diagnostic_log">导出诊断日志</string>
+    <string name="export_diagnostic_log_description">导出平台、token 统计和最近错误日志</string>
+    <string name="auto_context_compression">自动压缩上下文</string>
+    <string name="auto_context_compression_description">对话较长时自动把较早内容压缩成摘要，并保留最近消息。</string>
+    <string name="assistant_message">助手消息</string>
+    <string name="assistant_thoughts">助手思考</string>
+    <string name="edit_assistant_message">编辑助手消息</string>
+    <string name="loading">加载中</string>
+    <string name="revision_counter">第 %1$d/%2$d 页</string>
+    <string name="claude_description">Anthropic Claude Messages API。</string>
+    <string name="copy_code">复制代码</string>
+    <string name="code">代码</string>
+    <string name="duplicate">复制会话</string>
+    <string name="duplicated_chat">已复制会话。</string>
+    <string name="timeout">超时</string>
+    <string name="timeout_icon">超时图标</string>
+    <string name="timeout_seconds_label">超时（秒）</string>
+    <string name="timeout_setting_description">流式响应两段内容之间允许等待的最长时间。设为 0 可关闭超时。</string>
+    <string name="timeout_invalid">请输入 0 或正整数秒。</string>
 </resources>

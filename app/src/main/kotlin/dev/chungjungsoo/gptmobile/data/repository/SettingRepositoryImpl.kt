@@ -52,7 +52,7 @@ class SettingRepositoryImpl @Inject constructor(
         .filter { it.compatibleType in ClientType.SUPPORTED }
 
     override suspend fun fetchThemes(): ThemeSetting = ThemeSetting(
-        dynamicTheme = settingDataSource.getDynamicTheme() ?: DynamicTheme.OFF,
+        dynamicTheme = settingDataSource.getDynamicTheme() ?: DynamicTheme.ON,
         themeMode = settingDataSource.getThemeMode() ?: ThemeMode.SYSTEM
     )
 

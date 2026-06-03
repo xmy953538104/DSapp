@@ -24,5 +24,6 @@ fun getClientTypeDisplayName(clientType: ClientType): String = when (clientType)
     ClientType.OPENAI -> "OpenAI"
     ClientType.ANTHROPIC -> "Claude"
     ClientType.DEEPSEEK -> "DeepSeek"
+    ClientType.QWEN -> "千问"
     ClientType.CUSTOM -> "Custom"
 }

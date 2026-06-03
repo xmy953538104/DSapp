@@ -165,7 +165,7 @@ fun PlatformSettingScreen(
                 )
                 val isReasoningDisabled =
                     platformData.reasoning &&
-                        (platformData.compatibleType == ClientType.OPENAI || platformData.compatibleType == ClientType.DEEPSEEK)
+                        (platformData.compatibleType == ClientType.OPENAI || platformData.compatibleType == ClientType.DEEPSEEK || platformData.compatibleType == ClientType.QWEN)
                 val notSetText = stringResource(R.string.not_set)
                 SettingItem(
                     modifier = Modifier.height(64.dp),

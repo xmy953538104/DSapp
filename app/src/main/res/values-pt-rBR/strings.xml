@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="gpt_mobile_introduction_logo">Logotipo de introdução do GPT Mobile</string>
     <string name="welcome_description">Use o modelo que mais combina com você\nmais. Pergunte o que quiser!</string>
@@ -91,7 +91,7 @@
 
 
 
-<string name="app_name">GPTMovel</string>
+<string name="app_name">Chat-AI</string>
     <string name="welcome_title">O melhor assistente de IA\nque você pode ter no seu\nsmartphone.</string>
     <string name="openai_description">Criador do ChatGPT.</string>
     <string name="next">Próximo</string>

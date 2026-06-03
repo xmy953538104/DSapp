@@ -514,5 +514,6 @@ private fun getApiHelpUrl(clientType: ClientType): String? = when (clientType) {
     ClientType.OPENAI -> "https://platform.openai.com/account/api-keys"
     ClientType.ANTHROPIC -> "https://console.anthropic.com/settings/keys"
     ClientType.DEEPSEEK -> "https://platform.deepseek.com/api_keys"
+    ClientType.QWEN -> "https://bailian.console.aliyun.com/"
     ClientType.CUSTOM -> null
 }

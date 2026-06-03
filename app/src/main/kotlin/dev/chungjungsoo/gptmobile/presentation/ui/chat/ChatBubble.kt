@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,12 +33,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -208,20 +214,21 @@ fun GPTMobileIcon(loading: Boolean) {
         modifier = Modifier
             .padding(start = 8.dp)
             .size(40.dp)
-            .clip(RoundedCornerShape(40.dp))
-            .background(color = Color(0xFF00A67D)),
+            .clip(RoundedCornerShape(10.dp))
+            .background(color = Color(0xFFF5F0E3)),
         contentAlignment = Alignment.Center
     ) {
+        Image(
+            painter = painterResource(R.drawable.ic_chat_ai),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         if (loading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(40.dp)
             )
         }
-        Image(
-            painter = painterResource(R.drawable.ic_gpt_mobile_no_padding),
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-        )
     }
 }
 
@@ -352,6 +359,14 @@ internal fun MessageFileThumbnailRow(
     if (validFiles.isEmpty()) {
         return
     }
+    var previewImagePath by remember { mutableStateOf<String?>(null) }
+
+    previewImagePath?.let { imagePath ->
+        AttachmentImagePreviewDialog(
+            filePath = imagePath,
+            onDismissRequest = { previewImagePath = null }
+        )
+    }
 
     Row(
         modifier = modifier
@@ -362,7 +377,8 @@ internal fun MessageFileThumbnailRow(
         validFiles.forEach { filePath ->
             MessageFileThumbnail(
                 filePath = filePath,
-                usePrimaryColors = usePrimaryColors
+                usePrimaryColors = usePrimaryColors,
+                onImagePreview = { previewImagePath = it }
             )
         }
     }
@@ -371,10 +387,12 @@ internal fun MessageFileThumbnailRow(
 @Composable
 private fun MessageFileThumbnail(
     filePath: String,
-    usePrimaryColors: Boolean
+    usePrimaryColors: Boolean,
+    onImagePreview: (String) -> Unit
 ) {
     val file = File(filePath)
     val isImage = isImageFile(file.extension)
+    val imageBitmap = if (isImage) rememberLocalImageBitmap(file.absolutePath) else null
     val containerColor = if (usePrimaryColors) {
         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
     } else {
@@ -395,16 +413,30 @@ private fun MessageFileThumbnail(
                 .size(48.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(containerColor)
+                .pointerInput(isImage, file.absolutePath) {
+                    if (isImage) {
+                        detectTapGestures(onTap = { onImagePreview(file.absolutePath) })
+                    }
+                }
         ) {
             if (isImage) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_image),
-                    contentDescription = file.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    tint = contentColor
-                )
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = file.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_image),
+                        contentDescription = file.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        tint = contentColor
+                    )
+                }
             } else {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_file),
@@ -417,17 +449,19 @@ private fun MessageFileThumbnail(
             }
         }
 
-        Text(
-            text = file.name,
-            style = MaterialTheme.typography.labelSmall,
-            color = contentColor,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .width(56.dp)
-        )
+        if (!isImage) {
+            Text(
+                text = file.name,
+                style = MaterialTheme.typography.labelSmall,
+                color = contentColor,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .width(56.dp)
+            )
+        }
     }
 }
 

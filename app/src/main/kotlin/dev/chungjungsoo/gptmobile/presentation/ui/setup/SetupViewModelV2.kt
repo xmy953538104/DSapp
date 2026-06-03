@@ -169,6 +169,7 @@ class SetupViewModelV2 @Inject constructor(
         ClientType.OPENAI -> "OpenAI"
         ClientType.ANTHROPIC -> "Claude"
         ClientType.DEEPSEEK -> "DeepSeek"
+        ClientType.QWEN -> "千问"
         ClientType.CUSTOM -> ""
     }
 
@@ -176,6 +177,7 @@ class SetupViewModelV2 @Inject constructor(
         ClientType.OPENAI -> ModelConstants.OPENAI_API_URL
         ClientType.ANTHROPIC -> ModelConstants.ANTHROPIC_API_URL
         ClientType.DEEPSEEK -> ModelConstants.DEEPSEEK_API_URL
+        ClientType.QWEN -> ModelConstants.QWEN_API_URL
         ClientType.CUSTOM -> ""
     }
 
@@ -183,6 +185,7 @@ class SetupViewModelV2 @Inject constructor(
         ClientType.OPENAI -> "gpt-5.2"
         ClientType.ANTHROPIC -> "claude-sonnet-4-5-20250929"
         ClientType.DEEPSEEK -> "deepseek-v4-flash"
+        ClientType.QWEN -> "qwen-vl-plus"
         ClientType.CUSTOM -> ""
     }
 

@@ -6,11 +6,13 @@ object ModelConstants {
     // LinkedHashSet should be used to guarantee item order
     val openaiModels = linkedSetOf("gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4")
     val anthropicModels = linkedSetOf("claude-3-5-sonnet-20240620", "claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307")
-    val deepSeekModels = linkedSetOf("deepseek-v4-flash", "deepseek-v4-pro", "deepseek-chat", "deepseek-reasoner")
+    val deepSeekModels = linkedSetOf("deepseek-v4-flash", "deepseek-v4-pro")
+    val qwenModels = linkedSetOf("qwen-vl-plus", "qwen-vl-max", "qwen3.5-plus", "qwen3-next-80b-a3b-thinking")
 
     const val OPENAI_API_URL = "https://api.openai.com/"
     const val ANTHROPIC_API_URL = "https://api.anthropic.com/"
     const val DEEPSEEK_API_URL = "https://api.deepseek.com/"
+    const val QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/"
 
     fun getDefaultAPIUrl(apiType: ApiType) = when (apiType) {
         ApiType.OPENAI -> OPENAI_API_URL

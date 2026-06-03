@@ -35,6 +35,14 @@ data class ProviderContextPolicy(
                     maxInlineAttachmentBytes = INLINE_ATTACHMENT_LIMIT_BYTES
                 )
             }
+
+            ClientType.QWEN -> {
+                ProviderContextPolicy(
+                    recentTurnWindow = 8,
+                    historicalImageTurnWindow = 2,
+                    maxInlineAttachmentBytes = INLINE_ATTACHMENT_LIMIT_BYTES
+                )
+            }
         }
     }
 }

@@ -3,11 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <queries>
-        <package android:name="com.google.android.aicore" />
-        <package android:name="com.google.android.as.oss" />
-    </queries>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".presentation.GPTMobileApp"

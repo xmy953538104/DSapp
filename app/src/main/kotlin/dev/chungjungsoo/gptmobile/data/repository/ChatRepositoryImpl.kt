@@ -142,6 +142,10 @@ class ChatRepositoryImpl @Inject constructor(
             completeChatWithDeepSeek(userMessages, assistantMessages, platform)
         }
 
+        ClientType.QWEN -> {
+            completeChatWithQwen(userMessages, assistantMessages, platform)
+        }
+
         ClientType.CUSTOM -> {
             // Use Chat Completions API for OpenAI-compatible services
             completeChatWithOpenAIChatCompletions(userMessages, assistantMessages, platform)
@@ -163,7 +167,7 @@ class ChatRepositoryImpl @Inject constructor(
 
         streamPreparedApiState(
             prepare = {
-                val normalizedPlatform = platform.withDeepSeekThinkingModel()
+                val normalizedPlatform = platform.withSupportedDeepSeekModel()
                 val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, normalizedPlatform)
                 val contextTurns = preparedContext.turns
                 validateInlineBudgetIfNeeded(contextTurns, normalizedPlatform)
@@ -202,6 +206,63 @@ class ChatRepositoryImpl @Inject constructor(
         }
     } catch (e: Exception) {
         AppLogger.error(context, "ChatRepository", "DeepSeek completion failed for ${platform.name}", e)
+        flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
+    }
+
+    private suspend fun completeChatWithQwen(
+        userMessages: List<MessageV2>,
+        assistantMessages: List<List<MessageV2>>,
+        platform: PlatformV2
+    ): Flow<ApiState> = try {
+        openAIAPI.setToken(platform.token)
+        openAIAPI.setAPIUrl(platform.apiUrl)
+
+        streamPreparedApiState(
+            prepare = {
+                val preparedContext = prepareContextForCompletion(userMessages, assistantMessages, platform)
+                val contextTurns = preparedContext.turns
+                validateInlineBudgetIfNeeded(contextTurns, platform)
+                val messages = buildOpenAIChatMessages(contextTurns, preparedContext.systemPrompt)
+
+                ChatCompletionRequest(
+                    model = platform.model,
+                    messages = messages,
+                    stream = platform.stream,
+                    temperature = if (platform.reasoning) null else platform.temperature,
+                    topP = if (platform.reasoning) null else platform.topP
+                )
+            },
+            stream = { request ->
+                flow {
+                    val parser = ReasoningStreamParser()
+                    openAIAPI.streamChatCompletion(request, platform.timeout).collect { chunk ->
+                        when {
+                            chunk.error != null -> {
+                                AppLogger.error(context, "ChatRepository", "Qwen API error for ${platform.name}: ${chunk.error.message}")
+                                emit(ApiState.Error(chunk.error.message))
+                            }
+
+                            else -> {
+                                val delta = chunk.choices?.firstOrNull()?.delta
+                                parser.append(
+                                    reasoningChunk = delta?.reasoningContent,
+                                    contentChunk = delta?.content
+                                ).forEach { emit(it) }
+                            }
+                        }
+                    }
+
+                    parser.flush().forEach { emit(it) }
+                }
+            }
+        ).catch { e ->
+            AppLogger.error(context, "ChatRepository", "Qwen request preparation failed for ${platform.name}", e)
+            emit(ApiState.Error(e.message ?: "Unknown error"))
+        }.onCompletion {
+            emit(ApiState.Done)
+        }
+    } catch (e: Exception) {
+        AppLogger.error(context, "ChatRepository", "Qwen completion failed for ${platform.name}", e)
         flowOf(ApiState.Error(e.message ?: "Failed to complete chat"))
     }
 
@@ -506,7 +567,7 @@ class ChatRepositoryImpl @Inject constructor(
         return when (platform.compatibleType) {
             ClientType.OPENAI -> generateOpenAIResponsesSummary(platform, instructions, prompt)
             ClientType.ANTHROPIC -> generateAnthropicSummary(platform, instructions, prompt)
-            ClientType.DEEPSEEK, ClientType.CUSTOM -> generateOpenAICompatibleSummary(platform.copy(reasoning = false), instructions, prompt)
+            ClientType.DEEPSEEK, ClientType.QWEN, ClientType.CUSTOM -> generateOpenAICompatibleSummary(platform.copy(reasoning = false), instructions, prompt)
         }
     }
 
@@ -1207,7 +1268,7 @@ internal fun createDeepSeekChatCompletionRequest(
     messages: List<ChatMessage>,
     platform: PlatformV2
 ): ChatCompletionRequest {
-    val normalizedPlatform = platform.withDeepSeekThinkingModel()
+    val normalizedPlatform = platform.withSupportedDeepSeekModel()
     val isThinkingEnabled = normalizedPlatform.reasoning
     val usesV4ThinkingToggle = isDeepSeekV4Model(normalizedPlatform.model)
 
@@ -1226,12 +1287,12 @@ internal fun createDeepSeekChatCompletionRequest(
     )
 }
 
-internal fun PlatformV2.withDeepSeekThinkingModel(): PlatformV2 {
+internal fun PlatformV2.withSupportedDeepSeekModel(): PlatformV2 {
     if (compatibleType != ClientType.DEEPSEEK) return this
 
     return when {
-        reasoning && model.equals("deepseek-chat", ignoreCase = true) -> copy(model = "deepseek-reasoner")
-        !reasoning && model.equals("deepseek-reasoner", ignoreCase = true) -> copy(model = "deepseek-chat")
+        model.equals("deepseek-chat", ignoreCase = true) -> copy(model = "deepseek-v4-flash")
+        model.equals("deepseek-reasoner", ignoreCase = true) -> copy(model = "deepseek-v4-pro")
         else -> this
     }
 }

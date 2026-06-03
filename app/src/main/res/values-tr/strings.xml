@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GPTMobile</string>
+    <string name="app_name">Chat-AI</string>
     <string name="gpt_mobile_introduction_logo">GPT Mobile Tanıtım Logosu</string>
     <string name="welcome_title">Akıllı telefonunuzda\nalabileceğiniz en iyi\nyapay zeka asistanı.</string>
     <string name="welcome_description">Size en uygun modeli\nkullanın. İstediğiniz her şeyi sorun!</string>
@@ -8,8 +8,6 @@
     <string name="platform_select_description">Kullanmak istediğiniz platformu seçin. Bunu daha sonra ayarlardan değiştirebilirsiniz. Daha fazla platform desteklenecek.</string>
     <string name="sample_item_title">Öğe 1</string>
     <string name="sample_item_description">Öğe açıklaması</string>
-    <string name="openai" translatable="false">OpenAI</string>
-    <string name="anthropic" translatable="false">Anthropic</string>
 <string name="openai_description">ChatGPT’nin yaratıcısı.</string>
     <string name="anthropic_description">Claude burada doğdu.</string>
 
@@ -21,24 +19,14 @@
     <string name="openai_api_key">OpenAI API Anahtarı</string>
     <string name="anthropic_api_key">Anthropic API Anahtarı</string>
 
-    <string name="openai_api_help" translatable="false">https://platform.openai.com/account/api-keys</string>
-    <string name="anthropic_api_help" translatable="false">https://console.anthropic.com/settings/keys</string>
 <string name="select_openai_model">OpenAI Sohbet Modelini Seçin</string>
     <string name="select_openai_model_description">Lütfen OpenAI sohbet modelini seçin. Seçilen model çok modlu olsa bile, uygulama şu anda yalnızca metin girişlerini destekliyor. İleride desteklenebilir.</string>
-    <string name="gpt_4o" translatable="false">GPT-4o</string>
-    <string name="gpt_4o_mini" translatable="false">GPT-4o mini</string>
-    <string name="gpt_4_turbo" translatable="false">GPT-4 Turbo</string>
-    <string name="gpt_4" translatable="false">GPT-4</string>
     <string name="gpt_4o_description">En hızlı ve en uygun fiyatlı amiral gemisi model.</string>
     <string name="gpt_4o_mini_description">Hızlı, hafif görevler için uygun fiyatlı ve akıllı küçük model.</string>
     <string name="gpt_4_turbo_description">Makum güvenilirlik, GPT-4’ten 3 kat daha ucuz.</string>
     <string name="gpt_4_description">Soyut problemleri çözmede en iyi performansı sergiler.</string>
     <string name="select_anthropic_model">Anthropic Sohbet Modelini Seçin</string>
     <string name="select_anthropic_model_description">Lütfen Anthropic sohbet modelini seçin. Şu anda yalnızca Claude 3 ailesi modellerini ve yalnızca metin girişlerini destekliyoruz.</string>
-    <string name="claude_3_5_sonnet" translatable="false">Claude 3.5 Sonnet</string>
-    <string name="claude_3_opus" translatable="false">Claude 3 Opus</string>
-    <string name="claude_3_sonnet" translatable="false">Claude 3 Sonnet</string>
-    <string name="claude_3_haiku" translatable="false">Claude 3 Haiku</string>
     <string name="claude_3_5_sonnet_description">Anthropic’in en zeki modeli.</string>
     <string name="claude_3_opus_description">Yazma ve karmaşık görevlerde üstün.</string>
     <string name="claude_3_sonnet_description">Zeka ve hız arasında dengeli model.</string>
@@ -85,8 +73,6 @@
     <string name="retry">Tekrar Dene</string>
     <string name="ask_a_question">Bir soru sor…</string>
     <string name="some_platforms_disabled">Bazı API’ler devre dışı</string>
-    <string name="openai_brand_text" translatable="false">Powered by OpenAI</string>
-    <string name="anthropic_brand_text" translatable="false">Powered by Claude</string>
 
     <string name="token_not_set">Anahtar ayarlanmadı</string>
     <string name="token_set">Anahtar %s***** olarak ayarlandı</string>
@@ -112,9 +98,6 @@
     <string name="about_description">Sürüm, Lisans, Geri Bildirim</string>
     <string name="version">Sürüm</string>
     <string name="license">Lisans</string>
-    <string name="github" translatable="false">GitHub</string>
-    <string name="f_droid" translatable="false">F-Droid</string>
-    <string name="play_store" translatable="false">Play Store</string>
     <string name="feedback">Geri Bildirim</string>
     <string name="license_description">Açık Kaynak Lisansları</string>
     <string name="feedback_description">Her türlü geri bildirime açığız!</string>
@@ -124,11 +107,6 @@
     <string name="github_icon">GitHub Simgesi</string>
     <string name="f_droid_icon">F-Droid Simgesi</string>
     <string name="play_store_icon">Play Store Simgesi</string>
-    <string name="github_link" translatable="false">https://github.com/Taewan-P/gpt_mobile</string>
-    <string name="f_droid_link" translatable="false">https://f-droid.org/packages/dev.chungjungsoo.gptmobile/</string>
-    <string name="play_store_link" translatable="false">https://play.google.com/store/apps/details?id=dev.chungjungsoo.gptmobile</string>
-    <string name="bug_report_link" translatable="false">https://github.com/Taewan-P/gpt_mobile/issues/new/choose</string>
-    <string name="feedback_link" translatable="false">https://github.com/Taewan-P/gpt_mobile/discussions/new/choose</string>
     <string name="api_url">API URL’si</string>
     <string name="url_icon">URL Simgesi</string>
     <string name="invalid_api_url">Lütfen geçerli bir URL girin.</string>

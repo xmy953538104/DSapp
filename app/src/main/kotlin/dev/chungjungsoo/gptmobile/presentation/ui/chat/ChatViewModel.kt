@@ -241,33 +241,32 @@ class ChatViewModel @Inject constructor(
             .mapValues { (_, model) -> model.trim() }
 
         _chatPlatformModels.update { it + sanitizedModels }
-        val deepSeekReasoningUpdates = sanitizedModels.mapNotNull { (platformUid, model) ->
-            val platform = _platformsInApp.value.firstOrNull { it.uid == platformUid && it.compatibleType == ClientType.DEEPSEEK }
+        val reasoningUpdates = sanitizedModels.mapNotNull { (platformUid, model) ->
+            val platform = _platformsInApp.value.firstOrNull { it.uid == platformUid }
                 ?: return@mapNotNull null
-            val reasoning = when {
-                model.equals("deepseek-reasoner", ignoreCase = true) -> true
-                model.equals("deepseek-chat", ignoreCase = true) -> false
+            val reasoning = when (platform.compatibleType) {
+                ClientType.QWEN -> isQwenReasoningModel(model)
                 else -> return@mapNotNull null
             }
             platformUid to reasoning
         }.toMap()
 
-        if (deepSeekReasoningUpdates.isNotEmpty()) {
+        if (reasoningUpdates.isNotEmpty()) {
             _platformsInApp.update { platforms ->
                 platforms.map { platform ->
-                    deepSeekReasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
+                    reasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
                 }
             }
             _enabledPlatformsInApp.update { platforms ->
                 platforms.map { platform ->
-                    deepSeekReasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
+                    reasoningUpdates[platform.uid]?.let { reasoning -> platform.copy(reasoning = reasoning) } ?: platform
                 }
             }
         }
 
         if (_chatRoom.value.id > 0) {
             viewModelScope.launch {
-                deepSeekReasoningUpdates.forEach { (platformUid, reasoning) ->
+                reasoningUpdates.forEach { (platformUid, reasoning) ->
                     _platformsInApp.value.firstOrNull { it.uid == platformUid }
                         ?.let { settingRepository.updatePlatformV2(it.copy(reasoning = reasoning)) }
                 }
@@ -294,24 +293,9 @@ class ChatViewModel @Inject constructor(
             }
         }
 
-        _chatPlatformModels.update { currentModels ->
-            currentModels + deepSeekPlatforms.associate { platform ->
-                val currentModel = currentModels[platform.uid]?.trim().orEmpty().ifBlank { platform.model }
-                val updatedModel = when {
-                    enabled && currentModel.equals("deepseek-chat", ignoreCase = true) -> "deepseek-reasoner"
-                    !enabled && currentModel.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-chat"
-                    else -> currentModel
-                }
-                platform.uid to updatedModel
-            }
-        }
-
         viewModelScope.launch {
             deepSeekPlatforms.forEach { platform ->
                 settingRepository.updatePlatformV2(platform.copy(reasoning = enabled))
-            }
-            if (_chatRoom.value.id > 0) {
-                chatRepository.saveChatPlatformModels(_chatRoom.value.id, _chatPlatformModels.value)
             }
         }
     }
@@ -973,8 +957,7 @@ class ChatViewModel @Inject constructor(
         if (chatModel.isBlank()) return platform
 
         val reasoning = when {
-            platform.compatibleType == ClientType.DEEPSEEK && chatModel.equals("deepseek-reasoner", ignoreCase = true) -> true
-            platform.compatibleType == ClientType.DEEPSEEK && chatModel.equals("deepseek-chat", ignoreCase = true) -> false
+            platform.compatibleType == ClientType.QWEN -> isQwenReasoningModel(chatModel)
             else -> platform.reasoning
         }
         if (chatModel == platform.model && reasoning == platform.reasoning) return platform
@@ -1025,6 +1008,13 @@ internal fun createEmptyAssistantMessage(chatId: Int, platformUid: String): Mess
     content = "",
     platformType = platformUid
 )
+
+internal fun isQwenReasoningModel(model: String): Boolean {
+    val normalized = model.lowercase()
+    return normalized.contains("thinking") ||
+        normalized.startsWith("qwq") ||
+        normalized.startsWith("qvq")
+}
 
 internal fun createRetryAssistantMessage(
     currentMessage: MessageV2,

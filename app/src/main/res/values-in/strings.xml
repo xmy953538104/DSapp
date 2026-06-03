@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="anthropic_api_key">Kunci API Anthropic</string>
     <string name="select_anthropic_model_description">Pilih model obrolan Anthropic. Kami saat ini hanya mendukung input teks untuk keluarga model Claude 3.</string>
@@ -56,7 +56,7 @@
     <string name="api_model">Model API</string>
     <string name="dynamic_theme">Tema Dinamis</string>
     <string name="dark_mode">Mode gelap</string>
-    <string name="app_name">GPTMobile</string>
+    <string name="app_name">Chat-AI</string>
     <string name="welcome_title">Asisten AI Terbaik\nyang ada\ndi ponsel.</string>
     <string name="get_started">Mulai Sekarang</string>
     <string name="platform_select_description">Pilih platform yang ingin Anda gunakan. Anda dapat mengubah ini nanti di pengaturan. Platform-platform lain akan didukung.</string>

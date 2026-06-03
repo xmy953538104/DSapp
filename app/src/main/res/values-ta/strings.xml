@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="chats">அரட்டைகள்</string>
     <string name="system_prompt">கணினி வரியில்</string>
     <string name="version">பதிப்பு</string>
     <string name="api_url">பநிஇ முகவரி</string>
 <string name="enter_api_address">பநிஇ முகவரியை உள்ளிடவும்</string>
-    <string name="app_name">Gptmobile</string>
+    <string name="app_name">Chat-AI</string>
     <string name="gpt_mobile_introduction_logo">சிபிடி மொபைல் அறிமுகம் லோகோ</string>
     <string name="welcome_title">சிறந்த AI உதவியாளர்\n நீங்கள் பெறலாம்\n ச்மார்ட்போன்.</string>
     <string name="get_started">தொடங்கவும்</string>

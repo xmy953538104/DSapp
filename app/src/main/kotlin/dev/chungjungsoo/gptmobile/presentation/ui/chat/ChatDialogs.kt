@@ -60,8 +60,17 @@ fun ChatModelDialog(
     val configuration = LocalWindowInfo.current
     val screenWidth = with(LocalDensity.current) { configuration.containerSize.width.toDp() }
     val screenHeight = with(LocalDensity.current) { configuration.containerSize.height.toDp() }
-    var models by rememberSaveable(platformOrder, initialModels) {
-        mutableStateOf(platformOrder.associateWith { uid -> initialModels[uid].orEmpty() })
+    var models by rememberSaveable(platformOrder, initialModels, platformTypes) {
+        mutableStateOf(
+            platformOrder.associateWith { uid ->
+                val initialModel = initialModels[uid].orEmpty()
+                if (platformTypes[uid] == ClientType.DEEPSEEK) {
+                    normalizeDeepSeekPickerModel(initialModel)
+                } else {
+                    initialModel
+                }
+            }
+        )
     }
 
     AlertDialog(
@@ -80,6 +89,14 @@ fun ChatModelDialog(
                     val platformName = platformNames[platformUid] ?: stringResource(R.string.unknown)
                     if (platformTypes[platformUid] == ClientType.DEEPSEEK) {
                         DeepSeekModelPicker(
+                            platformName = platformName,
+                            selectedModel = models[platformUid].orEmpty(),
+                            onModelChange = { model ->
+                                models = models.toMutableMap().apply { put(platformUid, model) }
+                            }
+                        )
+                    } else if (platformTypes[platformUid] == ClientType.QWEN) {
+                        QwenModelPicker(
                             platformName = platformName,
                             selectedModel = models[platformUid].orEmpty(),
                             onModelChange = { model ->
@@ -127,20 +144,62 @@ fun ChatModelDialog(
     )
 }
 
-private data class DeepSeekModelOption(
+private data class ProviderModelOption(
     val titleResId: Int,
     val model: String
 )
 
 private val deepSeekModelOptions = listOf(
-    DeepSeekModelOption(R.string.deepseek_model_fast, "deepseek-v4-flash"),
-    DeepSeekModelOption(R.string.deepseek_model_pro, "deepseek-v4-pro"),
-    DeepSeekModelOption(R.string.deepseek_model_chat, "deepseek-chat"),
-    DeepSeekModelOption(R.string.deepseek_model_reasoner, "deepseek-reasoner")
+    ProviderModelOption(R.string.deepseek_model_fast, "deepseek-v4-flash"),
+    ProviderModelOption(R.string.deepseek_model_thinking, "deepseek-v4-pro")
+)
+
+private val qwenModelOptions = listOf(
+    ProviderModelOption(R.string.qwen_model_vision_fast, "qwen-vl-plus"),
+    ProviderModelOption(R.string.qwen_model_vision_max, "qwen-vl-max"),
+    ProviderModelOption(R.string.qwen_model_chat, "qwen3.5-plus"),
+    ProviderModelOption(R.string.qwen_model_thinking, "qwen3-next-80b-a3b-thinking")
 )
 
 @Composable
 private fun DeepSeekModelPicker(
+    platformName: String,
+    selectedModel: String,
+    onModelChange: (String) -> Unit
+) {
+    val effectiveSelectedModel = when {
+        selectedModel.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
+        selectedModel.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
+        else -> selectedModel
+    }
+    Column(
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.chat_model_for_platform, platformName),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        deepSeekModelOptions.forEach { option ->
+            val optionModel = option.model
+            ProviderModelOptionCard(
+                option = option,
+                selected = effectiveSelectedModel.equals(optionModel, ignoreCase = true),
+                onModelChange = onModelChange
+            )
+        }
+    }
+}
+
+private fun normalizeDeepSeekPickerModel(model: String): String = when {
+    model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
+    model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
+    else -> model
+}
+
+@Composable
+private fun QwenModelPicker(
     platformName: String,
     selectedModel: String,
     onModelChange: (String) -> Unit
@@ -154,47 +213,13 @@ private fun DeepSeekModelPicker(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        deepSeekModelOptions.forEach { option ->
+        qwenModelOptions.forEach { option ->
             val optionModel = option.model
-            val selected = selectedModel.equals(optionModel, ignoreCase = true)
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onModelChange(optionModel) },
-                colors = CardDefaults.cardColors(
-                    containerColor = if (selected) {
-                        MaterialTheme.colorScheme.primaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.surfaceContainerLow
-                    }
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = selected,
-                        onClick = { onModelChange(optionModel) }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(option.titleResId),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = optionModel,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
+            ProviderModelOptionCard(
+                option = option,
+                selected = selectedModel.equals(optionModel, ignoreCase = true),
+                onModelChange = onModelChange
+            )
         }
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
@@ -206,6 +231,52 @@ private fun DeepSeekModelPicker(
                 Text(stringResource(R.string.model_supporting))
             }
         )
+    }
+}
+
+@Composable
+private fun ProviderModelOptionCard(
+    option: ProviderModelOption,
+    selected: Boolean,
+    onModelChange: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onModelChange(option.model) },
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            }
+        ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selected = selected,
+                onClick = { onModelChange(option.model) }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(option.titleResId),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = option.model,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 

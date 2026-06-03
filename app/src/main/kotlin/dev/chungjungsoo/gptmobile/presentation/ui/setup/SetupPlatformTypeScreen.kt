@@ -56,6 +56,11 @@ private val platformTypes = listOf(
         descriptionResId = R.string.deepseek_description
     ),
     PlatformTypeInfo(
+        clientType = ClientType.QWEN,
+        titleResId = R.string.qwen,
+        descriptionResId = R.string.qwen_description
+    ),
+    PlatformTypeInfo(
         clientType = ClientType.CUSTOM,
         titleResId = R.string.custom_provider,
         descriptionResId = R.string.custom_provider_description

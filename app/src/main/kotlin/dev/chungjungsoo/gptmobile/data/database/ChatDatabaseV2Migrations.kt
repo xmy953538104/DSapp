@@ -218,7 +218,7 @@ object ChatDatabaseV2Migrations {
             val removedPlatformUids = mutableSetOf<String>()
             db.query(
                 "SELECT `uid` FROM `platform_v2` " +
-                    "WHERE `compatible_type` NOT IN ('OPENAI', 'ANTHROPIC', 'DEEPSEEK', 'CUSTOM')"
+                    "WHERE `compatible_type` NOT IN ('OPENAI', 'ANTHROPIC', 'DEEPSEEK', 'QWEN', 'CUSTOM')"
             ).use { cursor ->
                 val uidIndex = cursor.getColumnIndex("uid")
                 while (cursor.moveToNext()) {

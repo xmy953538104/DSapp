@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">GPTMobile</string>
-    <string name="gpt_mobile_introduction_logo">GPT Mobile Introduction Logo</string>
+    <string name="app_name">Chat-AI</string>
+    <string name="gpt_mobile_introduction_logo">Chat-AI Logo</string>
     <string name="welcome_title">The best AI assistant\nyou can get in your\nsmartphone.</string>
     <string name="welcome_description">Use the model that suits you\nthe most. Ask anything you want!</string>
     <string name="get_started">Get Started</string>
@@ -43,7 +43,7 @@
     <string name="claude_3_sonnet_description">Balanced model between intelligence and speed.</string>
     <string name="claude_3_haiku_description">Anthropic\'s fastest and most compact model.</string>
     <string name="setup_complete">You’re all set!</string>
-    <string name="setup_complete_description">Let’s start using GPT Mobile!</string>
+    <string name="setup_complete_description">Let’s start using Chat-AI!</string>
     <string name="done">Done</string>
     <string name="setup_complete_logo">Setup Complete Logo</string>
     <string name="chats">Chats</string>
@@ -151,17 +151,21 @@
     <string name="bug_report_icon">Bug Report Icon</string>
     <string name="scroll_to_bottom_icon">Scroll to bottom icon</string>
     <string name="options">Options</string>
-    <string name="chat_models">Chat Models</string>
-    <string name="chat_models_description">Set model identifiers for each provider in this chat only.</string>
-    <string name="chat_model_for_platform">Model for %1$s</string>
-    <string name="update_chat_models">Update Models</string>
+    <string name="chat_models">聊天模型</string>
+    <string name="chat_models_description">仅为当前对话设置每个接入点使用的模型。</string>
+    <string name="chat_model_for_platform">%1$s 的模型</string>
+    <string name="update_chat_models">更新模型</string>
     <string name="estimated_tokens">&#32422; %1$d tokens</string>
     <string name="deepseek_thinking_on">&#28145;&#24230;&#24605;&#32771;</string>
     <string name="deepseek_thinking_off">&#24555;&#36895;&#22238;&#31572;</string>
-    <string name="deepseek_model_fast">&#24555;&#36895;&#22238;&#31572;</string>
-    <string name="deepseek_model_pro">&#19987;&#19994;&#25512;&#29702;</string>
-    <string name="deepseek_model_chat">&#26222;&#36890;&#23545;&#35805;</string>
-    <string name="deepseek_model_reasoner">&#28145;&#24230;&#24605;&#32771;</string>
+    <string name="deepseek_model_fast">日常使用</string>
+    <string name="deepseek_model_thinking">专业应用</string>
+    <string name="qwen" translatable="false">千问</string>
+    <string name="qwen_description">使用通义千问模型，支持图片理解和思考模型。</string>
+    <string name="qwen_model_vision_fast">图片理解</string>
+    <string name="qwen_model_vision_max">高级视觉</string>
+    <string name="qwen_model_chat">普通对话</string>
+    <string name="qwen_model_thinking">深度思考</string>
     <string name="update_chat_title">Update chat title</string>
     <string name="chat_title">Chat Title</string>
     <string name="chat_title_dialog_description">AI generated title is only available with AICore supported devices.</string>
@@ -195,7 +199,10 @@
     <string name="search_chats">Search chats</string>
     <string name="no_search_results">No chats found</string>
     <string name="clear">Clear</string>
-    <string name="attach_file">Attach File</string>
+    <string name="attach_file">添加附件</string>
+    <string name="take_photo">拍照</string>
+    <string name="camera_permission_required">需要相机权限才能拍照。</string>
+    <string name="camera_capture_failed">拍照失败。</string>
     <string name="add_platform">Add Platform</string>
     <string name="add_platform_description">Configure a new API platform</string>
     <string name="platform_name">Platform Name</string>
@@ -205,7 +212,8 @@
     <string name="api_type">API Type</string>
     <string name="client_type_openai_desc">OpenAI chat completions API</string>
     <string name="client_type_anthropic_desc">Claude Messages API</string>
-    <string name="client_type_deepseek_desc">DeepSeek OpenAI-compatible API</string>
+    <string name="client_type_deepseek_desc">DeepSeek OpenAI 兼容 API</string>
+    <string name="client_type_qwen_desc">通义千问 DashScope OpenAI 兼容 API</string>
     <string name="client_type_custom_desc">Custom OpenAI-compatible endpoint</string>
     <string name="api_url_hint">https://api.example.com</string>
     <string name="api_key_hint">sk-…</string>
@@ -249,17 +257,17 @@
     <string name="platform_basics_description">Give your platform a name and verify the API URL</string>
     <string name="api_key_description">Enter your API key. This is stored locally on your device.</string>
     <string name="model_description">Enter the model identifier you want to use</string>
-    <string name="model_examples">Examples: gpt-4o, claude-sonnet-4-20250514, deepseek-v4-flash</string>
+    <string name="model_examples">例如：gpt-4o、claude-sonnet-4-20250514、deepseek-v4-flash、qwen-vl-plus</string>
     <string name="back">Back</string>
     <string name="finish">Finish</string>
     <string name="deepseek" translatable="false">DeepSeek</string>
-    <string name="deepseek_description">Use DeepSeek V4 models with thinking mode support</string>
+    <string name="deepseek_description">使用 DeepSeek V4 模型，并支持深度思考切换</string>
     <string name="custom_provider">Custom Provider</string>
     <string name="custom_provider_description">Connect to any OpenAI-compatible API</string>
     <string name="platform_added_successfully">Platform added successfully</string>
     <string name="at_least_one_platform_required">Add at least one platform to continue</string>
     <string name="remove">Remove</string>
-    <string name="revision_counter">Revision %1$d/%2$d</string>
+    <string name="revision_counter">第 %1$d/%2$d 页</string>
     <string name="previous_revision" translatable="false">Previous revision</string>
     <string name="next_revision" translatable="false">Next revision</string>
 </resources>

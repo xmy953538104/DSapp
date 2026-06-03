@@ -158,6 +158,7 @@ fun AddPlatformScreen(
                                     ClientType.OPENAI -> ModelConstants.OPENAI_API_URL
                                     ClientType.ANTHROPIC -> ModelConstants.ANTHROPIC_API_URL
                                     ClientType.DEEPSEEK -> ModelConstants.DEEPSEEK_API_URL
+                                    ClientType.QWEN -> ModelConstants.QWEN_API_URL
                                     ClientType.CUSTOM -> ""
                                 }
                                 model = getDefaultModel(clientType)
@@ -283,6 +284,7 @@ private fun getClientTypeName(clientType: ClientType): String = when (clientType
     ClientType.OPENAI -> "OpenAI"
     ClientType.ANTHROPIC -> "Claude"
     ClientType.DEEPSEEK -> "DeepSeek"
+    ClientType.QWEN -> stringResource(R.string.qwen)
     ClientType.CUSTOM -> stringResource(R.string.custom)
 }
 
@@ -291,6 +293,7 @@ private fun getClientTypeDescription(clientType: ClientType): String = when (cli
     ClientType.OPENAI -> stringResource(R.string.client_type_openai_desc)
     ClientType.ANTHROPIC -> stringResource(R.string.client_type_anthropic_desc)
     ClientType.DEEPSEEK -> stringResource(R.string.client_type_deepseek_desc)
+    ClientType.QWEN -> stringResource(R.string.client_type_qwen_desc)
     ClientType.CUSTOM -> stringResource(R.string.client_type_custom_desc)
 }
 
@@ -304,5 +307,6 @@ private fun getDefaultModel(clientType: ClientType): String = when (clientType) 
     ClientType.OPENAI -> "gpt-5.2"
     ClientType.ANTHROPIC -> "claude-sonnet-4-5-20250929"
     ClientType.DEEPSEEK -> "deepseek-v4-flash"
+    ClientType.QWEN -> "qwen-vl-plus"
     ClientType.CUSTOM -> ""
 }

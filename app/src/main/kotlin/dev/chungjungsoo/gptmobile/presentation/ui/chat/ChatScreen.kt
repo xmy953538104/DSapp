@@ -1,5 +1,6 @@
 package dev.chungjungsoo.gptmobile.presentation.ui.chat
 
+import android.Manifest
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -43,6 +45,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,6 +78,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -88,6 +92,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider.getUriForFile
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -145,7 +150,7 @@ fun ChatScreen(
         }
     }
     val isDeepSeekThinkingEnabled = deepSeekPlatformsInChat.any { platform ->
-        platform.reasoning || chatPlatformModels[platform.uid]?.equals("deepseek-reasoner", ignoreCase = true) == true
+        platform.reasoning
     }
     val currentTokenEstimate = remember(groupedMessages) {
         estimateMessagesTokens(groupedMessages.userMessages + groupedMessages.assistantMessages.flatten())
@@ -308,13 +313,11 @@ fun ChatScreen(
                 chatEnabled = canUseChat,
                 sendButtonEnabled = isIdle,
                 selectedAttachments = selectedAttachments,
-                showModelButton = chatViewModel.enabledPlatformsInChat.isNotEmpty(),
                 deepSeekThinkingAvailable = deepSeekPlatformsInChat.isNotEmpty(),
                 deepSeekThinkingEnabled = isDeepSeekThinkingEnabled,
                 tokenEstimate = currentTokenEstimate,
                 onFileSelected = { filePath -> chatViewModel.addSelectedFile(filePath) },
                 onFileRemoved = { filePath -> chatViewModel.removeSelectedFile(filePath) },
-                onModelButtonClick = chatViewModel::openChatModelDialog,
                 onDeepSeekThinkingToggle = chatViewModel::updateDeepSeekReasoning
             ) {
                 chatViewModel.askQuestion()
@@ -703,13 +706,11 @@ fun ChatInputBox(
     chatEnabled: Boolean = true,
     sendButtonEnabled: Boolean = true,
     selectedAttachments: List<ChatAttachmentDraft> = emptyList(),
-    showModelButton: Boolean = false,
     deepSeekThinkingAvailable: Boolean = false,
     deepSeekThinkingEnabled: Boolean = false,
     tokenEstimate: Int = 0,
     onFileSelected: (String) -> Unit = {},
     onFileRemoved: (String) -> Unit = {},
-    onModelButtonClick: () -> Unit = {},
     onDeepSeekThinkingToggle: (Boolean) -> Unit = {},
     onSendButtonClick: () -> Unit = {}
 ) {
@@ -719,6 +720,11 @@ fun ChatInputBox(
     val scope = rememberCoroutineScope()
     val chatInputLineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 5)
     val hasQuestionText = inputState.text.isNotEmpty()
+    val canSend = hasQuestionText || selectedAttachments.isNotEmpty()
+    val cameraCaptureFailedText = stringResource(R.string.camera_capture_failed)
+    val cameraPermissionRequiredText = stringResource(R.string.camera_permission_required)
+    var previewImagePath by remember { mutableStateOf<String?>(null) }
+    var pendingCameraFile by remember { mutableStateOf<File?>(null) }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -733,6 +739,55 @@ fun ChatInputBox(
         }
     }
 
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        val capturedFile = pendingCameraFile
+        pendingCameraFile = null
+        if (success && capturedFile != null && capturedFile.exists()) {
+            onFileSelected(capturedFile.absolutePath)
+        } else {
+            capturedFile?.delete()
+            Toast.makeText(context, cameraCaptureFailedText, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun launchCameraCapture() {
+        val photoFile = createCameraImageFile(context)
+        if (photoFile == null) {
+            Toast.makeText(context, cameraCaptureFailedText, Toast.LENGTH_SHORT).show()
+            return
+        }
+        pendingCameraFile = photoFile
+        val uri = getUriForFile(context, "${context.packageName}.fileprovider", photoFile)
+        cameraLauncher.launch(uri)
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            launchCameraCapture()
+        } else {
+            Toast.makeText(context, cameraPermissionRequiredText, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun requestCameraCapture() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            launchCameraCapture()
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    previewImagePath?.let { imagePath ->
+        AttachmentImagePreviewDialog(
+            filePath = imagePath,
+            onDismissRequest = { previewImagePath = null }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -741,47 +796,55 @@ fun ChatInputBox(
         if (selectedAttachments.isNotEmpty()) {
             FileThumbnailRow(
                 selectedAttachments = selectedAttachments,
-                onFileRemoved = onFileRemoved
+                onFileRemoved = onFileRemoved,
+                onImagePreview = { imagePath -> previewImagePath = imagePath }
             )
         }
-        if (showModelButton || deepSeekThinkingAvailable || tokenEstimate > 0) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                enabled = chatEnabled,
+                onClick = { filePickerLauncher.launch("image/*") }
             ) {
-                if (deepSeekThinkingAvailable) {
-                    FilterChip(
-                        selected = deepSeekThinkingEnabled,
-                        enabled = chatEnabled && sendButtonEnabled,
-                        onClick = { onDeepSeekThinkingToggle(!deepSeekThinkingEnabled) },
-                        label = {
-                            Text(
-                                text = stringResource(
-                                    if (deepSeekThinkingEnabled) {
-                                        R.string.deepseek_thinking_on
-                                    } else {
-                                        R.string.deepseek_thinking_off
-                                    }
-                                )
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_attach_file),
+                    contentDescription = stringResource(R.string.attach_file)
+                )
+            }
+            IconButton(
+                enabled = chatEnabled,
+                onClick = ::requestCameraCapture
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PhotoCamera,
+                    contentDescription = stringResource(R.string.take_photo)
+                )
+            }
+            if (deepSeekThinkingAvailable) {
+                FilterChip(
+                    selected = deepSeekThinkingEnabled,
+                    enabled = chatEnabled && sendButtonEnabled,
+                    onClick = { onDeepSeekThinkingToggle(!deepSeekThinkingEnabled) },
+                    label = {
+                        Text(
+                            text = stringResource(
+                                if (deepSeekThinkingEnabled) {
+                                    R.string.deepseek_thinking_on
+                                } else {
+                                    R.string.deepseek_thinking_off
+                                }
                             )
-                        }
-                    )
-                }
-                if (showModelButton) {
-                    IconButton(
-                        enabled = chatEnabled && sendButtonEnabled,
-                        onClick = onModelButtonClick
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_model),
-                            contentDescription = stringResource(R.string.chat_models)
                         )
                     }
-                }
-                Spacer(modifier = Modifier.weight(1f))
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (tokenEstimate > 0) {
                 Text(
                     text = stringResource(R.string.estimated_tokens, tokenEstimate),
                     style = MaterialTheme.typography.labelMedium,
@@ -806,15 +869,6 @@ fun ChatInputBox(
                         .padding(all = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        enabled = chatEnabled,
-                        onClick = { filePickerLauncher.launch("image/*") }
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_attach_file),
-                            contentDescription = stringResource(R.string.attach_file)
-                        )
-                    }
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -831,7 +885,7 @@ fun ChatInputBox(
                         }
                     }
                     IconButton(
-                        enabled = chatEnabled && sendButtonEnabled && hasQuestionText,
+                        enabled = chatEnabled && sendButtonEnabled && canSend,
                         onClick = onSendButtonClick
                     ) {
                         Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ic_send), contentDescription = stringResource(R.string.send))
@@ -845,7 +899,8 @@ fun ChatInputBox(
 @Composable
 internal fun FileThumbnailRow(
     selectedAttachments: List<ChatAttachmentDraft>,
-    onFileRemoved: (String) -> Unit
+    onFileRemoved: (String) -> Unit,
+    onImagePreview: (String) -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -857,7 +912,8 @@ internal fun FileThumbnailRow(
         selectedAttachments.forEach { attachment ->
             FileThumbnail(
                 attachment = attachment,
-                onRemove = { onFileRemoved(attachment.sourceFilePath) }
+                onRemove = { onFileRemoved(attachment.sourceFilePath) },
+                onImagePreview = onImagePreview
             )
         }
     }
@@ -866,10 +922,12 @@ internal fun FileThumbnailRow(
 @Composable
 internal fun FileThumbnail(
     attachment: ChatAttachmentDraft,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onImagePreview: (String) -> Unit = {}
 ) {
     val file = File(attachment.preparedFilePath ?: attachment.sourceFilePath)
     val isImage = isImageFile(file.extension)
+    val imageBitmap = if (isImage) rememberLocalImageBitmap(file.absolutePath) else null
 
     Column(
         modifier = Modifier.width(72.dp),
@@ -880,14 +938,24 @@ internal fun FileThumbnail(
                 .size(64.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable(enabled = isImage) { onImagePreview(file.absolutePath) }
         ) {
             if (isImage) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_image),
-                    contentDescription = file.name,
-                    modifier = Modifier.fillMaxSize(),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = file.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_image),
+                        contentDescription = file.name,
+                        modifier = Modifier.fillMaxSize(),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             } else {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_file),
@@ -929,17 +997,19 @@ internal fun FileThumbnail(
             }
         }
 
-        Text(
-            text = file.name,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .width(72.dp)
-        )
+        if (!isImage) {
+            Text(
+                text = file.name,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .width(72.dp)
+            )
+        }
 
         attachment.notice?.let { notice ->
             Text(
@@ -965,6 +1035,28 @@ internal fun FileThumbnail(
             )
         }
     }
+}
+
+internal fun createCameraImageFile(context: Context): File? = try {
+    val cameraDir = File(context.getExternalFilesDir(null) ?: context.filesDir, "camera")
+    cameraDir.mkdirs()
+
+    val file = File.createTempFile(
+        "camera_${System.currentTimeMillis()}_",
+        ".jpg",
+        cameraDir
+    )
+
+    val cameraDirCanonical = cameraDir.canonicalPath
+    val fileCanonical = file.canonicalPath
+    if (!fileCanonical.startsWith(cameraDirCanonical + File.separator)) {
+        file.delete()
+        null
+    } else {
+        file
+    }
+} catch (_: Exception) {
+    null
 }
 
 internal fun copyFileToAppDirectory(context: Context, uri: android.net.Uri): String? {
