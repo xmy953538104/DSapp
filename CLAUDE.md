@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GPT Mobile is an Android chat application that supports chatting with multiple AI models simultaneously (OpenAI GPT, Anthropic Claude, Google Gemini, Groq, and Ollama). Built with 100% Kotlin, Jetpack Compose, and follows Modern Android App Architecture patterns.
+Chat-AI is an Android chat application that supports chatting with OpenAI, Claude, DeepSeek, Qwen, and custom OpenAI-compatible providers. Built with 100% Kotlin, Jetpack Compose, and follows Modern Android App Architecture patterns.
 
 ## Build Commands
 
@@ -16,7 +16,7 @@ GPT Mobile is an Android chat application that supports chatting with multiple A
 ### Release Build
 ```bash
 ./gradlew assembleRelease
-./gradlew bundleRelease  # For Google Play Store AAB format
+./gradlew bundleRelease  # AAB format
 ```
 
 ### Testing

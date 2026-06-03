@@ -237,7 +237,7 @@
     <string name="platform_basics_description">Give your platform a name and verify the API URL</string>
     <string name="api_key_description">Enter your API key. This is stored locally on your device.</string>
     <string name="model_description">Enter the model identifier you want to use</string>
-    <string name="model_examples">Examples: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.7-flash</string>
+    <string name="model_examples">Examples: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.6-flash</string>
     <string name="back">Back</string>
     <string name="finish">Finish</string>
     <string name="deepseek" translatable="false">DeepSeek</string>

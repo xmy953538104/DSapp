@@ -31,6 +31,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import java.io.File
 import java.util.Base64
+import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -166,8 +167,10 @@ class AppBackupRepository @Inject constructor(
 
     private suspend fun restoreWebDavPlatforms(platforms: List<WebDavPlatformBackup>) {
         platforms.forEach { backup ->
-            val existing = platformV2Dao.getPlatformByUid(backup.uid)
-                ?: platformV2Dao.getPlatforms().firstOrNull { it.compatibleType.name == backup.compatibleType && it.name == backup.name }
+            val compatibleType = backup.clientType()
+            val platformName = backup.name.trim().ifBlank { compatibleType.name }
+            val existing = backup.uid.takeIf { it.isNotBlank() }?.let { platformV2Dao.getPlatformByUid(it) }
+                ?: platformV2Dao.getPlatforms().firstOrNull { it.compatibleType == compatibleType && it.name == platformName }
             val entity = backup.toEntity(existing)
             if (existing == null) {
                 platformV2Dao.addPlatform(entity)
@@ -303,35 +306,52 @@ private data class WebDavProviderConfig(
 
 @Serializable
 private data class WebDavPlatformBackup(
-    val uid: String,
+    val uid: String = "",
     val name: String,
     val compatibleType: String,
-    val enabled: Boolean,
+    val enabled: Boolean = true,
     val apiUrl: String,
-    val token: String?,
+    val token: String? = null,
     val model: String,
-    val modelPresets: List<PlatformModelPreset>,
-    val systemPrompt: String?,
-    val stream: Boolean,
-    val timeout: Int
+    val modelPresets: List<PlatformModelPreset> = emptyList(),
+    val systemPrompt: String? = null,
+    val stream: Boolean = true,
+    val timeout: Int = 30
 ) {
-    fun toEntity(existing: PlatformV2?): PlatformV2 = PlatformV2(
-        id = existing?.id ?: 0,
-        uid = existing?.uid ?: uid,
-        name = name,
-        compatibleType = ClientType.valueOf(compatibleType),
-        enabled = enabled,
-        apiUrl = apiUrl,
-        token = token,
-        model = model,
-        temperature = existing?.temperature,
-        topP = existing?.topP,
-        systemPrompt = systemPrompt,
-        stream = stream,
-        reasoning = false,
-        modelPresets = modelPresets,
-        timeout = timeout
-    )
+    fun clientType(): ClientType = ClientType.valueOf(compatibleType.trim().uppercase())
+
+    fun toEntity(existing: PlatformV2?): PlatformV2 {
+        val normalizedModel = model.trim()
+        require(normalizedModel.isNotBlank()) { "WebDAV model cannot be blank" }
+
+        val normalizedPresets = modelPresets
+            .mapNotNull { preset ->
+                val presetModel = preset.model.trim()
+                if (presetModel.isBlank()) {
+                    null
+                } else {
+                    PlatformModelPreset(presetModel, preset.remark.trim())
+                }
+            }
+
+        return PlatformV2(
+            id = existing?.id ?: 0,
+            uid = existing?.uid ?: uid.trim().ifBlank { UUID.randomUUID().toString() },
+            name = name.trim().ifBlank { clientType().name },
+            compatibleType = clientType(),
+            enabled = enabled,
+            apiUrl = apiUrl.trim(),
+            token = token?.trim()?.takeIf { it.isNotBlank() },
+            model = normalizedModel,
+            temperature = existing?.temperature,
+            topP = existing?.topP,
+            systemPrompt = systemPrompt?.trim()?.takeIf { it.isNotBlank() },
+            stream = stream,
+            reasoning = false,
+            modelPresets = normalizedPresets,
+            timeout = timeout
+        )
+    }
 
     companion object {
         fun from(platform: PlatformV2): WebDavPlatformBackup = WebDavPlatformBackup(

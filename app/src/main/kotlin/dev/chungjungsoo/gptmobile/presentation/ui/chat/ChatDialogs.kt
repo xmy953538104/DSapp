@@ -189,13 +189,14 @@ private fun ProviderModelPicker(
 private fun normalizePickerModel(clientType: ClientType, model: String): String = when {
     clientType == ClientType.DEEPSEEK && model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
     clientType == ClientType.DEEPSEEK && model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
-    clientType == ClientType.QWEN && model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-flash"
-    clientType == ClientType.QWEN && model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-plus"
-    clientType == ClientType.QWEN && model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-flash"
-    clientType == ClientType.QWEN && model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-plus"
-    clientType == ClientType.QWEN && model.equals("qwen-flash", ignoreCase = true) -> "qwen3.7-flash"
-    clientType == ClientType.QWEN && model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-plus"
-    clientType == ClientType.QWEN && model.equals("qwen3.6-flash", ignoreCase = true) -> "qwen3.7-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.6-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-max"
+    clientType == ClientType.QWEN && model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.6-flash"
+    clientType == ClientType.QWEN && model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-max"
+    clientType == ClientType.QWEN && model.equals("qwen-flash", ignoreCase = true) -> "qwen3.6-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-max"
+    clientType == ClientType.QWEN && model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.6-flash"
+    clientType == ClientType.QWEN && model.equals("qwen3.7-plus", ignoreCase = true) -> "qwen3.7-max"
     else -> model
 }
 

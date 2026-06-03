@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "updatedAt": 1780000000,
+  "platforms": [
+    {
+      "uid": "optional-existing-platform-uid",
+      "name": "千问",
+      "compatibleType": "QWEN",
+      "enabled": true,
+      "apiUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1/",
+      "token": "sk-your-qwen-api-key",
+      "model": "qwen3.6-flash",
+      "modelPresets": [
+        {
+          "model": "qwen3.6-flash",
+          "remark": "日常使用"
+        },
+        {
+          "model": "qwen3.7-max",
+          "remark": "专业应用"
+        }
+      ],
+      "systemPrompt": null,
+      "stream": true,
+      "timeout": 30
+    },
+    {
+      "uid": "optional-existing-platform-uid",
+      "name": "DeepSeek",
+      "compatibleType": "DEEPSEEK",
+      "enabled": true,
+      "apiUrl": "https://api.deepseek.com/",
+      "token": "sk-your-deepseek-api-key",
+      "model": "deepseek-v4-flash",
+      "modelPresets": [
+        {
+          "model": "deepseek-v4-flash",
+          "remark": "日常使用"
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "remark": "专业应用"
+        }
+      ],
+      "systemPrompt": null,
+      "stream": true,
+      "timeout": 30
+    }
+  ]
+}

@@ -195,7 +195,7 @@
     <string name="api_key_description">请输入你的 API 密钥，它只存储在您的设备上。</string>
 
     <string name="model_description">请输入您使用模型的标识符</string>
-    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.7-flash</string>
+    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.6-flash</string>
     <string name="back">返回</string>
     <string name="finish">完成</string>
 <string name="custom_provider">自定义提供商</string>

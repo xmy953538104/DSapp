@@ -1,15 +1,15 @@
-This is an Material3 style chat app that supports answers from multiple LLMs at once.
+Chat-AI is a Material 3 style Android chat app for a small, focused set of AI providers.
 
 Supported Platforms
-- OpenAI GPT (GPT-4o, turbo, etc)
-- Anthropic Claude (3.5 Sonnet, 3 Opus, etc)
-- Google Gemini (1.5 Pro, Flash, etc)
-- Groq (Fast inference server for various models)
-- Ollama (Your own server)
+- OpenAI
+- Claude
+- DeepSeek
+- Qwen
+- Custom OpenAI-compatible API
 
 Local chat history
 Chat history is only saved locally. The app only sends to official API servers while chatting. NOT SHARED anywhere else.
 
-Custom API address and custom model name supported. Also, adjust system prompt, top p, temperature, and more!
+Custom API address and model identifiers are supported. You can also adjust system prompt, top p, temperature, model presets, context compression, backups, and WebDAV provider configuration sync.
 
 Note that some platforms may not be supported in some countries.

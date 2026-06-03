@@ -1,1 +1,1 @@
-Your all in one chat assistant - Chat with multiple LLMs at once!
+A focused AI chat assistant for OpenAI, Claude, DeepSeek, Qwen, and custom APIs.

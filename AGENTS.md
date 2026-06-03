@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents working on this Android codebase
 
 ## Project Overview
 
-GPT Mobile is an Android chat app supporting multiple AI providers (OpenAI, Anthropic, Google, Groq, Ollama, OpenRouter). Built with Kotlin, Jetpack Compose, MVVM architecture, and Hilt DI.
+Chat-AI is an Android chat app supporting OpenAI, Claude, DeepSeek, Qwen, and custom OpenAI-compatible providers. Built with Kotlin, Jetpack Compose, MVVM architecture, and Hilt DI.
 
 ## Build Commands
 
@@ -14,7 +14,7 @@ GPT Mobile is an Android chat app supporting multiple AI providers (OpenAI, Anth
 
 # Release build
 ./gradlew assembleRelease
-./gradlew bundleRelease  # AAB format for Play Store
+./gradlew bundleRelease  # AAB format
 
 # Run all unit tests
 ./gradlew test
