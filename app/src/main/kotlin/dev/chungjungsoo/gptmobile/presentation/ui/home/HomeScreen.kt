@@ -4,12 +4,20 @@ import android.content.res.Configuration
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -18,11 +26,17 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.DriveFileMove
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
@@ -30,11 +44,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -48,17 +64,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -71,8 +91,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_FOOD
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_LIFE
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PROVIDER
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_STUDY
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_WORK
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatRoomV2
+import dev.chungjungsoo.gptmobile.data.database.entity.DEFAULT_CHAT_GROUP_NAME
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
+import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.presentation.common.PlatformCheckBoxItem
 import dev.chungjungsoo.gptmobile.util.getPlatformName
 
@@ -82,14 +109,17 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     settingOnClick: () -> Unit,
     onExistingChatClick: (ChatRoomV2) -> Unit,
-    navigateToNewChat: (enabledPlatforms: List<String>) -> Unit
+    navigateToNewChat: (enabledPlatforms: List<String>, groupName: String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val chatListState by homeViewModel.chatListState.collectAsStateWithLifecycle()
     val showSelectModelDialog by homeViewModel.showSelectModelDialog.collectAsStateWithLifecycle()
     val showDeleteWarningDialog by homeViewModel.showDeleteWarningDialog.collectAsStateWithLifecycle()
+    val showMoveGroupDialog by homeViewModel.showMoveGroupDialog.collectAsStateWithLifecycle()
     val platformState by homeViewModel.platformState.collectAsStateWithLifecycle()
+    val chatGroups by homeViewModel.chatGroups.collectAsStateWithLifecycle()
+    val selectedGroup by homeViewModel.selectedGroup.collectAsStateWithLifecycle()
     val searchQuery by homeViewModel.searchQuery.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
@@ -99,6 +129,7 @@ fun HomeScreen(
         if (lifecycleState == Lifecycle.State.RESUMED && !chatListState.isSelectionMode && !chatListState.isSearchMode) {
             homeViewModel.fetchChats()
             homeViewModel.fetchPlatformStatus()
+            homeViewModel.fetchGroups()
         }
     }
 
@@ -129,6 +160,8 @@ fun HomeScreen(
                     homeViewModel.duplicateSelectedChat()
                     Toast.makeText(context, context.getString(R.string.duplicated_chat), Toast.LENGTH_SHORT).show()
                 },
+                moveOnClick = homeViewModel::openMoveGroupDialog,
+                canMoveToGroup = chatGroups.size > 1,
                 navigationOnClick = {
                     if (chatListState.isSelectionMode) {
                         homeViewModel.disableSelectionMode()
@@ -149,11 +182,10 @@ fun HomeScreen(
             if (!chatListState.isSelectionMode && !chatListState.isSearchMode) {
                 NewChatButton(expanded = listState.isScrollingUp(), onClick = {
                     val enabledApiTypes = platformState.filter { it.enabled }.map { it.uid }
-                    if (enabledApiTypes.size == 1) {
-                        // Navigate to new chat directly if only one platform is enabled
-                        navigateToNewChat(enabledApiTypes)
+                    if (enabledApiTypes.size == 1 && chatGroups.size <= 1) {
+                        navigateToNewChat(enabledApiTypes, chatGroups.firstOrNull() ?: DEFAULT_CHAT_GROUP_NAME)
                     } else {
-                        homeViewModel.openSelectModelDialog()
+                        homeViewModel.openSelectModelDialog(preselectSingleEnabledPlatform = enabledApiTypes.size == 1)
                     }
                 })
             }
@@ -165,6 +197,15 @@ fun HomeScreen(
         ) {
             if (!chatListState.isSearchMode) {
                 item { ChatsTitle(scrollBehavior) }
+                if (chatGroups.size > 1) {
+                    item {
+                        GroupSwitchRow(
+                            groups = chatGroups,
+                            selectedGroup = selectedGroup,
+                            onGroupClick = homeViewModel::selectGroup
+                        )
+                    }
+                }
             }
             if (chatListState.isSearchMode && chatListState.chats.isEmpty() && searchQuery.isNotEmpty()) {
                 item {
@@ -209,10 +250,7 @@ fun HomeScreen(
                                 onCheckedChange = { homeViewModel.selectChat(idx) }
                             )
                         } else {
-                            Icon(
-                                ImageVector.vectorResource(id = R.drawable.ic_rounded_chat),
-                                contentDescription = stringResource(R.string.chat_icon)
-                            )
+                            ChatListAvatar(chatRoom = chatRoom, platforms = platformState)
                         }
                     },
                     supportingContent = { Text(text = stringResource(R.string.using_certain_platform, usingPlatform)) }
@@ -224,12 +262,24 @@ fun HomeScreen(
             SelectPlatformDialog(
                 platformState,
                 selectedPlatforms = chatListState.selectedPlatforms,
+                groups = chatGroups,
+                selectedGroup = selectedGroup,
                 onDismissRequest = { homeViewModel.closeSelectModelDialog() },
-                onConfirmation = {
-                    navigateToNewChat(it)
+                onConfirmation = { platforms, groupName ->
+                    navigateToNewChat(platforms, groupName)
                     homeViewModel.closeSelectModelDialog()
                 },
-                onPlatformSelect = { homeViewModel.updatePlatformCheckedState(it) }
+                onPlatformSelect = { homeViewModel.updatePlatformCheckedState(it) },
+                onGroupSelect = homeViewModel::selectGroup
+            )
+        }
+
+        if (showMoveGroupDialog) {
+            MoveToGroupDialog(
+                groups = chatGroups,
+                selectedGroup = selectedGroup,
+                onDismissRequest = homeViewModel::closeMoveGroupDialog,
+                onConfirm = homeViewModel::moveSelectedChatsToGroup
             )
         }
 
@@ -247,6 +297,58 @@ fun HomeScreen(
     }
 }
 
+@Composable
+private fun ChatListAvatar(
+    chatRoom: ChatRoomV2,
+    platforms: List<PlatformV2>
+) {
+    val platform = chatRoom.enabledPlatform.firstNotNullOfOrNull { uid ->
+        platforms.firstOrNull { it.uid == uid }
+    }
+    val iconResId = platform?.compatibleType?.let(::providerIconResId)
+    val categoryIcon = chatIconVector(chatRoom.icon)
+
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center
+    ) {
+        if (chatRoom.icon == CHAT_ICON_PROVIDER && iconResId != null) {
+            Image(
+                painter = painterResource(iconResId),
+                contentDescription = stringResource(R.string.chat_icon),
+                modifier = Modifier.size(40.dp),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Icon(
+                categoryIcon ?: ImageVector.vectorResource(id = R.drawable.ic_rounded_chat),
+                contentDescription = stringResource(R.string.chat_icon),
+                modifier = Modifier.size(22.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+    }
+}
+
+private fun chatIconVector(icon: String): ImageVector? = when (icon) {
+    CHAT_ICON_LIFE -> Icons.Filled.Home
+    CHAT_ICON_WORK -> Icons.Filled.Work
+    CHAT_ICON_STUDY -> Icons.Filled.School
+    CHAT_ICON_FOOD -> Icons.Filled.Restaurant
+    else -> null
+}
+
+private fun providerIconResId(clientType: ClientType): Int? = when (clientType) {
+    ClientType.OPENAI -> R.drawable.provider_openai
+    ClientType.ANTHROPIC -> R.drawable.provider_claude
+    ClientType.DEEPSEEK -> R.drawable.provider_deepseek
+    ClientType.QWEN -> R.drawable.provider_qwen
+    ClientType.CUSTOM -> null
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopAppBar(
@@ -256,6 +358,8 @@ fun HomeTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     actionOnClick: () -> Unit,
     duplicateOnClick: () -> Unit,
+    moveOnClick: () -> Unit,
+    canMoveToGroup: Boolean,
     navigationOnClick: () -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     searchQuery: String
@@ -371,6 +475,19 @@ fun HomeTopAppBar(
                             )
                         }
                     }
+                    if (canMoveToGroup) {
+                        IconButton(
+                            modifier = Modifier.padding(4.dp),
+                            enabled = selectedChats > 0,
+                            onClick = moveOnClick
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.DriveFileMove,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                contentDescription = stringResource(R.string.move_to_group)
+                            )
+                        }
+                    }
                     IconButton(
                         modifier = Modifier.padding(4.dp),
                         onClick = actionOnClick
@@ -395,6 +512,29 @@ fun HomeTopAppBar(
         },
         scrollBehavior = scrollBehavior
     )
+}
+
+@Composable
+private fun GroupSwitchRow(
+    groups: List<String>,
+    selectedGroup: String,
+    onGroupClick: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        groups.forEach { group ->
+            FilterChip(
+                selected = group == selectedGroup,
+                onClick = { onGroupClick(group) },
+                label = { Text(group, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -454,9 +594,12 @@ fun NewChatButton(
 fun SelectPlatformDialog(
     platforms: List<PlatformV2>,
     selectedPlatforms: List<Boolean>,
+    groups: List<String>,
+    selectedGroup: String,
     onDismissRequest: () -> Unit,
-    onConfirmation: (enabledPlatforms: List<String>) -> Unit,
-    onPlatformSelect: (idx: Int) -> Unit
+    onConfirmation: (enabledPlatforms: List<String>, groupName: String) -> Unit,
+    onPlatformSelect: (idx: Int) -> Unit,
+    onGroupSelect: (String) -> Unit
 ) {
     val configuration = LocalWindowInfo.current
     val screenWidth = with(LocalDensity.current) { configuration.containerSize.width.toDp() }
@@ -498,13 +641,38 @@ fun SelectPlatformDialog(
                 } else {
                     EnablePlatformWarningText()
                 }
+                if (groups.size > 1) {
+                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                    Text(
+                        text = stringResource(R.string.select_group),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    groups.forEach { group ->
+                        ListItem(
+                            headlineContent = { Text(group) },
+                            leadingContent = {
+                                RadioButton(
+                                    selected = group == selectedGroup,
+                                    onClick = { onGroupSelect(group) }
+                                )
+                            },
+                            modifier = Modifier.clickable { onGroupSelect(group) }
+                        )
+                    }
+                }
                 HorizontalDivider(Modifier.padding(top = 8.dp))
             }
         },
         confirmButton = {
             TextButton(
                 enabled = selectedPlatforms.any { it },
-                onClick = { onConfirmation(platforms.filterIndexed { i, _ -> selectedPlatforms[i] }.map { it.uid }) }
+                onClick = {
+                    onConfirmation(
+                        platforms.filterIndexed { i, _ -> selectedPlatforms[i] }.map { it.uid },
+                        selectedGroup
+                    )
+                }
             ) {
                 Text(stringResource(R.string.confirm))
             }
@@ -513,6 +681,48 @@ fun SelectPlatformDialog(
             TextButton(
                 onClick = { onDismissRequest() }
             ) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+@Composable
+fun MoveToGroupDialog(
+    groups: List<String>,
+    selectedGroup: String,
+    onDismissRequest: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var targetGroup by remember(selectedGroup, groups) {
+        mutableStateOf(groups.firstOrNull { it != selectedGroup } ?: selectedGroup)
+    }
+    AlertDialog(
+        title = { Text(stringResource(R.string.move_to_group)) },
+        text = {
+            Column {
+                groups.forEach { group ->
+                    ListItem(
+                        headlineContent = { Text(group) },
+                        leadingContent = {
+                            RadioButton(
+                                selected = targetGroup == group,
+                                onClick = { targetGroup = group }
+                            )
+                        },
+                        modifier = Modifier.clickable { targetGroup = group }
+                    )
+                }
+            }
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = { onConfirm(targetGroup) }) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }

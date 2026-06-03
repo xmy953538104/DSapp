@@ -11,7 +11,7 @@ object Route {
     const val SETUP_COMPLETE = "setup_complete"
 
     const val CHAT_LIST = "chat_list"
-    const val CHAT_ROOM = "chat_room/{chatRoomId}?enabled={enabledPlatforms}"
+    const val CHAT_ROOM = "chat_room/{chatRoomId}?enabled={enabledPlatforms}&group={groupName}"
 
     const val SETTING_ROUTE = "setting_route"
     const val SETTINGS = "settings"

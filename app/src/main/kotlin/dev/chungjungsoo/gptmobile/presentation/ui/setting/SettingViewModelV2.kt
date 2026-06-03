@@ -1,11 +1,15 @@
 package dev.chungjungsoo.gptmobile.presentation.ui.setting
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.chungjungsoo.gptmobile.data.backup.AppBackupRepository
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.repository.ChatRepository
 import dev.chungjungsoo.gptmobile.data.repository.SettingRepository
+import dev.chungjungsoo.gptmobile.data.repository.WebDavConfig
 import dev.chungjungsoo.gptmobile.util.TokenUsageStats
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +21,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SettingViewModelV2 @Inject constructor(
     private val settingRepository: SettingRepository,
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val appBackupRepository: AppBackupRepository
 ) : ViewModel() {
 
     private val _platformState = MutableStateFlow(listOf<PlatformV2>())
@@ -26,11 +31,20 @@ class SettingViewModelV2 @Inject constructor(
     private val _autoContextCompression = MutableStateFlow(true)
     val autoContextCompression: StateFlow<Boolean> = _autoContextCompression.asStateFlow()
 
-    private val _appTestMode = MutableStateFlow(true)
+    private val _appTestMode = MutableStateFlow(false)
     val appTestMode: StateFlow<Boolean> = _appTestMode.asStateFlow()
 
     private val _tokenUsageStats = MutableStateFlow<TokenUsageStats?>(null)
     val tokenUsageStats: StateFlow<TokenUsageStats?> = _tokenUsageStats.asStateFlow()
+
+    private val _chatGroups = MutableStateFlow(listOf<String>())
+    val chatGroups: StateFlow<List<String>> = _chatGroups.asStateFlow()
+
+    private val _webDavConfig = MutableStateFlow(WebDavConfig(username = "", url = "", password = "", readOnly = false, lastSyncAt = 0L))
+    val webDavConfig: StateFlow<WebDavConfig> = _webDavConfig.asStateFlow()
+
+    private val _operationNotice = MutableStateFlow<String?>(null)
+    val operationNotice: StateFlow<String?> = _operationNotice.asStateFlow()
 
     private val _dialogState = MutableStateFlow(DialogState())
     val dialogState: StateFlow<DialogState> = _dialogState.asStateFlow()
@@ -39,6 +53,8 @@ class SettingViewModelV2 @Inject constructor(
         fetchPlatforms()
         fetchAutoContextCompression()
         fetchAppTestMode()
+        fetchChatGroups()
+        fetchWebDavConfig()
     }
 
     fun fetchPlatforms() {
@@ -83,6 +99,68 @@ class SettingViewModelV2 @Inject constructor(
 
     fun closeTokenStatsDialog() = _dialogState.update { it.copy(isTokenStatsDialogOpen = false) }
 
+    fun consumeOperationNotice() = _operationNotice.update { null }
+
+    fun fetchChatGroups() {
+        viewModelScope.launch {
+            _chatGroups.update { settingRepository.getChatGroups() }
+        }
+    }
+
+    fun openChatGroupDialog() = _dialogState.update { it.copy(isChatGroupDialogOpen = true) }
+
+    fun closeChatGroupDialog() = _dialogState.update { it.copy(isChatGroupDialogOpen = false) }
+
+    fun openWebDavDialog() = _dialogState.update { it.copy(isWebDavDialogOpen = true) }
+
+    fun closeWebDavDialog() = _dialogState.update { it.copy(isWebDavDialogOpen = false) }
+
+    fun updateChatGroups(groups: List<String>) {
+        viewModelScope.launch {
+            val normalized = groups
+                .map { it.trim().replace('\n', ' ').take(16) }
+                .filter { it.isNotBlank() }
+                .distinct()
+                .take(MAX_CHAT_GROUPS)
+            settingRepository.updateChatGroups(normalized)
+            val savedGroups = settingRepository.getChatGroups()
+            chatRepository.normalizeChatGroups(savedGroups, savedGroups.first())
+            _chatGroups.update { savedGroups }
+            closeChatGroupDialog()
+        }
+    }
+
+    fun fetchWebDavConfig() {
+        viewModelScope.launch {
+            _webDavConfig.update { settingRepository.getWebDavConfig() }
+        }
+    }
+
+    fun updateWebDavConfig(username: String, url: String, password: String) {
+        viewModelScope.launch {
+            val config = _webDavConfig.value.copy(
+                username = username,
+                url = url,
+                password = password,
+                readOnly = false
+            )
+            settingRepository.updateWebDavConfig(config)
+            _webDavConfig.update { settingRepository.getWebDavConfig() }
+            closeWebDavDialog()
+            _operationNotice.update { "WebDAV settings saved." }
+        }
+    }
+
+    fun clearWebDavConfig() {
+        viewModelScope.launch {
+            settingRepository.updateWebDavConfig(
+                WebDavConfig(username = "", url = "", password = "", readOnly = false, lastSyncAt = 0L)
+            )
+            _webDavConfig.update { settingRepository.getWebDavConfig() }
+            _operationNotice.update { "WebDAV settings cleared." }
+        }
+    }
+
     suspend fun createDiagnosticReport(appLog: String): String {
         val platformsResult = runCatching { settingRepository.fetchPlatformV2s() }
         val tokenStatsResult = runCatching { chatRepository.getTokenUsageStats() }
@@ -115,6 +193,53 @@ class SettingViewModelV2 @Inject constructor(
             appendLine()
             appendLine("Recent app log:")
             appendLine(appLog.ifBlank { "(empty)" })
+        }
+    }
+
+    fun exportLocalBackup(context: Context) {
+        viewModelScope.launch {
+            val notice = runCatching { appBackupRepository.exportLocalBackup(context) }
+                .fold(
+                    onSuccess = { "Backup exported to Download/$it" },
+                    onFailure = { "Backup export failed: ${it.message ?: "unknown"}" }
+                )
+            _operationNotice.update { notice }
+        }
+    }
+
+    fun importLocalBackup(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            val notice = runCatching { appBackupRepository.importLocalBackup(context, uri) }
+                .fold(
+                    onSuccess = { "Backup imported. Restored $it chats." },
+                    onFailure = { "Backup import failed: ${it.message ?: "unknown"}" }
+                )
+            fetchPlatforms()
+            fetchChatGroups()
+            _operationNotice.update { notice }
+        }
+    }
+
+    fun uploadWebDavConfig() {
+        viewModelScope.launch {
+            val notice = runCatching { appBackupRepository.uploadWebDavConfig() }
+                .fold(
+                    onSuccess = { "WebDAV provider config uploaded." },
+                    onFailure = { "WebDAV upload failed: ${it.message ?: "unknown"}" }
+                )
+            _operationNotice.update { notice }
+        }
+    }
+
+    fun downloadWebDavConfig() {
+        viewModelScope.launch {
+            val notice = runCatching { appBackupRepository.downloadWebDavConfig() }
+                .fold(
+                    onSuccess = { "WebDAV pulled $it provider configs." },
+                    onFailure = { "WebDAV pull failed: ${it.message ?: "unknown"}" }
+                )
+            fetchPlatforms()
+            _operationNotice.update { notice }
         }
     }
 
@@ -176,6 +301,12 @@ class SettingViewModelV2 @Inject constructor(
         val isThemeDialogOpen: Boolean = false,
         val isDeleteDialogOpen: Boolean = false,
         val isTokenStatsDialogOpen: Boolean = false,
+        val isChatGroupDialogOpen: Boolean = false,
+        val isWebDavDialogOpen: Boolean = false,
         val platformToDelete: Int? = null
     )
+
+    private companion object {
+        private const val MAX_CHAT_GROUPS = 5
+    }
 }

@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -43,6 +44,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -104,6 +106,7 @@ import dev.chungjungsoo.gptmobile.data.database.entity.effectiveContent
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveThoughts
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.util.estimateMessagesTokens
+import dev.chungjungsoo.gptmobile.util.estimateTextTokens
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -140,6 +143,7 @@ fun ChatScreen(
     val appEnabledPlatforms by chatViewModel.enabledPlatformsInApp.collectAsStateWithLifecycle()
     val appAllPlatforms by chatViewModel.platformsInApp.collectAsStateWithLifecycle()
     val chatPlatformModels by chatViewModel.chatPlatformModels.collectAsStateWithLifecycle()
+    val chatPlatformReasoning by chatViewModel.chatPlatformReasoning.collectAsStateWithLifecycle()
     val enabledPlatformLookup = remember(appEnabledPlatforms) { appEnabledPlatforms.associateBy { it.uid } }
     val chatPlatformSet = chatViewModel.enabledPlatformsInChat.toSet()
     val canUseChat = chatPlatformSet.isNotEmpty() && (chatPlatformSet - appEnabledPlatforms.map { it.uid }.toSet()).isEmpty()
@@ -150,7 +154,7 @@ fun ChatScreen(
         }
     }
     val isReasoningModeEnabled = reasoningPlatformsInChat.any { platform ->
-        platform.reasoning
+        chatPlatformReasoning[platform.uid] ?: false
     }
     val currentTokenEstimate = remember(groupedMessages) {
         estimateMessagesTokens(groupedMessages.userMessages + groupedMessages.assistantMessages.flatten())
@@ -328,8 +332,9 @@ fun ChatScreen(
         if (isChatTitleDialogOpen) {
             ChatTitleDialog(
                 initialTitle = chatRoom.title,
+                initialIcon = chatRoom.icon,
                 onDefaultTitleMode = chatViewModel::generateDefaultChatTitle,
-                onConfirmRequest = { title -> chatViewModel.updateChatTitle(title) },
+                onConfirmRequest = { title, icon -> chatViewModel.updateChatMeta(title, icon) },
                 onDismissRequest = chatViewModel::closeChatTitleDialog
             )
         }
@@ -728,6 +733,7 @@ fun ChatInputBox(
     val chatInputLineLimits = TextFieldLineLimits.MultiLine(maxHeightInLines = 5)
     val hasQuestionText = inputState.text.isNotEmpty()
     val canSend = hasQuestionText || selectedAttachments.isNotEmpty()
+    val displayTokenEstimate = tokenEstimate + estimateTextTokens(inputState.text.toString())
     val cameraCaptureFailedText = stringResource(R.string.camera_capture_failed)
     val cameraPermissionRequiredText = stringResource(R.string.camera_permission_required)
     var previewImagePath by remember { mutableStateOf<String?>(null) }
@@ -814,24 +820,6 @@ fun ChatInputBox(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                enabled = chatEnabled,
-                onClick = { filePickerLauncher.launch("image/*") }
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_attach_file),
-                    contentDescription = stringResource(R.string.attach_file)
-                )
-            }
-            IconButton(
-                enabled = chatEnabled,
-                onClick = ::requestCameraCapture
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.PhotoCamera,
-                    contentDescription = stringResource(R.string.take_photo)
-                )
-            }
             if (reasoningModeAvailable) {
                 FilterChip(
                     selected = reasoningModeEnabled,
@@ -850,15 +838,31 @@ fun ChatInputBox(
                     }
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            if (tokenEstimate > 0) {
-                Text(
-                    text = stringResource(R.string.estimated_tokens, tokenEstimate),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1
+            IconButton(
+                enabled = chatEnabled,
+                onClick = { filePickerLauncher.launch("image/*") }
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_attach_file),
+                    contentDescription = stringResource(R.string.attach_file)
                 )
             }
+            IconButton(
+                enabled = chatEnabled,
+                onClick = ::requestCameraCapture
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PhotoCamera,
+                    contentDescription = stringResource(R.string.take_photo)
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = stringResource(R.string.estimated_tokens, displayTokenEstimate),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
+            )
         }
         BasicTextField(
             state = inputState,
@@ -891,11 +895,30 @@ fun ChatInputBox(
                             innerTextField()
                         }
                     }
+                    val sendEnabled = chatEnabled && sendButtonEnabled && canSend
                     IconButton(
-                        enabled = chatEnabled && sendButtonEnabled && canSend,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (sendEnabled) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.outlineVariant
+                                }
+                            ),
+                        enabled = sendEnabled,
                         onClick = onSendButtonClick
                     ) {
-                        Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ic_send), contentDescription = stringResource(R.string.send))
+                        Icon(
+                            imageVector = Icons.Filled.ArrowUpward,
+                            contentDescription = stringResource(R.string.send),
+                            tint = if (sendEnabled) {
+                                MaterialTheme.colorScheme.surface
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
                     }
                 }
             }

@@ -4,6 +4,7 @@ import dev.chungjungsoo.gptmobile.data.ModelConstants
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatCompactionPointV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.ChatPlatformModelV2Dao
 import dev.chungjungsoo.gptmobile.data.database.dao.PlatformV2Dao
+import dev.chungjungsoo.gptmobile.data.database.entity.DEFAULT_CHAT_GROUP_NAME
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.datastore.SettingDataSource
 import dev.chungjungsoo.gptmobile.data.dto.Platform
@@ -129,10 +130,38 @@ class SettingRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAppTestMode(): Boolean =
-        settingDataSource.getAppTestMode() ?: true
+        settingDataSource.getAppTestMode() ?: false
 
     override suspend fun updateAppTestMode(enabled: Boolean) {
         settingDataSource.updateAppTestMode(enabled)
+    }
+
+    override suspend fun getChatGroups(): List<String> =
+        normalizeChatGroups(settingDataSource.getChatGroups()?.lines().orEmpty())
+
+    override suspend fun updateChatGroups(groups: List<String>) {
+        val normalizedGroups = normalizeChatGroups(groups)
+        settingDataSource.updateChatGroups(normalizedGroups.joinToString("\n"))
+    }
+
+    override suspend fun getWebDavConfig(): WebDavConfig = WebDavConfig(
+        username = settingDataSource.getWebDavUsername() ?: "",
+        url = settingDataSource.getWebDavUrl() ?: "",
+        password = settingDataSource.getWebDavPassword() ?: "",
+        readOnly = settingDataSource.getWebDavReadOnly() ?: false,
+        lastSyncAt = settingDataSource.getWebDavLastSyncAt() ?: 0L
+    )
+
+    override suspend fun updateWebDavConfig(config: WebDavConfig) {
+        settingDataSource.updateWebDavUsername(config.username.trim())
+        settingDataSource.updateWebDavUrl(config.url.trim())
+        settingDataSource.updateWebDavPassword(config.password)
+        settingDataSource.updateWebDavReadOnly(config.readOnly)
+        settingDataSource.updateWebDavLastSyncAt(config.lastSyncAt)
+    }
+
+    override suspend fun updateWebDavLastSyncAt(timestamp: Long) {
+        settingDataSource.updateWebDavLastSyncAt(timestamp)
     }
 
     override suspend fun addPlatformV2(platform: PlatformV2) {
@@ -159,7 +188,12 @@ class SettingRepositoryImpl @Inject constructor(
         if (defaults.isEmpty()) return this
 
         val normalizedPresets = modelPresets
-            .map { preset -> preset.copy(model = preset.model.trim(), remark = preset.remark.trim()) }
+            .map { preset ->
+                preset.copy(
+                    model = normalizeLegacyModel(preset.model.trim()),
+                    remark = preset.remark.trim()
+                )
+            }
             .filter { it.model.isNotBlank() }
             .ifEmpty { defaults }
 
@@ -178,10 +212,26 @@ class SettingRepositoryImpl @Inject constructor(
     private fun normalizeLegacyModel(model: String): String = when {
         model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
         model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
-        model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-flash"
+        model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.6-flash"
         model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-plus"
-        model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-flash"
+        model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.6-flash"
         model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen-flash", ignoreCase = true) -> "qwen3.6-flash"
+        model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.6-flash"
         else -> model
+    }
+
+    private fun normalizeChatGroups(groups: List<String>): List<String> {
+        val sanitized = groups
+            .map { it.trim().replace('\n', ' ').take(16) }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .take(MAX_CHAT_GROUPS)
+        return sanitized.ifEmpty { listOf(DEFAULT_CHAT_GROUP_NAME) }
+    }
+
+    private companion object {
+        private const val MAX_CHAT_GROUPS = 5
     }
 }

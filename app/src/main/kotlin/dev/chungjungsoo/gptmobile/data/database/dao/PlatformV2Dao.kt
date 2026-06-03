@@ -16,6 +16,9 @@ interface PlatformV2Dao {
     @Query("SELECT * FROM platform_v2 WHERE platform_id = :id")
     suspend fun getPlatform(id: Int): PlatformV2?
 
+    @Query("SELECT * FROM platform_v2 WHERE uid = :uid LIMIT 1")
+    suspend fun getPlatformByUid(uid: String): PlatformV2?
+
     @Insert
     suspend fun addPlatform(platform: PlatformV2): Long
 

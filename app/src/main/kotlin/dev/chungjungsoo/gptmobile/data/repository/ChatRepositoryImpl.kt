@@ -46,6 +46,7 @@ import dev.chungjungsoo.gptmobile.data.dto.openai.response.ReasoningSummaryTextD
 import dev.chungjungsoo.gptmobile.data.dto.openai.response.ResponseErrorEvent
 import dev.chungjungsoo.gptmobile.data.dto.openai.response.ResponseFailedEvent
 import dev.chungjungsoo.gptmobile.data.model.ApiType
+import dev.chungjungsoo.gptmobile.data.model.ChatPlatformSetting
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.data.network.AnthropicAPI
 import dev.chungjungsoo.gptmobile.data.network.OpenAIAPI
@@ -1043,18 +1044,32 @@ class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun fetchMessagesV2(chatId: Int): List<MessageV2> = messageV2Dao.loadMessages(chatId)
 
+    override suspend fun fetchChatRoomV2(chatId: Int): ChatRoomV2? = chatRoomV2Dao.getChatRoom(chatId)
+
     override suspend fun fetchChatPlatformModels(chatId: Int): Map<String, String> = chatPlatformModelV2Dao.getByChatId(chatId).associate {
         it.platformUid to it.model
     }
 
+    override suspend fun fetchChatPlatformSettings(chatId: Int): Map<String, ChatPlatformSetting> =
+        chatPlatformModelV2Dao.getByChatId(chatId).associate { row ->
+            row.platformUid to ChatPlatformSetting(
+                model = row.model,
+                reasoning = row.reasoning
+            )
+        }
+
     override suspend fun saveChatPlatformModels(chatId: Int, models: Map<String, String>) {
+        val existingReasoning = chatPlatformModelV2Dao.getByChatId(chatId).associate { row ->
+            row.platformUid to row.reasoning
+        }
         val rows = models
             .filterKeys { it.isNotBlank() }
             .map { (platformUid, model) ->
                 ChatPlatformModelV2(
                     chatId = chatId,
                     platformUid = platformUid,
-                    model = model.trim()
+                    model = model.trim(),
+                    reasoning = existingReasoning[platformUid] ?: false
                 )
             }
 
@@ -1062,6 +1077,24 @@ class ChatRepositoryImpl @Inject constructor(
             chatPlatformModelV2Dao.upsertAll(*rows.toTypedArray())
         }
     }
+
+    override suspend fun saveChatPlatformSettings(chatId: Int, settings: Map<String, ChatPlatformSetting>) {
+        val rows = settings
+            .filterKeys { it.isNotBlank() }
+            .map { (platformUid, setting) ->
+                ChatPlatformModelV2(
+                    chatId = chatId,
+                    platformUid = platformUid,
+                    model = setting.model.trim(),
+                    reasoning = setting.reasoning
+                )
+            }
+
+        if (rows.isNotEmpty()) {
+            chatPlatformModelV2Dao.upsertAll(*rows.toTypedArray())
+        }
+    }
+
 
     override suspend fun getTokenUsageStats(): TokenUsageStats {
         val chats = chatRoomV2Dao.getChatRooms()
@@ -1159,15 +1192,44 @@ class ChatRepositoryImpl @Inject constructor(
         chatRoomV2Dao.editChatRoom(chatRoom.copy(title = title.replace('\n', ' ').take(50)))
     }
 
-    override suspend fun saveChat(chatRoom: ChatRoomV2, messages: List<MessageV2>, chatPlatformModels: Map<String, String>): ChatRoomV2 {
+    override suspend fun updateChatMeta(chatRoom: ChatRoomV2, title: String, icon: String) {
+        chatRoomV2Dao.editChatRoom(
+            chatRoom.copy(
+                title = title.replace('\n', ' ').take(50),
+                icon = icon
+            )
+        )
+    }
+
+    override suspend fun updateChatsGroup(chatRooms: List<ChatRoomV2>, groupName: String) {
+        chatRooms.forEach { chatRoom ->
+            chatRoomV2Dao.editChatRoom(
+                chatRoom.copy(
+                    groupName = groupName,
+                    updatedAt = System.currentTimeMillis() / 1000
+                )
+            )
+        }
+    }
+
+    override suspend fun normalizeChatGroups(validGroups: List<String>, fallbackGroup: String) {
+        val validGroupSet = validGroups.toSet()
+        chatRoomV2Dao.getChatRooms()
+            .filter { it.groupName !in validGroupSet }
+            .forEach { chatRoom ->
+                chatRoomV2Dao.editChatRoom(chatRoom.copy(groupName = fallbackGroup))
+            }
+    }
+
+    override suspend fun saveChat(chatRoom: ChatRoomV2, messages: List<MessageV2>, chatPlatformSettings: Map<String, ChatPlatformSetting>): ChatRoomV2 {
         if (chatRoom.id == 0) {
             // New Chat
             val chatId = chatRoomV2Dao.addChatRoom(chatRoom)
             val updatedMessages = messages.map { it.copy(chatId = chatId.toInt()) }
             messageV2Dao.addMessages(*updatedMessages.toTypedArray())
-            saveChatPlatformModels(
+            saveChatPlatformSettings(
                 chatId = chatId.toInt(),
-                models = chatPlatformModels.filterKeys { it in chatRoom.enabledPlatform }
+                settings = chatPlatformSettings.filterKeys { it in chatRoom.enabledPlatform }
             )
 
             val savedChatRoom = chatRoom.copy(id = chatId.toInt())
@@ -1196,9 +1258,9 @@ class ChatRepositoryImpl @Inject constructor(
         messageV2Dao.deleteMessages(*shouldBeDeleted.toTypedArray())
         messageV2Dao.editMessages(*shouldBeUpdated.toTypedArray())
         messageV2Dao.addMessages(*shouldBeAdded.toTypedArray())
-        saveChatPlatformModels(
+        saveChatPlatformSettings(
             chatId = chatRoom.id,
-            models = chatPlatformModels.filterKeys { it in chatRoom.enabledPlatform }
+            settings = chatPlatformSettings.filterKeys { it in chatRoom.enabledPlatform }
         )
 
         return chatRoom
@@ -1209,7 +1271,9 @@ class ChatRepositoryImpl @Inject constructor(
         val duplicatedChatId = chatRoomV2Dao.addChatRoom(
             ChatRoomV2(
                 title = duplicatedTitle,
-                enabledPlatform = chatRoom.enabledPlatform
+                enabledPlatform = chatRoom.enabledPlatform,
+                groupName = chatRoom.groupName,
+                icon = chatRoom.icon
             )
         ).toInt()
 
@@ -1224,8 +1288,8 @@ class ChatRepositoryImpl @Inject constructor(
             messageV2Dao.addMessages(*messages.toTypedArray())
         }
 
-        val chatPlatformModels = fetchChatPlatformModels(chatRoom.id)
-        saveChatPlatformModels(duplicatedChatId, chatPlatformModels)
+        val chatPlatformSettings = fetchChatPlatformSettings(chatRoom.id)
+        saveChatPlatformSettings(duplicatedChatId, chatPlatformSettings)
 
         return chatRoom.copy(
             id = duplicatedChatId,

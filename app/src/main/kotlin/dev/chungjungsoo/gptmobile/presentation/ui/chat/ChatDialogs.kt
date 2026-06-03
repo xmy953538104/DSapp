@@ -3,6 +3,7 @@ package dev.chungjungsoo.gptmobile.presentation.ui.chat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,14 +12,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -40,6 +50,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_FOOD
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_LIFE
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PROVIDER
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_STUDY
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_WORK
 import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformModelPreset
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveContent
@@ -166,10 +181,13 @@ private fun ProviderModelPicker(
 private fun normalizePickerModel(clientType: ClientType, model: String): String = when {
     clientType == ClientType.DEEPSEEK && model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
     clientType == ClientType.DEEPSEEK && model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
-    clientType == ClientType.QWEN && model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.6-flash"
     clientType == ClientType.QWEN && model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-plus"
-    clientType == ClientType.QWEN && model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-flash"
+    clientType == ClientType.QWEN && model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.6-flash"
     clientType == ClientType.QWEN && model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen-flash", ignoreCase = true) -> "qwen3.6-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.6-flash"
     else -> model
 }
 
@@ -223,14 +241,16 @@ private fun ProviderModelOptionCard(
 @Composable
 fun ChatTitleDialog(
     initialTitle: String,
+    initialIcon: String,
     onDefaultTitleMode: () -> String?,
-    onConfirmRequest: (title: String) -> Unit,
+    onConfirmRequest: (title: String, icon: String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     val configuration = LocalWindowInfo.current
     val screenWidth = with(LocalDensity.current) { configuration.containerSize.width.toDp() }
     val screenHeight = with(LocalDensity.current) { configuration.containerSize.height.toDp() }
     var title by rememberSaveable { mutableStateOf(initialTitle) }
+    var selectedIcon by rememberSaveable { mutableStateOf(initialIcon) }
     val untitledChat = stringResource(R.string.untitled_chat)
 
     AlertDialog(
@@ -256,14 +276,41 @@ fun ChatTitleDialog(
                     onValueChange = { title = it },
                     label = { Text(stringResource(R.string.chat_title)) }
                 )
+                Text(
+                    text = stringResource(R.string.chat_icon),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    chatIconOptions().forEach { option ->
+                        FilterChip(
+                            selected = selectedIcon == option.id,
+                            onClick = { selectedIcon = option.id },
+                            label = { Text(stringResource(option.labelRes)) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = option.icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        )
+                    }
+                }
             }
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
-                enabled = title.isNotBlank() && title != initialTitle,
+                enabled = title.isNotBlank() && (title != initialTitle || selectedIcon != initialIcon),
                 onClick = {
-                    onConfirmRequest(title)
+                    onConfirmRequest(title, selectedIcon)
                     onDismissRequest()
                 }
             ) {
@@ -284,6 +331,20 @@ fun ChatTitleDialog(
         }
     )
 }
+
+private data class ChatIconOption(
+    val id: String,
+    val labelRes: Int,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector
+)
+
+private fun chatIconOptions(): List<ChatIconOption> = listOf(
+    ChatIconOption(CHAT_ICON_PROVIDER, R.string.chat_icon_provider, Icons.Filled.SmartToy),
+    ChatIconOption(CHAT_ICON_LIFE, R.string.chat_icon_life, Icons.Filled.Home),
+    ChatIconOption(CHAT_ICON_WORK, R.string.chat_icon_work, Icons.Filled.Work),
+    ChatIconOption(CHAT_ICON_STUDY, R.string.chat_icon_study, Icons.Filled.School),
+    ChatIconOption(CHAT_ICON_FOOD, R.string.chat_icon_food, Icons.Filled.Restaurant)
+)
 
 @Composable
 fun UserMessageEditDialog(

@@ -229,29 +229,35 @@ fun ProviderAvatar(
     Box(
         modifier = Modifier
             .padding(start = 8.dp)
-            .size(40.dp)
-            .clip(CircleShape)
-            .background(color = fallback.containerColor),
+            .size(42.dp),
         contentAlignment = Alignment.Center
     ) {
-        if (iconResId != null) {
-            Image(
-                painter = painterResource(iconResId),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Text(
-                text = fallback.label,
-                style = MaterialTheme.typography.titleMedium,
-                color = fallback.contentColor
-            )
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(color = fallback.containerColor),
+            contentAlignment = Alignment.Center
+        ) {
+            if (iconResId != null) {
+                Image(
+                    painter = painterResource(iconResId),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Text(
+                    text = fallback.label,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = fallback.contentColor
+                )
+            }
         }
         if (loading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(40.dp),
-                strokeWidth = 2.dp
+                modifier = Modifier.size(42.dp),
+                strokeWidth = 3.dp
             )
         }
     }

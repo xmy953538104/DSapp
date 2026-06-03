@@ -4,7 +4,7 @@
     <string name="gpt_mobile_introduction_logo">Chat-AI 图标</string>
     <string name="welcome_title">卓越的 AI 助理：\n 文明之智，尽收股掌。</string>
     <string name="welcome_description">选择最适合你的模型，畅所欲问！</string>
-    <string name="get_started">开始使用</string>
+    <string name="get_started">全新配置</string>
     <string name="platform_select_description">选择您要使用的提供商，也可以稍后在设置中更改。我们未来将支持更多提供商。</string>
     <string name="sample_item_title">项目 1</string>
     <string name="sample_item_description">项目描述</string>
@@ -195,7 +195,7 @@
     <string name="api_key_description">请输入你的 API 密钥，它只存储在您的设备上。</string>
 
     <string name="model_description">请输入您使用模型的标识符</string>
-    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.7-flash</string>
+    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.6-flash</string>
     <string name="back">返回</string>
     <string name="finish">完成</string>
 <string name="custom_provider">自定义提供商</string>
@@ -252,4 +252,33 @@
     <string name="settings_about_section">关于</string>
     <string name="app_test_mode">应用测试</string>
     <string name="app_test_mode_description">开启完整运行日志，方便导出后定位问题。</string>
+    <string name="default_chat_group">默认</string>
+    <string name="chat_groups">会话分组</string>
+    <string name="chat_groups_description">当前 %1$d 个分组，可编辑名称和数量。</string>
+    <string name="chat_group_index">分组 %1$d</string>
+    <string name="add_chat_group">添加分组</string>
+    <string name="select_group">选择分组</string>
+    <string name="move_to_group">移动到分组</string>
+    <string name="chat_icon_provider">AI</string>
+    <string name="chat_icon_life">生活</string>
+    <string name="chat_icon_work">工作</string>
+    <string name="chat_icon_study">学习</string>
+    <string name="chat_icon_food">饮食</string>
+    <string name="import_backup_start">备份导入</string>
+    <string name="export_local_backup">导出本地备份</string>
+    <string name="export_local_backup_description">保存提供商、模型、会话、消息和分组到 Download 目录。</string>
+    <string name="import_local_backup">导入本地备份</string>
+    <string name="import_local_backup_description">从 JSON 文件恢复提供商，并追加导入备份会话。</string>
+    <string name="webdav_settings">WebDAV 设置</string>
+    <string name="webdav_settings_description">配置用于同步供应商 API 和模型标识符的账号。</string>
+    <string name="webdav_username">WebDAV 账号</string>
+    <string name="webdav_url">WebDAV 地址</string>
+    <string name="webdav_password">WebDAV 应用密码</string>
+    <string name="webdav_pull">拉取 WebDAV 配置</string>
+    <string name="webdav_pull_description">从 WebDAV 下载供应商 API 和模型标识符。</string>
+    <string name="webdav_upload">上传 WebDAV 配置</string>
+    <string name="webdav_upload_description">把本地供应商 API 和模型标识符上传到 WebDAV。</string>
+    <string name="webdav_clear">清除 WebDAV 配置</string>
+    <string name="webdav_clear_description">移除已保存的 WebDAV 账号、地址、密码和同步状态。</string>
+    <string name="hidden_webdav_import">云端配置</string>
 </resources>

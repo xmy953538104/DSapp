@@ -1,9 +1,9 @@
-<resources>
+﻿<resources>
     <string name="app_name">Chat-AI</string>
     <string name="gpt_mobile_introduction_logo">Chat-AI Logo</string>
     <string name="welcome_title">The best AI assistant\nyou can get in your\nsmartphone.</string>
     <string name="welcome_description">Use the model that suits you\nthe most. Ask anything you want!</string>
-    <string name="get_started">Get Started</string>
+    <string name="get_started">New Setup</string>
     <string name="platform_select_description">Choose the platform you want to use. You can change this later in settings. More platforms to be supported.</string>
     <string name="sample_item_title">Item 1</string>
     <string name="sample_item_description">Item description</string>
@@ -42,8 +42,8 @@
     <string name="claude_3_opus_description">Excels at writing and complex tasks.</string>
     <string name="claude_3_sonnet_description">Balanced model between intelligence and speed.</string>
     <string name="claude_3_haiku_description">Anthropic\'s fastest and most compact model.</string>
-    <string name="setup_complete">You’re all set!</string>
-    <string name="setup_complete_description">Let’s start using Chat-AI!</string>
+    <string name="setup_complete">You\'re all set!</string>
+    <string name="setup_complete_description">Let\'s start using Chat-AI!</string>
     <string name="done">Done</string>
     <string name="setup_complete_logo">Setup Complete Logo</string>
     <string name="chats">Chats</string>
@@ -82,7 +82,7 @@
     <string name="copy_code">Copy Code</string>
     <string name="code">Code</string>
     <string name="retry">Retry</string>
-    <string name="ask_a_question">Ask a question…</string>
+    <string name="ask_a_question">Ask a question...</string>
     <string name="some_platforms_disabled">Some APIs are disabled</string>
     <string name="openai_brand_text" translatable="false">Powered by OpenAI</string>
     <string name="anthropic_brand_text" translatable="false">Powered by Claude</string>
@@ -130,22 +130,22 @@
     <string name="custom">Custom</string>
     <string name="custom_description">Use model that is not on the list.</string>
     <string name="model_name">Model Identifier</string>
-    <string name="model_custom_example">e.g. llama3.2, llava, llama3:latest, …</string>
+    <string name="model_custom_example">e.g. llama3.2, llava, llama3:latest, ...</string>
     <string name="custom_model_warning">Note that the model name should be supported by the api.</string>
     <string name="enter_api_address">Enter API Address</string>
     <string name="reset">Reset</string>
     <string name="api_url_cautions">The url must end with a \'/\'.</string>
     <string name="scroll_to_bottom_icon">Scroll to bottom icon</string>
     <string name="options">Options</string>
-    <string name="chat_models">聊天模型</string>
-    <string name="chat_models_description">仅为当前对话设置每个接入点使用的模型。</string>
-    <string name="chat_model_for_platform">%1$s 的模型</string>
-    <string name="update_chat_models">更新模型</string>
+    <string name="chat_models">Chat models</string>
+    <string name="chat_models_description">Set the model used by each provider in this chat.</string>
+    <string name="chat_model_for_platform">%1$s model</string>
+    <string name="update_chat_models">Update models</string>
     <string name="estimated_tokens">&#32422; %1$d tokens</string>
     <string name="deepseek_thinking_on">&#28145;&#24230;&#24605;&#32771;</string>
     <string name="deepseek_thinking_off">&#24555;&#36895;&#22238;&#31572;</string>
-    <string name="qwen" translatable="false">千问</string>
-    <string name="qwen_description">使用通义千问模型，支持图片理解和思考模型。</string>
+    <string name="qwen" translatable="false">Qwen</string>
+    <string name="qwen_description">Use Qwen models with image understanding and thinking support.</string>
     <string name="update_chat_title">Update chat title</string>
     <string name="chat_title">Chat Title</string>
     <string name="chat_title_dialog_description">AI generated title is only available with AICore supported devices.</string>
@@ -179,10 +179,10 @@
     <string name="search_chats">Search chats</string>
     <string name="no_search_results">No chats found</string>
     <string name="clear">Clear</string>
-    <string name="attach_file">添加附件</string>
-    <string name="take_photo">拍照</string>
-    <string name="camera_permission_required">需要相机权限才能拍照。</string>
-    <string name="camera_capture_failed">拍照失败。</string>
+    <string name="attach_file">Attach file</string>
+    <string name="take_photo">Take photo</string>
+    <string name="camera_permission_required">Camera permission is required to take a photo.</string>
+    <string name="camera_capture_failed">Photo capture failed.</string>
     <string name="add_platform">Add Platform</string>
     <string name="add_platform_description">Configure a new API platform</string>
     <string name="platform_name">Platform Name</string>
@@ -192,11 +192,11 @@
     <string name="api_type">API Type</string>
     <string name="client_type_openai_desc">OpenAI chat completions API</string>
     <string name="client_type_anthropic_desc">Claude Messages API</string>
-    <string name="client_type_deepseek_desc">DeepSeek OpenAI 兼容 API</string>
-    <string name="client_type_qwen_desc">通义千问 DashScope OpenAI 兼容 API</string>
+    <string name="client_type_deepseek_desc">DeepSeek OpenAI-compatible API</string>
+    <string name="client_type_qwen_desc">Qwen DashScope OpenAI-compatible API</string>
     <string name="client_type_custom_desc">Custom OpenAI-compatible endpoint</string>
     <string name="api_url_hint">https://api.example.com</string>
-    <string name="api_key_hint">sk-…</string>
+    <string name="api_key_hint">sk-...</string>
     <string name="api_key_supporting">Your API key is stored locally</string>
     <string name="loading">&#21152;&#36733;&#20013;</string>
     <string name="model">Model</string>
@@ -208,7 +208,7 @@
     <string name="delete_platform_confirmation">Are you sure you want to delete this platform? This action cannot be undone.</string>
     <string name="view_thinking">View thinking process</string>
     <string name="hide_thinking">Hide thinking</string>
-    <string name="thinking_in_progress">Thinking…</string>
+    <string name="thinking_in_progress">Thinking...</string>
     <string name="expand">Expand</string>
     <string name="collapse">Collapse</string>
     <string name="extended_thinking">Extended Thinking</string>
@@ -237,17 +237,17 @@
     <string name="platform_basics_description">Give your platform a name and verify the API URL</string>
     <string name="api_key_description">Enter your API key. This is stored locally on your device.</string>
     <string name="model_description">Enter the model identifier you want to use</string>
-    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.7-flash</string>
+    <string name="model_examples">Examples: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.6-flash</string>
     <string name="back">Back</string>
     <string name="finish">Finish</string>
     <string name="deepseek" translatable="false">DeepSeek</string>
-    <string name="deepseek_description">使用 DeepSeek V4 模型，并支持深度思考切换</string>
+    <string name="deepseek_description">Use DeepSeek V4 models with thinking mode support.</string>
     <string name="custom_provider">Custom Provider</string>
     <string name="custom_provider_description">Connect to any OpenAI-compatible API</string>
     <string name="platform_added_successfully">Platform added successfully</string>
     <string name="at_least_one_platform_required">Add at least one platform to continue</string>
     <string name="remove">Remove</string>
-    <string name="revision_counter">第 %1$d/%2$d 页</string>
+    <string name="revision_counter">Page %1$d/%2$d</string>
     <string name="previous_revision" translatable="false">Previous revision</string>
     <string name="next_revision" translatable="false">Next revision</string>
     <string name="model_remark">Remark</string>
@@ -259,4 +259,33 @@
     <string name="settings_about_section">About</string>
     <string name="app_test_mode">App testing</string>
     <string name="app_test_mode_description">Keep detailed runtime logs enabled for troubleshooting.</string>
+    <string name="default_chat_group">Default</string>
+    <string name="chat_groups">Chat groups</string>
+    <string name="chat_groups_description">%1$d groups. Edit names and count.</string>
+    <string name="chat_group_index">Group %1$d</string>
+    <string name="add_chat_group">Add group</string>
+    <string name="select_group">Select group</string>
+    <string name="move_to_group">Move to group</string>
+    <string name="chat_icon_provider">AI</string>
+    <string name="chat_icon_life">Life</string>
+    <string name="chat_icon_work">Work</string>
+    <string name="chat_icon_study">Study</string>
+    <string name="chat_icon_food">Food</string>
+    <string name="import_backup_start">Import Backup</string>
+    <string name="export_local_backup">Export local backup</string>
+    <string name="export_local_backup_description">Save providers, models, chats, messages, and groups to Downloads.</string>
+    <string name="import_local_backup">Import local backup</string>
+    <string name="import_local_backup_description">Restore providers and append backed-up chats from a JSON file.</string>
+    <string name="webdav_settings">WebDAV settings</string>
+    <string name="webdav_settings_description">Configure the account used to sync provider API and model identifiers.</string>
+    <string name="webdav_username">WebDAV account</string>
+    <string name="webdav_url">WebDAV URL</string>
+    <string name="webdav_password">WebDAV app password</string>
+    <string name="webdav_pull">Pull WebDAV config</string>
+    <string name="webdav_pull_description">Download provider API and model identifiers from WebDAV.</string>
+    <string name="webdav_upload">Upload WebDAV config</string>
+    <string name="webdav_upload_description">Upload local provider API and model identifiers to WebDAV.</string>
+    <string name="webdav_clear">Clear WebDAV config</string>
+    <string name="webdav_clear_description">Remove the saved WebDAV account, URL, password, and sync state.</string>
+    <string name="hidden_webdav_import">Cloud configuration</string>
 </resources>

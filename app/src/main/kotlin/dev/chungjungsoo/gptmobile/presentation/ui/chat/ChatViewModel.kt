@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.chungjungsoo.gptmobile.data.database.entity.ACTIVE_REVISION_LATEST
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatRoomV2
+import dev.chungjungsoo.gptmobile.data.database.entity.DEFAULT_CHAT_GROUP_NAME
 import dev.chungjungsoo.gptmobile.data.database.entity.MessageV2
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.database.entity.effectiveContent
@@ -18,6 +19,7 @@ import dev.chungjungsoo.gptmobile.data.database.entity.effectiveThoughts
 import dev.chungjungsoo.gptmobile.data.database.entity.resetActiveRevision
 import dev.chungjungsoo.gptmobile.data.database.entity.selectRevision
 import dev.chungjungsoo.gptmobile.data.database.entity.snapshotLatestAssistantRevision
+import dev.chungjungsoo.gptmobile.data.model.ChatPlatformSetting
 import dev.chungjungsoo.gptmobile.data.model.ClientType
 import dev.chungjungsoo.gptmobile.data.repository.AttachmentUploadCoordinator
 import dev.chungjungsoo.gptmobile.data.repository.ChatRepository
@@ -67,12 +69,13 @@ class ChatViewModel @Inject constructor(
 
     private val chatRoomId: Int = checkNotNull(savedStateHandle["chatRoomId"])
     private val enabledPlatformString: String = checkNotNull(savedStateHandle["enabledPlatforms"])
+    private val initialGroupName: String = savedStateHandle["groupName"] ?: DEFAULT_CHAT_GROUP_NAME
     val enabledPlatformsInChat = enabledPlatformString.split(',').filter { it.isNotBlank() }
 
     private val currentTimeStamp: Long
         get() = System.currentTimeMillis() / 1000
 
-    private val _chatRoom = MutableStateFlow(ChatRoomV2(id = -1, title = "", enabledPlatform = enabledPlatformsInChat))
+    private val _chatRoom = MutableStateFlow(ChatRoomV2(id = -1, title = "", enabledPlatform = enabledPlatformsInChat, groupName = initialGroupName))
     val chatRoom = _chatRoom.asStateFlow()
 
     private val _isChatTitleDialogOpen = MutableStateFlow(false)
@@ -89,6 +92,9 @@ class ChatViewModel @Inject constructor(
 
     private val _chatPlatformModels = MutableStateFlow<Map<String, String>>(emptyMap())
     val chatPlatformModels = _chatPlatformModels.asStateFlow()
+
+    private val _chatPlatformReasoning = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val chatPlatformReasoning = _chatPlatformReasoning.asStateFlow()
 
     // All platforms configured in app (including disabled)
     private val _platformsInApp = MutableStateFlow(listOf<PlatformV2>())
@@ -244,7 +250,7 @@ class ChatViewModel @Inject constructor(
 
         if (_chatRoom.value.id > 0) {
             viewModelScope.launch {
-                chatRepository.saveChatPlatformModels(_chatRoom.value.id, _chatPlatformModels.value)
+                chatRepository.saveChatPlatformSettings(_chatRoom.value.id, currentChatPlatformSettings())
             }
         }
     }
@@ -256,20 +262,13 @@ class ChatViewModel @Inject constructor(
         if (reasoningPlatforms.isEmpty()) return
 
         val reasoningPlatformUids = reasoningPlatforms.map { it.uid }.toSet()
-        _platformsInApp.update { platforms ->
-            platforms.map { platform ->
-                if (platform.uid in reasoningPlatformUids) platform.copy(reasoning = enabled) else platform
-            }
-        }
-        _enabledPlatformsInApp.update { platforms ->
-            platforms.map { platform ->
-                if (platform.uid in reasoningPlatformUids) platform.copy(reasoning = enabled) else platform
-            }
+        _chatPlatformReasoning.update { current ->
+            current + reasoningPlatformUids.associateWith { enabled }
         }
 
-        viewModelScope.launch {
-            reasoningPlatforms.forEach { platform ->
-                settingRepository.updatePlatformV2(platform.copy(reasoning = enabled))
+        if (_chatRoom.value.id > 0) {
+            viewModelScope.launch {
+                chatRepository.saveChatPlatformSettings(_chatRoom.value.id, currentChatPlatformSettings())
             }
         }
     }
@@ -322,6 +321,15 @@ class ChatViewModel @Inject constructor(
             _chatRoom.update { it.copy(title = title) }
             viewModelScope.launch {
                 chatRepository.updateChatTitle(_chatRoom.value, title)
+            }
+        }
+    }
+
+    fun updateChatMeta(title: String, icon: String) {
+        if (_chatRoom.value.id > 0) {
+            _chatRoom.update { it.copy(title = title, icon = icon) }
+            viewModelScope.launch {
+                chatRepository.updateChatMeta(_chatRoom.value, title, icon)
             }
         }
     }
@@ -854,9 +862,14 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             _chatRoom.update {
                 if (chatRoomId == 0) {
-                    ChatRoomV2(id = 0, title = "Untitled Chat", enabledPlatform = enabledPlatformsInChat)
+                    ChatRoomV2(
+                        id = 0,
+                        title = "Untitled Chat",
+                        enabledPlatform = enabledPlatformsInChat,
+                        groupName = initialGroupName
+                    )
                 } else {
-                    chatRepository.fetchChatListV2().first { it.id == chatRoomId }
+                    chatRepository.fetchChatRoomV2(chatRoomId) ?: it
                 }
             }
         }
@@ -875,20 +888,24 @@ class ChatViewModel @Inject constructor(
         val defaultModels = enabledPlatformsInChat.associateWith { uid ->
             platforms.firstOrNull { it.uid == uid }?.model ?: ""
         }
-        val persistedModels = if (chatRoomId != 0) {
-            chatRepository.fetchChatPlatformModels(chatRoomId)
+        val persistedSettings = if (chatRoomId != 0) {
+            chatRepository.fetchChatPlatformSettings(chatRoomId)
         } else {
             emptyMap()
         }
 
         val mergedModels = defaultModels.mapValues { (uid, defaultModel) ->
-            persistedModels[uid]?.takeIf { it.isNotBlank() } ?: defaultModel
+            persistedSettings[uid]?.model?.takeIf { it.isNotBlank() } ?: defaultModel
+        }
+        val mergedReasoning = enabledPlatformsInChat.associateWith { uid ->
+            persistedSettings[uid]?.reasoning ?: false
         }
 
         _chatPlatformModels.update { mergedModels }
+        _chatPlatformReasoning.update { mergedReasoning }
 
-        if (chatRoomId != 0 && mergedModels != persistedModels) {
-            chatRepository.saveChatPlatformModels(chatRoomId, mergedModels)
+        if (chatRoomId != 0 && currentChatPlatformSettings() != persistedSettings) {
+            chatRepository.saveChatPlatformSettings(chatRoomId, currentChatPlatformSettings())
         }
     }
 
@@ -902,13 +919,13 @@ class ChatViewModel @Inject constructor(
                 ) {
                     val chatRoom = _chatRoom.value
                     val groupedMessages = _groupedMessages.value
-                    val chatPlatformModels = _chatPlatformModels.value
+                    val chatPlatformSettings = currentChatPlatformSettings()
 
                     val savedChatRoom = withContext(Dispatchers.IO) {
                         chatRepository.saveChat(
                             chatRoom = chatRoom,
                             messages = persistableMessages(groupedMessages),
-                            chatPlatformModels = chatPlatformModels
+                            chatPlatformSettings = chatPlatformSettings
                         )
                     }
                     _chatRoom.update { currentChatRoom ->
@@ -928,11 +945,14 @@ class ChatViewModel @Inject constructor(
 
     private fun resolvePlatformModel(platform: PlatformV2): PlatformV2 {
         val chatModel = _chatPlatformModels.value[platform.uid]?.trim().orEmpty()
-        if (chatModel.isBlank()) return platform
+        val chatReasoning = _chatPlatformReasoning.value[platform.uid] ?: false
+        val platformWithReasoning = platform.copy(reasoning = chatReasoning)
 
-        if (chatModel == platform.model) return platform
+        if (chatModel.isBlank()) return platformWithReasoning
 
-        return platform.copy(model = chatModel)
+        if (chatModel == platform.model) return platformWithReasoning
+
+        return platformWithReasoning.copy(model = chatModel)
     }
 
     private fun persistCurrentChatSnapshot() {
@@ -947,11 +967,19 @@ class ChatViewModel @Inject constructor(
                 chatRepository.saveChat(
                     chatRoom = chatRoom,
                     messages = persistableMessages(groupedMessages),
-                    chatPlatformModels = _chatPlatformModels.value
+                    chatPlatformSettings = currentChatPlatformSettings()
                 )
             }
         }
     }
+
+    private fun currentChatPlatformSettings(): Map<String, ChatPlatformSetting> =
+        enabledPlatformsInChat.associateWith { uid ->
+            ChatPlatformSetting(
+                model = _chatPlatformModels.value[uid].orEmpty(),
+                reasoning = _chatPlatformReasoning.value[uid] ?: false
+            )
+        }
 }
 
 internal fun groupedMessagesThroughTurn(

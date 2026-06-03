@@ -26,6 +26,9 @@ data class ChatPlatformModelV2(
     @ColumnInfo(name = "model")
     val model: String,
 
+    @ColumnInfo(name = "reasoning")
+    val reasoning: Boolean = false,
+
     @ColumnInfo(name = "updated_at")
     val updatedAt: Long = System.currentTimeMillis() / 1000
 )

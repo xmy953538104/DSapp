@@ -16,6 +16,12 @@ interface SettingDataSource {
     suspend fun updateSystemPrompt(apiType: ApiType, prompt: String)
     suspend fun updateAutoContextCompression(enabled: Boolean)
     suspend fun updateAppTestMode(enabled: Boolean)
+    suspend fun updateChatGroups(groups: String)
+    suspend fun updateWebDavUsername(username: String)
+    suspend fun updateWebDavUrl(url: String)
+    suspend fun updateWebDavPassword(password: String)
+    suspend fun updateWebDavReadOnly(readOnly: Boolean)
+    suspend fun updateWebDavLastSyncAt(timestamp: Long)
     suspend fun getDynamicTheme(): DynamicTheme?
     suspend fun getThemeMode(): ThemeMode?
     suspend fun getStatus(apiType: ApiType): Boolean?
@@ -27,4 +33,10 @@ interface SettingDataSource {
     suspend fun getSystemPrompt(apiType: ApiType): String?
     suspend fun getAutoContextCompression(): Boolean?
     suspend fun getAppTestMode(): Boolean?
+    suspend fun getChatGroups(): String?
+    suspend fun getWebDavUsername(): String?
+    suspend fun getWebDavUrl(): String?
+    suspend fun getWebDavPassword(): String?
+    suspend fun getWebDavReadOnly(): Boolean?
+    suspend fun getWebDavLastSyncAt(): Long?
 }

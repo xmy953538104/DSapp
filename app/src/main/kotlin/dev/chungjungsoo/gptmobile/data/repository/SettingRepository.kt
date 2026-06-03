@@ -15,6 +15,11 @@ interface SettingRepository {
     suspend fun updateAutoContextCompression(enabled: Boolean)
     suspend fun getAppTestMode(): Boolean
     suspend fun updateAppTestMode(enabled: Boolean)
+    suspend fun getChatGroups(): List<String>
+    suspend fun updateChatGroups(groups: List<String>)
+    suspend fun getWebDavConfig(): WebDavConfig
+    suspend fun updateWebDavConfig(config: WebDavConfig)
+    suspend fun updateWebDavLastSyncAt(timestamp: Long)
 
     // PlatformV2 CRUD operations
     suspend fun addPlatformV2(platform: PlatformV2)
@@ -22,3 +27,11 @@ interface SettingRepository {
     suspend fun deletePlatformV2(platform: PlatformV2)
     suspend fun getPlatformV2ById(id: Int): PlatformV2?
 }
+
+data class WebDavConfig(
+    val username: String,
+    val url: String,
+    val password: String,
+    val readOnly: Boolean,
+    val lastSyncAt: Long
+)

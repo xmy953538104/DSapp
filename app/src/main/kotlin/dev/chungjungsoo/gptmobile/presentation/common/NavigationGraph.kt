@@ -1,5 +1,6 @@
 package dev.chungjungsoo.gptmobile.presentation.common
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import dev.chungjungsoo.gptmobile.data.database.entity.DEFAULT_CHAT_GROUP_NAME
 import dev.chungjungsoo.gptmobile.presentation.ui.chat.ChatScreen
 import dev.chungjungsoo.gptmobile.presentation.ui.home.HomeScreen
 import dev.chungjungsoo.gptmobile.presentation.ui.migrate.MigrateScreen
@@ -60,7 +62,14 @@ fun NavGraphBuilder.migrationScreenNavigation(navController: NavHostController) 
 
 fun NavGraphBuilder.startScreenNavigation(navController: NavHostController) {
     composable(Route.GET_STARTED) {
-        StartScreen { navController.navigate(Route.SETUP_ROUTE) }
+        StartScreen(
+            onStartClick = { navController.navigate(Route.SETUP_ROUTE) },
+            onImportComplete = {
+                navController.navigate(Route.CHAT_LIST) {
+                    popUpTo(Route.GET_STARTED) { inclusive = true }
+                }
+            }
+        )
     }
 }
 
@@ -128,14 +137,16 @@ fun NavGraphBuilder.homeScreenNavigation(navController: NavHostController) {
                     Route.CHAT_ROOM
                         .replace(oldValue = "{chatRoomId}", newValue = "${chatRoom.id}")
                         .replace(oldValue = "{enabledPlatforms}", newValue = enabledPlatformString)
+                        .replace(oldValue = "{groupName}", newValue = Uri.encode(chatRoom.groupName))
                 )
             },
-            navigateToNewChat = {
-                val enabledPlatformString = it.joinToString(",")
+            navigateToNewChat = { enabledPlatforms, groupName ->
+                val enabledPlatformString = enabledPlatforms.joinToString(",")
                 navController.navigate(
                     Route.CHAT_ROOM
                         .replace(oldValue = "{chatRoomId}", newValue = "0")
                         .replace(oldValue = "{enabledPlatforms}", newValue = enabledPlatformString)
+                        .replace(oldValue = "{groupName}", newValue = Uri.encode(groupName))
                 )
             }
         )
@@ -147,7 +158,11 @@ fun NavGraphBuilder.chatScreenNavigation(navController: NavHostController) {
         Route.CHAT_ROOM,
         arguments = listOf(
             navArgument("chatRoomId") { type = NavType.IntType },
-            navArgument("enabledPlatforms") { defaultValue = "" }
+            navArgument("enabledPlatforms") { defaultValue = "" },
+            navArgument("groupName") {
+                type = NavType.StringType
+                defaultValue = DEFAULT_CHAT_GROUP_NAME
+            }
         )
     ) {
         ChatScreen(

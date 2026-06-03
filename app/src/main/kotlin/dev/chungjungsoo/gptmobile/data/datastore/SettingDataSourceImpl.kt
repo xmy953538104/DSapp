@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import dev.chungjungsoo.gptmobile.data.model.ApiType
 import dev.chungjungsoo.gptmobile.data.model.DynamicTheme
@@ -49,6 +50,12 @@ class SettingDataSourceImpl @Inject constructor(
     private val themeModeKey = intPreferencesKey("theme_mode")
     private val autoContextCompressionKey = booleanPreferencesKey("auto_context_compression")
     private val appTestModeKey = booleanPreferencesKey("app_test_mode")
+    private val chatGroupsKey = stringPreferencesKey("chat_groups")
+    private val webDavUsernameKey = stringPreferencesKey("webdav_username")
+    private val webDavUrlKey = stringPreferencesKey("webdav_url")
+    private val webDavPasswordKey = stringPreferencesKey("webdav_password")
+    private val webDavReadOnlyKey = booleanPreferencesKey("webdav_read_only")
+    private val webDavLastSyncAtKey = longPreferencesKey("webdav_last_sync_at")
 
     override suspend fun updateDynamicTheme(theme: DynamicTheme) {
         dataStore.edit { pref ->
@@ -116,6 +123,42 @@ class SettingDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateChatGroups(groups: String) {
+        dataStore.edit { pref ->
+            pref[chatGroupsKey] = groups
+        }
+    }
+
+    override suspend fun updateWebDavUsername(username: String) {
+        dataStore.edit { pref ->
+            pref[webDavUsernameKey] = username
+        }
+    }
+
+    override suspend fun updateWebDavUrl(url: String) {
+        dataStore.edit { pref ->
+            pref[webDavUrlKey] = url
+        }
+    }
+
+    override suspend fun updateWebDavPassword(password: String) {
+        dataStore.edit { pref ->
+            pref[webDavPasswordKey] = password
+        }
+    }
+
+    override suspend fun updateWebDavReadOnly(readOnly: Boolean) {
+        dataStore.edit { pref ->
+            pref[webDavReadOnlyKey] = readOnly
+        }
+    }
+
+    override suspend fun updateWebDavLastSyncAt(timestamp: Long) {
+        dataStore.edit { pref ->
+            pref[webDavLastSyncAtKey] = timestamp
+        }
+    }
+
     override suspend fun getDynamicTheme(): DynamicTheme? {
         val mode = dataStore.data.map { pref ->
             pref[dynamicThemeKey]
@@ -166,5 +209,29 @@ class SettingDataSourceImpl @Inject constructor(
 
     override suspend fun getAppTestMode(): Boolean? = dataStore.data.map { pref ->
         pref[appTestModeKey]
+    }.first()
+
+    override suspend fun getChatGroups(): String? = dataStore.data.map { pref ->
+        pref[chatGroupsKey]
+    }.first()
+
+    override suspend fun getWebDavUsername(): String? = dataStore.data.map { pref ->
+        pref[webDavUsernameKey]
+    }.first()
+
+    override suspend fun getWebDavUrl(): String? = dataStore.data.map { pref ->
+        pref[webDavUrlKey]
+    }.first()
+
+    override suspend fun getWebDavPassword(): String? = dataStore.data.map { pref ->
+        pref[webDavPasswordKey]
+    }.first()
+
+    override suspend fun getWebDavReadOnly(): Boolean? = dataStore.data.map { pref ->
+        pref[webDavReadOnlyKey]
+    }.first()
+
+    override suspend fun getWebDavLastSyncAt(): Long? = dataStore.data.map { pref ->
+        pref[webDavLastSyncAtKey]
     }.first()
 }

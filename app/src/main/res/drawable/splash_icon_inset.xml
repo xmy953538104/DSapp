@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/ic_chat_ai"
-    android:insetLeft="16dp"
-    android:insetRight="16dp"
-    android:insetTop="16dp"
-    android:insetBottom="16dp" />
+    android:drawable="@drawable/ic_chat_ai_mark"
+    android:insetLeft="28dp"
+    android:insetRight="28dp"
+    android:insetTop="28dp"
+    android:insetBottom="28dp" />

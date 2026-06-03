@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.chungjungsoo.gptmobile.data.backup.AppBackupRepository
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatRoomV2
+import dev.chungjungsoo.gptmobile.data.database.entity.DEFAULT_CHAT_GROUP_NAME
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.repository.ChatRepository
 import dev.chungjungsoo.gptmobile.data.repository.SettingRepository
@@ -24,7 +26,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val settingRepository: SettingRepository
+    private val settingRepository: SettingRepository,
+    private val appBackupRepository: AppBackupRepository
 ) : ViewModel() {
 
     companion object {
@@ -54,6 +57,9 @@ class HomeViewModel @Inject constructor(
     private val _showDeleteWarningDialog = MutableStateFlow(false)
     val showDeleteWarningDialog: StateFlow<Boolean> = _showDeleteWarningDialog.asStateFlow()
 
+    private val _showMoveGroupDialog = MutableStateFlow(false)
+    val showMoveGroupDialog: StateFlow<Boolean> = _showMoveGroupDialog.asStateFlow()
+
     init {
         // Set up debounced search
         _searchQuery
@@ -61,7 +67,18 @@ class HomeViewModel @Inject constructor(
             .distinctUntilChanged()
             .onEach { query -> searchChats(query) }
             .launchIn(viewModelScope)
+        viewModelScope.launch {
+            appBackupRepository.syncWebDavIfDue()
+        }
     }
+
+    private var allChats: List<ChatRoomV2> = emptyList()
+
+    private val _chatGroups = MutableStateFlow(listOf(DEFAULT_CHAT_GROUP_NAME))
+    val chatGroups = _chatGroups.asStateFlow()
+
+    private val _selectedGroup = MutableStateFlow(DEFAULT_CHAT_GROUP_NAME)
+    val selectedGroup = _selectedGroup.asStateFlow()
 
     fun updatePlatformCheckedState(idx: Int) {
         if (idx < 0 || idx >= _chatListState.value.selectedPlatforms.size) return
@@ -85,13 +102,8 @@ class HomeViewModel @Inject constructor(
 
     private fun searchChats(query: String) {
         viewModelScope.launch {
-            val chats = chatRepository.searchChatsV2(query)
-            _chatListState.update {
-                it.copy(
-                    chats = chats,
-                    selectedChats = List(chats.size) { false }
-                )
-            }
+            allChats = chatRepository.searchChatsV2(query)
+            updateVisibleChats()
         }
     }
 
@@ -104,8 +116,24 @@ class HomeViewModel @Inject constructor(
         _showDeleteWarningDialog.update { false }
     }
 
-    fun openSelectModelDialog() {
+    fun openMoveGroupDialog() {
+        _showMoveGroupDialog.update { true }
+    }
+
+    fun closeMoveGroupDialog() {
+        _showMoveGroupDialog.update { false }
+    }
+
+    fun openSelectModelDialog(preselectSingleEnabledPlatform: Boolean = false) {
         _showSelectModelDialog.update { true }
+        if (preselectSingleEnabledPlatform) {
+            val enabledCount = _platformState.value.count { it.enabled }
+            if (enabledCount == 1) {
+                _chatListState.update { state ->
+                    state.copy(selectedPlatforms = _platformState.value.map { it.enabled })
+                }
+            }
+        }
         disableSelectionMode()
     }
 
@@ -121,7 +149,8 @@ class HomeViewModel @Inject constructor(
             }
 
             chatRepository.deleteChatsV2(selectedChats)
-            _chatListState.update { it.copy(chats = chatRepository.fetchChatListV2()) }
+            allChats = chatRepository.fetchChatListV2()
+            updateVisibleChats()
             disableSelectionMode()
         }
     }
@@ -134,7 +163,23 @@ class HomeViewModel @Inject constructor(
             val selectedChat = selectedChats.singleOrNull() ?: return@launch
 
             chatRepository.duplicateChatV2(selectedChat)
-            _chatListState.update { it.copy(chats = chatRepository.fetchChatListV2()) }
+            allChats = chatRepository.fetchChatListV2()
+            updateVisibleChats()
+            disableSelectionMode()
+        }
+    }
+
+    fun moveSelectedChatsToGroup(groupName: String) {
+        viewModelScope.launch {
+            val selectedChats = _chatListState.value.chats.filterIndexed { index, _ ->
+                _chatListState.value.selectedChats[index]
+            }
+            if (selectedChats.isEmpty()) return@launch
+
+            chatRepository.updateChatsGroup(selectedChats, groupName)
+            allChats = chatRepository.fetchChatListV2()
+            updateVisibleChats()
+            closeMoveGroupDialog()
             disableSelectionMode()
         }
     }
@@ -165,17 +210,23 @@ class HomeViewModel @Inject constructor(
 
     fun fetchChats() {
         viewModelScope.launch {
-            val chats = chatRepository.fetchChatListV2()
-
-            _chatListState.update {
-                it.copy(
-                    chats = chats,
-                    selectedChats = List(chats.size) { false },
-                    isSelectionMode = false
-                )
-            }
+            allChats = chatRepository.fetchChatListV2()
+            updateVisibleChats(resetSelection = true)
 
             Log.d("chats", "${_chatListState.value.chats}")
+        }
+    }
+
+    fun fetchGroups() {
+        viewModelScope.launch {
+            val groups = settingRepository.getChatGroups()
+            _chatGroups.update { groups }
+            if (_selectedGroup.value !in groups) {
+                _selectedGroup.update { groups.firstOrNull() ?: DEFAULT_CHAT_GROUP_NAME }
+            }
+            chatRepository.normalizeChatGroups(groups, groups.firstOrNull() ?: DEFAULT_CHAT_GROUP_NAME)
+            allChats = chatRepository.fetchChatListV2()
+            updateVisibleChats(resetSelection = true)
         }
     }
 
@@ -191,7 +242,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun selectChat(chatRoomIdx: Int) {
-        if (chatRoomIdx < 0 || chatRoomIdx > _chatListState.value.chats.size) return
+        if (chatRoomIdx < 0 || chatRoomIdx >= _chatListState.value.chats.size) return
 
         _chatListState.update {
             it.copy(
@@ -207,6 +258,30 @@ class HomeViewModel @Inject constructor(
 
         if (_chatListState.value.selectedChats.count { it } == 0) {
             disableSelectionMode()
+        }
+    }
+
+    fun selectGroup(groupName: String) {
+        if (groupName !in _chatGroups.value) return
+        _selectedGroup.update { groupName }
+        disableSearchMode()
+        updateVisibleChats(resetSelection = true)
+    }
+
+    private fun updateVisibleChats(resetSelection: Boolean = false) {
+        val visibleChats = allChats.filter { chatRoom ->
+            _chatGroups.value.size <= 1 || chatRoom.groupName == _selectedGroup.value
+        }
+        _chatListState.update {
+            it.copy(
+                chats = visibleChats,
+                selectedChats = if (resetSelection || it.selectedChats.size != visibleChats.size) {
+                    List(visibleChats.size) { false }
+                } else {
+                    it.selectedChats
+                },
+                isSelectionMode = if (resetSelection) false else it.isSelectionMode
+            )
         }
     }
 }

@@ -65,6 +65,7 @@ object DatabaseModule {
         ChatDatabaseV2Migrations.MIGRATION_2_3,
         ChatDatabaseV2Migrations.MIGRATION_3_4,
         ChatDatabaseV2Migrations.MIGRATION_4_5,
-        ChatDatabaseV2Migrations.MIGRATION_5_6
+        ChatDatabaseV2Migrations.MIGRATION_5_6,
+        ChatDatabaseV2Migrations.MIGRATION_6_7
     ).build()
 }
