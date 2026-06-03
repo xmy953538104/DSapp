@@ -101,7 +101,12 @@ class AppBackupRepository @Inject constructor(
         chatIdMap.size
     }
 
-    suspend fun uploadWebDavConfig(config: WebDavConfig = settingRepository.getWebDavConfig()) {
+    suspend fun uploadWebDavConfig() {
+        val config = settingRepository.getWebDavConfig()
+        uploadWebDavConfig(config)
+    }
+
+    suspend fun uploadWebDavConfig(config: WebDavConfig) {
         config.requireUsable()
         require(!config.readOnly) { "This WebDAV config is read-only" }
         val payload = WebDavProviderConfig(
@@ -112,7 +117,12 @@ class AppBackupRepository @Inject constructor(
         settingRepository.updateWebDavLastSyncAt(System.currentTimeMillis() / 1000)
     }
 
-    suspend fun downloadWebDavConfig(config: WebDavConfig = settingRepository.getWebDavConfig()): Int {
+    suspend fun downloadWebDavConfig(): Int {
+        val config = settingRepository.getWebDavConfig()
+        return downloadWebDavConfig(config)
+    }
+
+    suspend fun downloadWebDavConfig(config: WebDavConfig): Int {
         config.requireUsable()
         val body = getWebDavJson(config, WEBDAV_CONFIG_FILE)
         val payload = json.decodeFromString<WebDavProviderConfig>(body)
