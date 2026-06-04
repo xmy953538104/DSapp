@@ -71,6 +71,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -273,8 +274,7 @@ fun HomeScreen(
                     navigateToNewChat(platforms, groupName)
                     homeViewModel.closeSelectModelDialog()
                 },
-                onPlatformSelect = { homeViewModel.updatePlatformCheckedState(it) },
-                onGroupSelect = homeViewModel::selectGroup
+                onPlatformSelect = { homeViewModel.updatePlatformCheckedState(it) }
             )
         }
 
@@ -613,12 +613,14 @@ fun SelectPlatformDialog(
     selectedGroup: String,
     onDismissRequest: () -> Unit,
     onConfirmation: (enabledPlatforms: List<String>, groupName: String) -> Unit,
-    onPlatformSelect: (idx: Int) -> Unit,
-    onGroupSelect: (String) -> Unit
+    onPlatformSelect: (idx: Int) -> Unit
 ) {
     val configuration = LocalWindowInfo.current
     val screenWidth = with(LocalDensity.current) { configuration.containerSize.width.toDp() }
     val screenHeight = with(LocalDensity.current) { configuration.containerSize.height.toDp() }
+    var draftGroup by rememberSaveable(groups, selectedGroup) {
+        mutableStateOf(selectedGroup.takeIf { it in groups } ?: groups.firstOrNull() ?: DEFAULT_CHAT_GROUP_NAME)
+    }
 
     AlertDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -673,8 +675,8 @@ fun SelectPlatformDialog(
                         groups.forEach { group ->
                             GroupFilterChip(
                                 text = group,
-                                selected = group == selectedGroup,
-                                onClick = { onGroupSelect(group) }
+                                selected = group == draftGroup,
+                                onClick = { draftGroup = group }
                             )
                         }
                     }
@@ -688,7 +690,7 @@ fun SelectPlatformDialog(
                 onClick = {
                     onConfirmation(
                         platforms.filterIndexed { i, _ -> selectedPlatforms[i] }.map { it.uid },
-                        selectedGroup
+                        draftGroup
                     )
                 }
             ) {

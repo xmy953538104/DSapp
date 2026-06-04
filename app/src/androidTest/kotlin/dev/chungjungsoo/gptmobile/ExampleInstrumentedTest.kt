@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("dev.chungjungsoo.gptmobile", appContext.packageName)
+        assertEquals("com.xmy.chatai", appContext.packageName)
     }
 }

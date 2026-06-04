@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -47,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -520,21 +517,18 @@ fun BackupRecoveryDialog(
                         icon = ImageVector.vectorResource(id = R.drawable.ic_backup_download),
                         contentDescription = stringResource(R.string.webdav_pull),
                         enabled = configComplete,
-                        contentColor = MaterialTheme.colorScheme.primary,
                         onClick = { onPull(username.trim(), url.trim(), password) }
                     )
                     BackupIconButton(
                         icon = ImageVector.vectorResource(id = R.drawable.ic_backup_upload),
                         contentDescription = stringResource(R.string.webdav_upload),
                         enabled = configComplete && !readOnly,
-                        contentColor = MaterialTheme.colorScheme.primary,
                         onClick = { onUpload(username.trim(), url.trim(), password) }
                     )
                     BackupIconButton(
                         icon = Icons.Filled.Delete,
                         contentDescription = stringResource(R.string.webdav_clear),
-                        enabled = true,
-                        contentColor = MaterialTheme.colorScheme.error,
+                        enabled = configComplete,
                         onClick = onClear
                     )
                 }
@@ -580,24 +574,22 @@ private fun BackupIconButton(
     icon: ImageVector,
     contentDescription: String,
     enabled: Boolean,
-    contentColor: Color,
     onClick: () -> Unit
 ) {
-    OutlinedButton(
+    IconButton(
         modifier = Modifier.size(56.dp),
         enabled = enabled,
-        onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = contentColor,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-        )
+        onClick = onClick
     ) {
         Icon(
             imageVector = icon,
             contentDescription = contentDescription,
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(24.dp),
+            tint = if (enabled) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+            }
         )
     }
 }

@@ -19,7 +19,7 @@ extensions.configure<ApplicationExtension> {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "dev.chungjungsoo.gptmobile"
+        applicationId = "com.xmy.chatai"
         minSdk = 31
         targetSdk = 36
         versionCode = 21
