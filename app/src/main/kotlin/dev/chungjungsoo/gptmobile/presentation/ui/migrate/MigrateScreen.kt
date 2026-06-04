@@ -17,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.presentation.common.NeutralTextButton
 import dev.chungjungsoo.gptmobile.presentation.common.PrimaryLongButton
 import dev.chungjungsoo.gptmobile.presentation.icons.Block
 import dev.chungjungsoo.gptmobile.presentation.icons.Complete
@@ -149,7 +149,7 @@ fun MigrationCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            TextButton(
+            NeutralTextButton(
                 onClick = onMigrationClick,
                 enabled = status == MigrateViewModel.MigrationState.READY || status == MigrateViewModel.MigrationState.ERROR
             ) {

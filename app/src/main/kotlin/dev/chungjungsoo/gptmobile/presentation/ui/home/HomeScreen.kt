@@ -59,7 +59,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -97,6 +96,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.presentation.common.NeutralTextButton
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_FOOD
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_LIFE
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PLAY
@@ -683,7 +683,7 @@ fun SelectPlatformDialog(
             }
         },
         confirmButton = {
-            TextButton(
+            NeutralTextButton(
                 enabled = selectedPlatforms.any { it },
                 onClick = {
                     onConfirmation(
@@ -696,7 +696,7 @@ fun SelectPlatformDialog(
             }
         },
         dismissButton = {
-            TextButton(
+            NeutralTextButton(
                 onClick = { onDismissRequest() }
             ) {
                 Text(stringResource(R.string.cancel))
@@ -768,12 +768,12 @@ fun MoveToGroupDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(onClick = { onConfirm(targetGroup) }) {
+            NeutralTextButton(onClick = { onConfirm(targetGroup) }) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            NeutralTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -846,12 +846,12 @@ fun DeleteWarningDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            NeutralTextButton(onClick = onConfirm) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            NeutralTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }

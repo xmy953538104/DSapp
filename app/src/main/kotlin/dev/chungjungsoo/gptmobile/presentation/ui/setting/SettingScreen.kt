@@ -36,7 +36,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -270,9 +269,9 @@ private fun SettingTopBar(
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
         ),
         title = {
             Text(
@@ -345,7 +344,7 @@ fun TokenStatsDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(onClick = onDismissRequest) {
+            SettingTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.confirm))
             }
         }
@@ -406,7 +405,7 @@ fun ChatGroupDialog(
                         }
                     }
                 }
-                TextButton(
+                SettingTextButton(
                     enabled = editingGroups.size < 5,
                     onClick = { editingGroups = editingGroups + "" }
                 ) {
@@ -417,7 +416,7 @@ fun ChatGroupDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 enabled = editingGroups.any { it.isNotBlank() },
                 onClick = { onConfirm(editingGroups) }
             ) {
@@ -425,7 +424,7 @@ fun ChatGroupDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            SettingTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -543,7 +542,7 @@ fun BackupRecoveryDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 enabled = configComplete,
                 onClick = { onSaveWebDav(username.trim(), url.trim(), password) }
             ) {
@@ -552,10 +551,10 @@ fun BackupRecoveryDialog(
         },
         dismissButton = {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                TextButton(onClick = { showInfo = true }) {
+                SettingTextButton(onClick = { showInfo = true }) {
                     Text(stringResource(R.string.explanation))
                 }
-                TextButton(onClick = onDismissRequest) {
+                SettingTextButton(onClick = onDismissRequest) {
                     Text(stringResource(R.string.cancel))
                 }
             }
@@ -568,7 +567,7 @@ fun BackupRecoveryDialog(
             text = { Text(stringResource(R.string.backup_restore_info)) },
             onDismissRequest = { showInfo = false },
             confirmButton = {
-                TextButton(onClick = { showInfo = false }) {
+                SettingTextButton(onClick = { showInfo = false }) {
                     Text(stringResource(R.string.confirm))
                 }
             }
@@ -667,7 +666,7 @@ fun ThemeSettingDialog(
         },
         onDismissRequest = settingViewModel::closeThemeDialog,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = settingViewModel::closeThemeDialog
             ) {
                 Text(stringResource(R.string.confirm))
@@ -704,14 +703,14 @@ fun DeletePlatformDialog(
         },
         onDismissRequest = settingViewModel::closeDeleteDialog,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = settingViewModel::confirmDelete
             ) {
                 Text(stringResource(R.string.delete))
             }
         },
         dismissButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = settingViewModel::closeDeleteDialog
             ) {
                 Text(stringResource(R.string.cancel))

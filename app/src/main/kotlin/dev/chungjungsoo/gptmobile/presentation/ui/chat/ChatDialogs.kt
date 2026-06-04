@@ -36,7 +36,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.presentation.common.NeutralTextButton
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_FOOD
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_LIFE
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PLAY
@@ -138,7 +138,7 @@ fun ChatModelDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             val hasBlank = platformOrder.any { models[it].orEmpty().trim().isBlank() }
-            TextButton(
+            NeutralTextButton(
                 enabled = !hasBlank,
                 onClick = {
                     onConfirmRequest(
@@ -150,7 +150,7 @@ fun ChatModelDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            NeutralTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -310,7 +310,7 @@ fun ChatTitleDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            NeutralTextButton(
                 enabled = title.isNotBlank() && (title != initialTitle || selectedIcon != initialIcon),
                 onClick = {
                     onConfirmRequest(title, selectedIcon)
@@ -322,12 +322,12 @@ fun ChatTitleDialog(
         },
         dismissButton = {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                TextButton(
+                NeutralTextButton(
                     onClick = { selectedIcon = CHAT_ICON_PROVIDER }
                 ) {
                     Text(text = stringResource(R.string.default_mode))
                 }
-                TextButton(
+                NeutralTextButton(
                     onClick = onDismissRequest
                 ) {
                     Text(stringResource(R.string.cancel))
@@ -449,7 +449,7 @@ fun UserMessageEditDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             val hasPendingOrFailedAttachments = attachments.any { it.status != ChatAttachmentDraft.Status.Ready }
-            TextButton(
+            NeutralTextButton(
                 enabled = !hasPendingOrFailedAttachments &&
                     (question.isNotBlank() || attachments.isNotEmpty()) &&
                     (question != initialQuestion.content || attachments.mapNotNull { it.attachment } != initialQuestion.attachments),
@@ -459,7 +459,7 @@ fun UserMessageEditDialog(
             }
         },
         dismissButton = {
-            TextButton(
+            NeutralTextButton(
                 onClick = onDismissRequest
             ) {
                 Text(stringResource(R.string.cancel))
@@ -542,7 +542,7 @@ fun AssistantMessageEditDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             val hasPendingOrFailedAttachments = attachments.any { it.status != ChatAttachmentDraft.Status.Ready }
-            TextButton(
+            NeutralTextButton(
                 enabled = !hasPendingOrFailedAttachments &&
                     (responseText.isNotBlank() || thoughtsText.isNotBlank() || attachments.isNotEmpty()) &&
                     (
@@ -561,7 +561,7 @@ fun AssistantMessageEditDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            NeutralTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -580,7 +580,7 @@ private fun AttachmentEditorSection(
             onFileRemoved = onFileRemoved
         )
     }
-    TextButton(
+    NeutralTextButton(
         modifier = Modifier.padding(horizontal = 12.dp),
         onClick = onAttachFileClick
     ) {

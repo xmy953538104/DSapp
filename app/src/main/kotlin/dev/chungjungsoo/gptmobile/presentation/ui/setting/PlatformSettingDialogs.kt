@@ -14,7 +14,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -208,7 +207,7 @@ private fun PlatformNameDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 enabled = platformName.isNotBlank(),
                 onClick = { onConfirmRequest(platformName) }
             ) {
@@ -216,7 +215,7 @@ private fun PlatformNameDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            SettingTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -266,7 +265,7 @@ private fun APIUrlDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 enabled = apiUrl.isNotBlank() && apiUrl.isValidUrl() && apiUrl.endsWith("/"),
                 onClick = { onConfirmRequest(apiUrl) }
             ) {
@@ -274,7 +273,7 @@ private fun APIUrlDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            SettingTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -309,14 +308,14 @@ private fun APIKeyDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = { onConfirmRequest(token) }
             ) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = onDismissRequest
             ) {
                 Text(stringResource(R.string.cancel))
@@ -369,7 +368,7 @@ private fun TimeoutDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 enabled = isValidTimeout,
                 onClick = { onConfirmRequest(parsedTimeout!!) }
             ) {
@@ -377,7 +376,7 @@ private fun TimeoutDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            SettingTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -416,7 +415,7 @@ private fun ModelDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 enabled = model.isNotBlank(),
                 onClick = { onConfirmRequest(model) }
             ) {
@@ -424,7 +423,7 @@ private fun ModelDialog(
             }
         },
         dismissButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = onDismissRequest
             ) {
                 Text(stringResource(R.string.cancel))
@@ -473,7 +472,7 @@ private fun ModelPresetsDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 enabled = sanitizedPresets.isNotEmpty(),
                 onClick = { onConfirmRequest(sanitizedPresets) }
             ) {
@@ -481,7 +480,7 @@ private fun ModelPresetsDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            SettingTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -556,7 +555,7 @@ private fun TemperatureDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(
+                    SettingTextButton(
                         onClick = {
                             textFieldTemperature = ""
                             isUnset = true
@@ -569,14 +568,14 @@ private fun TemperatureDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = { onConfirmRequest(if (isUnset) null else sliderTemperature) }
             ) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = onDismissRequest
             ) {
                 Text(stringResource(R.string.cancel))
@@ -653,7 +652,7 @@ private fun TopPDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(
+                    SettingTextButton(
                         onClick = {
                             textFieldTopP = ""
                             isUnset = true
@@ -666,14 +665,14 @@ private fun TopPDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = { onConfirmRequest(if (isUnset) null else sliderTopP) }
             ) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = onDismissRequest
             ) {
                 Text(stringResource(R.string.cancel))
@@ -718,14 +717,14 @@ private fun SystemPromptDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = { onConfirmRequest(textFieldPrompt) }
             ) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(
+            SettingTextButton(
                 onClick = onDismissRequest
             ) {
                 Text(stringResource(R.string.cancel))
@@ -767,12 +766,12 @@ private fun DeletePlatformDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(onClick = onConfirmRequest) {
+            SettingTextButton(onClick = onConfirmRequest) {
                 Text(stringResource(R.string.delete))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            SettingTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }

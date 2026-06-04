@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chungjungsoo.gptmobile.R
+import dev.chungjungsoo.gptmobile.presentation.common.NeutralTextButton
 import dev.chungjungsoo.gptmobile.presentation.common.PrimaryLongButton
 
 @Composable
@@ -129,7 +129,7 @@ private fun OwnerWebDavDialog(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            TextButton(
+            NeutralTextButton(
                 enabled = password.isNotBlank(),
                 onClick = { onConfirm(password) }
             ) {
@@ -137,7 +137,7 @@ private fun OwnerWebDavDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
+            NeutralTextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }

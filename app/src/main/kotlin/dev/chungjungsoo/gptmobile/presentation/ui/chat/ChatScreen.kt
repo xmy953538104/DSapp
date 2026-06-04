@@ -554,11 +554,7 @@ private fun ChatMessagePair(
     }
 }
 
-private fun chatMessagePairKey(message: MessageV2, index: Int): String = if (message.id > 0) {
-    "message-${message.id}"
-} else {
-    "message-${message.createdAt}-$index"
-}
+private fun chatMessagePairKey(message: MessageV2, index: Int): String = "message-${message.createdAt}-$index"
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -827,21 +823,13 @@ fun ChatInputBox(
                     enabled = chatEnabled && sendButtonEnabled,
                     onClick = { onReasoningModeToggle(!reasoningModeEnabled) },
                     colors = FilterChipDefaults.filterChipColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        containerColor = MaterialTheme.colorScheme.surface,
                         labelColor = MaterialTheme.colorScheme.onSurface,
-                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        selectedLabelColor = MaterialTheme.colorScheme.onSurface
                     ),
                     label = {
-                        Text(
-                            text = stringResource(
-                                if (reasoningModeEnabled) {
-                                    R.string.deepseek_thinking_on
-                                } else {
-                                    R.string.deepseek_thinking_off
-                                }
-                            )
-                        )
+                        Text(text = stringResource(R.string.deepseek_thinking_on))
                     }
                 )
             }
