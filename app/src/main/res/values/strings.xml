@@ -272,7 +272,6 @@
     <string name="chat_icon_study">Study</string>
     <string name="chat_icon_food">Food</string>
     <string name="chat_icon_play">Play</string>
-    <string name="save">Save</string>
     <string name="explanation">Info</string>
     <string name="import_backup_start">Import Backup</string>
     <string name="backup_restore_settings">Backup &amp; restore</string>

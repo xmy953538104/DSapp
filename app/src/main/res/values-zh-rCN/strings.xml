@@ -265,7 +265,6 @@
     <string name="chat_icon_study">学习</string>
     <string name="chat_icon_food">饮食</string>
     <string name="chat_icon_play">玩乐</string>
-    <string name="save">保存</string>
     <string name="explanation">说明</string>
     <string name="import_backup_start">备份导入</string>
     <string name="backup_restore_settings">备份与恢复</string>
