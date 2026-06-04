@@ -195,7 +195,7 @@
     <string name="api_key_description">请输入你的 API 密钥，它只存储在您的设备上。</string>
 
     <string name="model_description">请输入您使用模型的标识符</string>
-    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.6-flash</string>
+    <string name="model_examples">例如：gpt-5.2、claude-sonnet-4-5-20250929、deepseek-v4-flash、qwen3.7-plus</string>
     <string name="back">返回</string>
     <string name="finish">完成</string>
 <string name="custom_provider">自定义提供商</string>
@@ -264,7 +264,14 @@
     <string name="chat_icon_work">工作</string>
     <string name="chat_icon_study">学习</string>
     <string name="chat_icon_food">饮食</string>
+    <string name="chat_icon_play">玩乐</string>
+    <string name="save">保存</string>
+    <string name="explanation">说明</string>
     <string name="import_backup_start">备份导入</string>
+    <string name="backup_restore_settings">备份与恢复</string>
+    <string name="backup_restore_description">本地备份和 WebDAV 供应商同步。</string>
+    <string name="backup_restore_info_title">备份与恢复</string>
+    <string name="backup_restore_info">本地备份会导出供应商、模型备注、聊天记录、消息和分组到 Download 目录。WebDAV 只同步供应商 API 密钥、API 地址、模型标识符和模型备注。通过隐藏入口导入的 WebDAV 账号为只读，不能上传本地密钥。</string>
     <string name="backup_settings">备份</string>
     <string name="backup_settings_description">导出或导入本地配置与会话。</string>
     <string name="export_local_backup">导出本地备份</string>

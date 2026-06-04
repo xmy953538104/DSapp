@@ -122,10 +122,11 @@ class ChatRepositoryImplTest {
 
     @Test
     fun `qwen legacy aliases normalize to configured presets`() {
-        assertEquals("qwen3.6-flash", qwenPlatform("qwen3.7-flash").withSupportedQwenModel().model)
-        assertEquals("qwen3.6-flash", qwenPlatform("qwen-vl-plus").withSupportedQwenModel().model)
-        assertEquals("qwen3.7-max", qwenPlatform("qwen-plus").withSupportedQwenModel().model)
-        assertEquals("qwen3.7-max", qwenPlatform("qwen3.7-plus").withSupportedQwenModel().model)
+        assertEquals("qwen3.7-plus", qwenPlatform("qwen3.7-flash").withSupportedQwenModel().model)
+        assertEquals("qwen3.7-plus", qwenPlatform("qwen-vl-plus").withSupportedQwenModel().model)
+        assertEquals("qwen3.7-plus", qwenPlatform("qwen-plus").withSupportedQwenModel().model)
+        assertEquals("qwen3.7-plus", qwenPlatform("qwen-3.7-plus").withSupportedQwenModel().model)
+        assertEquals("qwen3.7-max", qwenPlatform("qwen-3.7-max").withSupportedQwenModel().model)
     }
 
     private fun createRepository(

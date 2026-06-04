@@ -115,10 +115,6 @@ class SettingViewModelV2 @Inject constructor(
 
     fun closeBackupDialog() = _dialogState.update { it.copy(isBackupDialogOpen = false) }
 
-    fun openWebDavDialog() = _dialogState.update { it.copy(isWebDavDialogOpen = true) }
-
-    fun closeWebDavDialog() = _dialogState.update { it.copy(isWebDavDialogOpen = false) }
-
     fun updateChatGroups(groups: List<String>) {
         viewModelScope.launch {
             val normalized = groups
@@ -143,7 +139,6 @@ class SettingViewModelV2 @Inject constructor(
     fun updateWebDavConfig(username: String, url: String, password: String) {
         viewModelScope.launch {
             saveWebDavConfig(username, url, password)
-            closeWebDavDialog()
             _operationNotice.update { "WebDAV settings saved." }
         }
     }
@@ -154,7 +149,6 @@ class SettingViewModelV2 @Inject constructor(
                 WebDavConfig(username = "", url = "", password = "", readOnly = false, lastSyncAt = 0L)
             )
             _webDavConfig.update { settingRepository.getWebDavConfig() }
-            closeWebDavDialog()
             _operationNotice.update { "WebDAV settings cleared." }
         }
     }
@@ -328,7 +322,6 @@ class SettingViewModelV2 @Inject constructor(
         val isTokenStatsDialogOpen: Boolean = false,
         val isChatGroupDialogOpen: Boolean = false,
         val isBackupDialogOpen: Boolean = false,
-        val isWebDavDialogOpen: Boolean = false,
         val platformToDelete: Int? = null
     )
 

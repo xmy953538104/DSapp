@@ -37,7 +37,7 @@ object ModelConstants {
         )
 
         ClientType.QWEN -> listOf(
-            PlatformModelPreset("qwen3.6-flash", DAILY_USE_REMARK),
+            PlatformModelPreset("qwen3.7-plus", DAILY_USE_REMARK),
             PlatformModelPreset("qwen3.7-max", PROFESSIONAL_USE_REMARK)
         )
 

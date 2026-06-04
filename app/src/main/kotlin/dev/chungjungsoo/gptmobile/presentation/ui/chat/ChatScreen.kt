@@ -331,14 +331,9 @@ fun ChatScreen(
         }
 
         if (isChatTitleDialogOpen) {
-            val titleProviderIconResId = chatRoom.enabledPlatform.firstNotNullOfOrNull { uid ->
-                appAllPlatforms.find { it.uid == uid }?.compatibleType?.let(::providerIconResId)
-            }
             ChatTitleDialog(
                 initialTitle = chatRoom.title,
                 initialIcon = chatRoom.icon,
-                providerIconResId = titleProviderIconResId,
-                onDefaultTitleMode = chatViewModel::generateDefaultChatTitle,
                 onConfirmRequest = { title, icon -> chatViewModel.updateChatMeta(title, icon) },
                 onDismissRequest = chatViewModel::closeChatTitleDialog
             )

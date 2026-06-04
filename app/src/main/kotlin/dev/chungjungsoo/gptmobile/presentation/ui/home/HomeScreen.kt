@@ -13,6 +13,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.School
@@ -53,7 +56,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -96,14 +98,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.chungjungsoo.gptmobile.R
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_FOOD
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_LIFE
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PLAY
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PROVIDER
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_STUDY
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_WORK
 import dev.chungjungsoo.gptmobile.data.database.entity.ChatRoomV2
 import dev.chungjungsoo.gptmobile.data.database.entity.DEFAULT_CHAT_GROUP_NAME
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
-import dev.chungjungsoo.gptmobile.data.model.ClientType
-import dev.chungjungsoo.gptmobile.presentation.common.PlatformCheckBoxItem
 import dev.chungjungsoo.gptmobile.presentation.common.providerIconResId
 import dev.chungjungsoo.gptmobile.util.getPlatformName
 
@@ -308,7 +309,6 @@ private fun ChatListAvatar(
         platforms.firstOrNull { it.uid == uid }
     }
     val iconResId = platform?.compatibleType?.let(::providerIconResId)
-    val isQwen = platform?.compatibleType == ClientType.QWEN
     val categoryIcon = chatIconVector(chatRoom.icon)
     val categoryColors = chatIconColors(chatRoom.icon)
 
@@ -324,8 +324,7 @@ private fun ChatListAvatar(
                 painter = painterResource(iconResId),
                 contentDescription = stringResource(R.string.chat_icon),
                 modifier = Modifier
-                    .size(40.dp)
-                    .padding(if (isQwen) 6.dp else 0.dp),
+                    .size(40.dp),
                 contentScale = ContentScale.Fit
             )
         } else {
@@ -349,6 +348,7 @@ private fun chatIconColors(icon: String): ChatIconColors = when (icon) {
     CHAT_ICON_WORK -> ChatIconColors(Color(0xFFDDE8F5), Color(0xFF285C91))
     CHAT_ICON_STUDY -> ChatIconColors(Color(0xFFE8DDF4), Color(0xFF674694))
     CHAT_ICON_FOOD -> ChatIconColors(Color(0xFFE4F0D8), Color(0xFF49682E))
+    CHAT_ICON_PLAY -> ChatIconColors(Color(0xFFFFE2B6), Color(0xFFA05A00))
     else -> ChatIconColors(Color(0xFFFFFFFF), Color(0xFF151312))
 }
 
@@ -357,6 +357,7 @@ private fun chatIconVector(icon: String): ImageVector? = when (icon) {
     CHAT_ICON_WORK -> Icons.Filled.Work
     CHAT_ICON_STUDY -> Icons.Filled.School
     CHAT_ICON_FOOD -> Icons.Filled.Restaurant
+    CHAT_ICON_PLAY -> Icons.Filled.FlightTakeoff
     else -> null
 }
 
@@ -601,6 +602,7 @@ fun NewChatButton(
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SelectPlatformDialog(
     platforms: List<PlatformV2>,
@@ -624,48 +626,55 @@ fun SelectPlatformDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest,
         title = {
-            Column {
-                Text(
-                    text = stringResource(R.string.select_platform),
-                    modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text(
-                    text = stringResource(R.string.select_platform_description),
-                    modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Text(
+                text = stringResource(R.string.select_platform),
+                modifier = Modifier.padding(8.dp),
+                style = MaterialTheme.typography.headlineSmall
+            )
         },
         text = {
             HorizontalDivider()
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier.padding(top = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
                 if (platforms.any { it.enabled }) {
-                    platforms.forEachIndexed { i, platform ->
-                        PlatformCheckBoxItem(
-                            title = platform.name,
-                            enabled = platform.enabled,
-                            selected = selectedPlatforms[i],
-                            description = null,
-                            onClickEvent = { onPlatformSelect(i) }
-                        )
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        platforms.forEachIndexed { i, platform ->
+                            if (platform.enabled) {
+                                PlatformFilterChip(
+                                    platform = platform,
+                                    selected = selectedPlatforms[i],
+                                    onClick = { onPlatformSelect(i) }
+                                )
+                            }
+                        }
                     }
                 } else {
                     EnablePlatformWarningText()
                 }
                 if (groups.size > 1) {
-                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
                     Text(
                         text = stringResource(R.string.select_group),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.titleSmall
                     )
-                    groups.forEach { group ->
-                        GroupRadioOption(
-                            text = group,
-                            selected = group == selectedGroup,
-                            onClick = { onGroupSelect(group) }
-                        )
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        groups.forEach { group ->
+                            GroupFilterChip(
+                                text = group,
+                                selected = group == selectedGroup,
+                                onClick = { onGroupSelect(group) }
+                            )
+                        }
                     }
                 }
                 HorizontalDivider(Modifier.padding(top = 8.dp))
@@ -695,6 +704,38 @@ fun SelectPlatformDialog(
 }
 
 @Composable
+private fun PlatformFilterChip(
+    platform: PlatformV2,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val iconResId = providerIconResId(platform.compatibleType)
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = {
+            Text(
+                text = platform.name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        leadingIcon = iconResId?.let { resId ->
+            {
+                Image(
+                    painter = painterResource(resId),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Fit
+                )
+            }
+        }
+    )
+}
+
+@Composable
 fun MoveToGroupDialog(
     groups: List<String>,
     selectedGroup: String,
@@ -708,9 +749,13 @@ fun MoveToGroupDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         title = { Text(stringResource(R.string.move_to_group)) },
         text = {
-            Column {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 groups.forEach { group ->
-                    GroupRadioOption(
+                    GroupFilterChip(
                         text = group,
                         selected = targetGroup == group,
                         onClick = { targetGroup = group }
@@ -733,41 +778,22 @@ fun MoveToGroupDialog(
 }
 
 @Composable
-private fun GroupRadioOption(
+private fun GroupFilterChip(
     text: String,
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val containerColor = if (selected) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        MaterialTheme.colorScheme.surfaceContainerLow
-    }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(containerColor)
-            .border(
-                width = 1.dp,
-                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-                shape = RoundedCornerShape(14.dp)
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = {
+            Text(
+                text = text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = onClick
-        )
-        Text(
-            text = text,
-            modifier = Modifier.padding(start = 8.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
+        }
+    )
 }
 
 @Preview

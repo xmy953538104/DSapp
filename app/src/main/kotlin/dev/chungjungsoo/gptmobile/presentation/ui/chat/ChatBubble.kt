@@ -239,8 +239,7 @@ fun ProviderAvatar(
                     painter = painterResource(iconResId),
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(if (providerType == ClientType.QWEN) 6.dp else 0.dp),
+                        .fillMaxSize(),
                     contentScale = ContentScale.Fit
                 )
             } else {

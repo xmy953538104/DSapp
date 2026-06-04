@@ -237,7 +237,7 @@
     <string name="platform_basics_description">Give your platform a name and verify the API URL</string>
     <string name="api_key_description">Enter your API key. This is stored locally on your device.</string>
     <string name="model_description">Enter the model identifier you want to use</string>
-    <string name="model_examples">Examples: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.6-flash</string>
+    <string name="model_examples">Examples: gpt-5.2, claude-sonnet-4-5-20250929, deepseek-v4-flash, qwen3.7-plus</string>
     <string name="back">Back</string>
     <string name="finish">Finish</string>
     <string name="deepseek" translatable="false">DeepSeek</string>
@@ -271,7 +271,14 @@
     <string name="chat_icon_work">Work</string>
     <string name="chat_icon_study">Study</string>
     <string name="chat_icon_food">Food</string>
+    <string name="chat_icon_play">Play</string>
+    <string name="save">Save</string>
+    <string name="explanation">Info</string>
     <string name="import_backup_start">Import Backup</string>
+    <string name="backup_restore_settings">Backup &amp; restore</string>
+    <string name="backup_restore_description">Local backup and WebDAV provider sync.</string>
+    <string name="backup_restore_info_title">Backup &amp; restore</string>
+    <string name="backup_restore_info">Local backup exports providers, model presets, chat history, messages, and groups to Downloads. WebDAV only syncs provider API keys, API URLs, model IDs, and model preset remarks. Owner-imported WebDAV accounts are read-only and cannot upload local keys.</string>
     <string name="backup_settings">Backup</string>
     <string name="backup_settings_description">Export or import local app configuration and chats.</string>
     <string name="export_local_backup">Export local backup</string>

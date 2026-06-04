@@ -13,6 +13,7 @@ const val CHAT_ICON_LIFE = "life"
 const val CHAT_ICON_WORK = "work"
 const val CHAT_ICON_STUDY = "study"
 const val CHAT_ICON_FOOD = "food"
+const val CHAT_ICON_PLAY = "play"
 
 @Parcelize
 @Entity(tableName = "chats_v2")

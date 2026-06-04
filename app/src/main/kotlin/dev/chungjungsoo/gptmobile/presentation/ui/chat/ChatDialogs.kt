@@ -2,11 +2,8 @@ package dev.chungjungsoo.gptmobile.presentation.ui.chat
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,10 +21,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -52,14 +50,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import dev.chungjungsoo.gptmobile.R
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_FOOD
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_LIFE
+import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PLAY
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_PROVIDER
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_STUDY
 import dev.chungjungsoo.gptmobile.data.database.entity.CHAT_ICON_WORK
@@ -189,14 +186,17 @@ private fun ProviderModelPicker(
 private fun normalizePickerModel(clientType: ClientType, model: String): String = when {
     clientType == ClientType.DEEPSEEK && model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
     clientType == ClientType.DEEPSEEK && model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
-    clientType == ClientType.QWEN && model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.6-flash"
+    clientType == ClientType.QWEN && model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-plus"
     clientType == ClientType.QWEN && model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-max"
-    clientType == ClientType.QWEN && model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.6-flash"
+    clientType == ClientType.QWEN && model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-plus"
     clientType == ClientType.QWEN && model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-max"
-    clientType == ClientType.QWEN && model.equals("qwen-flash", ignoreCase = true) -> "qwen3.6-flash"
-    clientType == ClientType.QWEN && model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-max"
-    clientType == ClientType.QWEN && model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.6-flash"
-    clientType == ClientType.QWEN && model.equals("qwen3.7-plus", ignoreCase = true) -> "qwen3.7-max"
+    clientType == ClientType.QWEN && model.equals("qwen-flash", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen3.6-flash", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen3.6-plus", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen-3.7-plus", ignoreCase = true) -> "qwen3.7-plus"
+    clientType == ClientType.QWEN && model.equals("qwen-3.7-max", ignoreCase = true) -> "qwen3.7-max"
     else -> model
 }
 
@@ -251,8 +251,6 @@ private fun ProviderModelOptionCard(
 fun ChatTitleDialog(
     initialTitle: String,
     initialIcon: String,
-    providerIconResId: Int? = null,
-    onDefaultTitleMode: () -> String?,
     onConfirmRequest: (title: String, icon: String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -261,7 +259,6 @@ fun ChatTitleDialog(
     val screenHeight = with(LocalDensity.current) { configuration.containerSize.height.toDp() }
     var title by rememberSaveable { mutableStateOf(initialTitle) }
     var selectedIcon by rememberSaveable { mutableStateOf(initialIcon) }
-    val untitledChat = stringResource(R.string.untitled_chat)
 
     AlertDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
@@ -295,15 +292,13 @@ fun ChatTitleDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
                         .padding(horizontal = 8.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     chatIconOptions().forEach { option ->
                         ChatIconCircleButton(
                             option = option,
                             selected = selectedIcon == option.id,
-                            providerIconResId = providerIconResId.takeIf { option.id == CHAT_ICON_PROVIDER },
                             onClick = { selectedIcon = option.id }
                         )
                     }
@@ -323,15 +318,17 @@ fun ChatTitleDialog(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = { title = onDefaultTitleMode.invoke() ?: untitledChat }
-            ) {
-                Text(text = stringResource(R.string.default_mode))
-            }
-            TextButton(
-                onClick = onDismissRequest
-            ) {
-                Text(stringResource(R.string.cancel))
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                TextButton(
+                    onClick = { selectedIcon = CHAT_ICON_PROVIDER }
+                ) {
+                    Text(text = stringResource(R.string.default_mode))
+                }
+                TextButton(
+                    onClick = onDismissRequest
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
         }
     )
@@ -346,45 +343,41 @@ private data class ChatIconOption(
 )
 
 private fun chatIconOptions(): List<ChatIconOption> = listOf(
-    ChatIconOption(CHAT_ICON_PROVIDER, R.string.chat_icon_provider, Icons.Filled.SmartToy, Color(0xFFFFFFFF), Color(0xFF151312)),
-    ChatIconOption(CHAT_ICON_LIFE, R.string.chat_icon_life, Icons.Filled.Home, Color(0xFFF7D8C6), Color(0xFF8A2E20)),
-    ChatIconOption(CHAT_ICON_WORK, R.string.chat_icon_work, Icons.Filled.Work, Color(0xFFDDE8F5), Color(0xFF285C91)),
-    ChatIconOption(CHAT_ICON_STUDY, R.string.chat_icon_study, Icons.Filled.School, Color(0xFFE8DDF4), Color(0xFF674694)),
-    ChatIconOption(CHAT_ICON_FOOD, R.string.chat_icon_food, Icons.Filled.Restaurant, Color(0xFFE4F0D8), Color(0xFF49682E))
+    ChatIconOption(CHAT_ICON_LIFE, R.string.chat_icon_life, Icons.Filled.Home, Color(0xFFFFD7C6), Color(0xFF8A2E20)),
+    ChatIconOption(CHAT_ICON_WORK, R.string.chat_icon_work, Icons.Filled.Work, Color(0xFFD9ECFF), Color(0xFF1D5FA8)),
+    ChatIconOption(CHAT_ICON_STUDY, R.string.chat_icon_study, Icons.Filled.School, Color(0xFFE8DFFF), Color(0xFF5F46A5)),
+    ChatIconOption(CHAT_ICON_FOOD, R.string.chat_icon_food, Icons.Filled.Restaurant, Color(0xFFE3F3D8), Color(0xFF42703A)),
+    ChatIconOption(CHAT_ICON_PLAY, R.string.chat_icon_play, Icons.Filled.FlightTakeoff, Color(0xFFFFE2B6), Color(0xFFA05A00))
 )
 
 @Composable
 private fun ChatIconCircleButton(
     option: ChatIconOption,
     selected: Boolean,
-    providerIconResId: Int?,
     onClick: () -> Unit
 ) {
-    val borderColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
     Box(
         modifier = Modifier
-            .size(54.dp)
+            .size(48.dp)
             .clip(CircleShape)
             .background(option.backgroundColor)
-            .border(2.dp, borderColor, CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        if (providerIconResId != null) {
-            Image(
-                painter = painterResource(providerIconResId),
-                contentDescription = stringResource(option.labelRes),
-                modifier = Modifier
-                    .size(54.dp)
-                    .padding(if (providerIconResId == R.drawable.provider_qwen) 9.dp else 0.dp),
-                contentScale = ContentScale.Fit
-            )
-        } else {
+        Icon(
+            imageVector = option.icon,
+            contentDescription = stringResource(option.labelRes),
+            modifier = Modifier.size(24.dp),
+            tint = option.contentColor
+        )
+        if (selected) {
             Icon(
-                imageVector = option.icon,
-                contentDescription = stringResource(option.labelRes),
-                modifier = Modifier.size(25.dp),
-                tint = option.contentColor
+                imageVector = Icons.Filled.CheckCircle,
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(16.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }

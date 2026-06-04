@@ -9,10 +9,10 @@
       "enabled": true,
       "apiUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1/",
       "token": "sk-your-qwen-api-key",
-      "model": "qwen3.6-flash",
+      "model": "qwen3.7-plus",
       "modelPresets": [
         {
-          "model": "qwen3.6-flash",
+          "model": "qwen3.7-plus",
           "remark": "日常使用"
         },
         {

@@ -218,20 +218,29 @@ class SettingRepositoryImpl @Inject constructor(
     private fun normalizeLegacyModel(model: String): String = when {
         model.equals("deepseek-chat", ignoreCase = true) -> "deepseek-v4-flash"
         model.equals("deepseek-reasoner", ignoreCase = true) -> "deepseek-v4-pro"
-        model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.6-flash"
+        model.equals("qwen-vl-plus", ignoreCase = true) -> "qwen3.7-plus"
         model.equals("qwen-vl-max", ignoreCase = true) -> "qwen3.7-max"
-        model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.6-flash"
+        model.equals("qwen3.5-plus", ignoreCase = true) -> "qwen3.7-plus"
         model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-max"
-        model.equals("qwen-flash", ignoreCase = true) -> "qwen3.6-flash"
-        model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-max"
-        model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.6-flash"
-        model.equals("qwen3.7-plus", ignoreCase = true) -> "qwen3.7-max"
+        model.equals("qwen-flash", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen3.6-flash", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen3.6-plus", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen-3.7-plus", ignoreCase = true) -> "qwen3.7-plus"
+        model.equals("qwen-3.7-max", ignoreCase = true) -> "qwen3.7-max"
         else -> model
     }
 
     private fun normalizeChatGroups(groups: List<String>): List<String> {
         val sanitized = groups
-            .map { it.trim().replace('\n', ' ').take(16) }
+            .map { group ->
+                group
+                    .trim()
+                    .replace('\n', ' ')
+                    .let { if (it == "\u699b\u6a3f\ue17b") DEFAULT_CHAT_GROUP_NAME else it }
+                    .take(16)
+            }
             .filter { it.isNotBlank() }
             .distinct()
             .take(MAX_CHAT_GROUPS)
