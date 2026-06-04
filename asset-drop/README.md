@@ -15,21 +15,29 @@ Android 自适应图标的前景层和背景层都是 108dp 画布，中心 72dp
 
 | 文件名 | 尺寸 | 背景 | 用途 |
 | --- | --- | --- | --- |
-| `app-icon-preview.png` | 1024 x 1024 | 带完整底色和圆角观感 | 桌面图标最终观感参考，当前用于生成 launcher 前景 |
-| `app-icon-foreground.png` | 1024 x 1024 | 透明 | 如果之后要做真正分层前景，把主体放在中心安全区 |
+| `app-icon-preview.png` | 1024 x 1024 | 带完整底色和桌面观感 | 用于生成普通 launcher、round launcher 和 512 预览图 |
+| `app-icon-foreground.png` | 1024 x 1024 | 透明 | 备用分层前景素材；当前 adaptive 前景已经改成矢量层 |
 | `home-logo.png` | 1024 x 1024 | 透明 | 新安装首页顶部图标，当前已使用这一版 |
 
-项目会生成这些 Android 密度资源：
+项目现在参考 FlClash 的结构生成这些 Android 图标资源：
 
 | 目录 | 文件名 | 实际尺寸 |
 | --- | --- | --- |
+| `mipmap-anydpi-v26` | `ic_gpt_mobile.xml` | adaptive icon，引用矢量前景 |
+| `mipmap-anydpi-v26` | `ic_gpt_mobile_round.xml` | round adaptive icon，引用同一矢量前景 |
+| `mipmap-mdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 48 x 48 |
+| `mipmap-hdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 72 x 72 |
+| `mipmap-xhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 96 x 96 |
+| `mipmap-xxhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 144 x 144 |
+| `mipmap-xxxhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 192 x 192 |
 | `mipmap-mdpi` | `ic_gpt_mobile_foreground.png` | 108 x 108 |
 | `mipmap-hdpi` | `ic_gpt_mobile_foreground.png` | 162 x 162 |
 | `mipmap-xhdpi` | `ic_gpt_mobile_foreground.png` | 216 x 216 |
 | `mipmap-xxhdpi` | `ic_gpt_mobile_foreground.png` | 324 x 324 |
 | `mipmap-xxxhdpi` | `ic_gpt_mobile_foreground.png` | 432 x 432 |
+| `app/src/main` | `ic_gpt_mobile-playstore.png` | 512 x 512 |
 
-Chatbox 本地也保留了多尺寸图标，例如 `assets/icons/1024x1024.png`、`512x512.png`、`256x256.png`、`128x128.png`、`96x96.png`、`72x72.png`、`48x48.png`、`32x32.png`、`24x24.png`、`16x16.png`。我们这边是 Android 应用，自适应图标优先使用上面那组 `mipmap` 密度资源。
+当前生成逻辑会把主体按中心 `1.24x` 放大，避免桌面图标显得过小。Chatbox 本地也保留了多尺寸图标，例如 `assets/icons/1024x1024.png`、`512x512.png`、`256x256.png`、`128x128.png`、`96x96.png`、`72x72.png`、`48x48.png`、`32x32.png`、`24x24.png`、`16x16.png`。我们这边是 Android 应用，优先走 `mipmap-anydpi-v26` adaptive icon，同时保留普通密度位图兜底。
 
 ## 聊天头像
 
