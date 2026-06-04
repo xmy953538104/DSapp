@@ -148,7 +148,7 @@ private fun OwnerWebDavDialog(
 @Composable
 fun StartScreenLogo(modifier: Modifier = Modifier) {
     Image(
-        painter = painterResource(R.drawable.ic_chat_ai),
+        painter = painterResource(R.drawable.home_logo),
         contentDescription = stringResource(R.string.gpt_mobile_introduction_logo),
         modifier = modifier
             .padding(top = 54.dp)
