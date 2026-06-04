@@ -51,6 +51,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -543,6 +544,7 @@ private fun GroupSwitchRow(
             FilterChip(
                 selected = group == selectedGroup,
                 onClick = { onGroupClick(group) },
+                colors = blueFilterChipColors(),
                 label = { Text(group, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             )
         }
@@ -713,6 +715,7 @@ private fun PlatformFilterChip(
     FilterChip(
         selected = selected,
         onClick = onClick,
+        colors = blueFilterChipColors(),
         label = {
             Text(
                 text = platform.name,
@@ -786,6 +789,7 @@ private fun GroupFilterChip(
     FilterChip(
         selected = selected,
         onClick = onClick,
+        colors = blueFilterChipColors(),
         label = {
             Text(
                 text = text,
@@ -795,6 +799,14 @@ private fun GroupFilterChip(
         }
     )
 }
+
+@Composable
+private fun blueFilterChipColors() = FilterChipDefaults.filterChipColors(
+    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+    labelColor = MaterialTheme.colorScheme.onSurface,
+    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+)
 
 @Preview
 @Composable

@@ -173,7 +173,7 @@ private fun PlatformCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.54f)
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -234,7 +234,7 @@ private fun AddPlatformCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.54f)
         ),
         shape = RoundedCornerShape(16.dp)
     ) {

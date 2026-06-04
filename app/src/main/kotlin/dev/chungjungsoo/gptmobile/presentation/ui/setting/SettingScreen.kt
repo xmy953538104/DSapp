@@ -5,8 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +27,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -39,8 +37,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -50,9 +48,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -77,7 +74,6 @@ import dev.chungjungsoo.gptmobile.util.TokenUsageStats
 import dev.chungjungsoo.gptmobile.util.getClientTypeDisplayName
 import dev.chungjungsoo.gptmobile.util.getDynamicThemeTitle
 import dev.chungjungsoo.gptmobile.util.getThemeModeTitle
-import dev.chungjungsoo.gptmobile.util.pinnedExitUntilCollapsedScrollBehavior
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,9 +86,6 @@ fun SettingScreen(
     onNavigateToAboutPage: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val scrollBehavior = pinnedExitUntilCollapsedScrollBehavior(
-        canScroll = { scrollState.canScrollForward || scrollState.canScrollBackward }
-    )
     val platformState by settingViewModel.platformState.collectAsStateWithLifecycle()
     val dialogState by settingViewModel.dialogState.collectAsStateWithLifecycle()
     val autoContextCompression by settingViewModel.autoContextCompression.collectAsStateWithLifecycle()
@@ -128,11 +121,9 @@ fun SettingScreen(
     }
 
     Scaffold(
-        modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = modifier,
         topBar = {
             SettingTopBar(
-                scrollBehavior = scrollBehavior,
                 navigationOnClick = onNavigationClick
             )
         }
@@ -275,13 +266,13 @@ private fun SettingsDivider() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingTopBar(
-    scrollBehavior: TopAppBarScrollBehavior,
     navigationOnClick: () -> Unit
 ) {
-    LargeTopAppBar(
+    TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         title = {
             Text(
@@ -298,8 +289,7 @@ private fun SettingTopBar(
             ) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.go_back))
             }
-        },
-        scrollBehavior = scrollBehavior
+        }
     )
 }
 
@@ -442,7 +432,6 @@ fun ChatGroupDialog(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BackupRecoveryDialog(
     configUsername: String,
@@ -473,12 +462,20 @@ fun BackupRecoveryDialog(
                 ) {
                     FilledTonalButton(
                         modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
                         onClick = onExport
                     ) {
                         Text(stringResource(R.string.export_local_backup))
                     }
                     FilledTonalButton(
                         modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
                         onClick = onImport
                     ) {
                         Text(stringResource(R.string.import_local_backup))
@@ -515,27 +512,30 @@ fun BackupRecoveryDialog(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
-                FlowRow(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     BackupIconButton(
                         icon = ImageVector.vectorResource(id = R.drawable.ic_backup_download),
                         contentDescription = stringResource(R.string.webdav_pull),
                         enabled = configComplete,
+                        contentColor = MaterialTheme.colorScheme.primary,
                         onClick = { onPull(username.trim(), url.trim(), password) }
                     )
                     BackupIconButton(
                         icon = ImageVector.vectorResource(id = R.drawable.ic_backup_upload),
                         contentDescription = stringResource(R.string.webdav_upload),
                         enabled = configComplete && !readOnly,
+                        contentColor = MaterialTheme.colorScheme.primary,
                         onClick = { onUpload(username.trim(), url.trim(), password) }
                     )
                     BackupIconButton(
                         icon = Icons.Filled.Delete,
                         contentDescription = stringResource(R.string.webdav_clear),
                         enabled = true,
+                        contentColor = MaterialTheme.colorScheme.error,
                         onClick = onClear
                     )
                 }
@@ -581,14 +581,17 @@ private fun BackupIconButton(
     icon: ImageVector,
     contentDescription: String,
     enabled: Boolean,
+    contentColor: Color,
     onClick: () -> Unit
 ) {
     OutlinedButton(
+        modifier = Modifier.size(56.dp),
         enabled = enabled,
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
+        contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.primary,
+            contentColor = contentColor,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
         )
     ) {

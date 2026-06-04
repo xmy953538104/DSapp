@@ -280,9 +280,9 @@
     <string name="backup_restore_info">Local backup exports providers, model presets, chat history, messages, and groups to Downloads. WebDAV only syncs provider API keys, API URLs, model IDs, and model preset remarks. Owner-imported WebDAV accounts are read-only and cannot upload local keys.</string>
     <string name="backup_settings">Backup</string>
     <string name="backup_settings_description">Export or import local app configuration and chats.</string>
-    <string name="export_local_backup">Export local backup</string>
+    <string name="export_local_backup">Export backup</string>
     <string name="export_local_backup_description">Save providers, models, chats, messages, and groups to Downloads.</string>
-    <string name="import_local_backup">Import local backup</string>
+    <string name="import_local_backup">Import backup</string>
     <string name="import_local_backup_description">Restore providers and append backed-up chats from a JSON file.</string>
     <string name="webdav_settings">WebDAV settings</string>
     <string name="webdav_settings_description">Configure the account used to sync provider API and model identifiers.</string>
@@ -296,4 +296,16 @@
     <string name="webdav_clear">Clear WebDAV config</string>
     <string name="webdav_clear_description">Remove the saved WebDAV account, URL, password, and sync state.</string>
     <string name="hidden_webdav_import">Cloud configuration</string>
+    <string name="notice_webdav_saved">WebDAV settings saved.</string>
+    <string name="notice_webdav_cleared">WebDAV settings cleared.</string>
+    <string name="notice_backup_exported">Backup exported to Download/%1$s</string>
+    <string name="notice_backup_export_failed">Backup export failed: %1$s</string>
+    <string name="notice_backup_imported">Backup imported. Restored %1$d chats.</string>
+    <string name="notice_backup_import_failed">Backup import failed: %1$s</string>
+    <string name="notice_webdav_uploaded">WebDAV provider config uploaded.</string>
+    <string name="notice_webdav_upload_failed">WebDAV upload failed: %1$s</string>
+    <string name="notice_webdav_pulled">WebDAV pulled %1$d provider configs.</string>
+    <string name="notice_webdav_pull_failed">WebDAV pull failed: %1$s</string>
+    <string name="notice_cloud_config_pulled">Cloud config pulled %1$d providers.</string>
+    <string name="notice_cloud_config_pull_failed">Cloud config pull failed: %1$s</string>
 </resources>

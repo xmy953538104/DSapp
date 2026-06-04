@@ -143,7 +143,7 @@ private fun PlatformTypeCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.62f)
         ),
         shape = RoundedCornerShape(16.dp)
     ) {

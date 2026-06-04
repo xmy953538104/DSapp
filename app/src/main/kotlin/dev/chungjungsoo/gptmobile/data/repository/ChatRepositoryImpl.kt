@@ -1393,8 +1393,6 @@ internal fun PlatformV2.withSupportedQwenModel(): PlatformV2 {
         model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> copy(model = "qwen3.7-max")
         model.equals("qwen-flash", ignoreCase = true) -> copy(model = "qwen3.7-plus")
         model.equals("qwen-plus", ignoreCase = true) -> copy(model = "qwen3.7-plus")
-        model.equals("qwen3.6-flash", ignoreCase = true) -> copy(model = "qwen3.7-plus")
-        model.equals("qwen3.6-plus", ignoreCase = true) -> copy(model = "qwen3.7-plus")
         model.equals("qwen3.7-flash", ignoreCase = true) -> copy(model = "qwen3.7-plus")
         model.equals("qwen-3.7-plus", ignoreCase = true) -> copy(model = "qwen3.7-plus")
         model.equals("qwen-3.7-max", ignoreCase = true) -> copy(model = "qwen3.7-max")

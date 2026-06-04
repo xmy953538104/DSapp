@@ -273,9 +273,9 @@
     <string name="backup_restore_info">本地备份会导出供应商、模型备注、聊天记录、消息和分组到 Download 目录。WebDAV 只同步供应商 API 密钥、API 地址、模型标识符和模型备注。通过隐藏入口导入的 WebDAV 账号为只读，不能上传本地密钥。</string>
     <string name="backup_settings">备份</string>
     <string name="backup_settings_description">导出或导入本地配置与会话。</string>
-    <string name="export_local_backup">导出本地备份</string>
+    <string name="export_local_backup">导出备份</string>
     <string name="export_local_backup_description">保存提供商、模型、会话、消息和分组到 Download 目录。</string>
-    <string name="import_local_backup">导入本地备份</string>
+    <string name="import_local_backup">导入备份</string>
     <string name="import_local_backup_description">从 JSON 文件恢复提供商，并追加导入备份会话。</string>
     <string name="webdav_settings">WebDAV 配置</string>
     <string name="webdav_settings_description">配置用于同步供应商 API 和模型标识符的账号。</string>
@@ -289,4 +289,16 @@
     <string name="webdav_clear">清除 WebDAV 配置</string>
     <string name="webdav_clear_description">移除已保存的 WebDAV 账号、地址、密码和同步状态。</string>
     <string name="hidden_webdav_import">云端配置</string>
+    <string name="notice_webdav_saved">WebDAV 配置已保存。</string>
+    <string name="notice_webdav_cleared">WebDAV 配置已清除。</string>
+    <string name="notice_backup_exported">备份已导出到 Download/%1$s</string>
+    <string name="notice_backup_export_failed">备份导出失败：%1$s</string>
+    <string name="notice_backup_imported">备份已导入，恢复了 %1$d 个会话。</string>
+    <string name="notice_backup_import_failed">备份导入失败：%1$s</string>
+    <string name="notice_webdav_uploaded">WebDAV 配置已上传。</string>
+    <string name="notice_webdav_upload_failed">WebDAV 上传失败：%1$s</string>
+    <string name="notice_webdav_pulled">WebDAV 已拉取 %1$d 个提供商配置。</string>
+    <string name="notice_webdav_pull_failed">WebDAV 拉取失败：%1$s</string>
+    <string name="notice_cloud_config_pulled">云端配置已拉取 %1$d 个提供商。</string>
+    <string name="notice_cloud_config_pull_failed">云端配置拉取失败：%1$s</string>
 </resources>

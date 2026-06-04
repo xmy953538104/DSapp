@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.chungjungsoo.gptmobile.R
 import dev.chungjungsoo.gptmobile.data.backup.AppBackupRepository
 import dev.chungjungsoo.gptmobile.data.database.entity.PlatformV2
 import dev.chungjungsoo.gptmobile.data.repository.ChatRepository
@@ -20,6 +22,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingViewModelV2 @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val settingRepository: SettingRepository,
     private val chatRepository: ChatRepository,
     private val appBackupRepository: AppBackupRepository
@@ -139,7 +142,7 @@ class SettingViewModelV2 @Inject constructor(
     fun updateWebDavConfig(username: String, url: String, password: String) {
         viewModelScope.launch {
             saveWebDavConfig(username, url, password)
-            _operationNotice.update { "WebDAV settings saved." }
+            _operationNotice.update { appContext.getString(R.string.notice_webdav_saved) }
         }
     }
 
@@ -149,7 +152,7 @@ class SettingViewModelV2 @Inject constructor(
                 WebDavConfig(username = "", url = "", password = "", readOnly = false, lastSyncAt = 0L)
             )
             _webDavConfig.update { settingRepository.getWebDavConfig() }
-            _operationNotice.update { "WebDAV settings cleared." }
+            _operationNotice.update { appContext.getString(R.string.notice_webdav_cleared) }
         }
     }
 
@@ -192,8 +195,8 @@ class SettingViewModelV2 @Inject constructor(
         viewModelScope.launch {
             val notice = runCatching { appBackupRepository.exportLocalBackup(context) }
                 .fold(
-                    onSuccess = { "Backup exported to Download/$it" },
-                    onFailure = { "Backup export failed: ${it.message ?: "unknown"}" }
+                    onSuccess = { appContext.getString(R.string.notice_backup_exported, it) },
+                    onFailure = { appContext.getString(R.string.notice_backup_export_failed, it.message ?: "unknown") }
                 )
             _operationNotice.update { notice }
         }
@@ -203,8 +206,8 @@ class SettingViewModelV2 @Inject constructor(
         viewModelScope.launch {
             val notice = runCatching { appBackupRepository.importLocalBackup(context, uri) }
                 .fold(
-                    onSuccess = { "Backup imported. Restored $it chats." },
-                    onFailure = { "Backup import failed: ${it.message ?: "unknown"}" }
+                    onSuccess = { appContext.getString(R.string.notice_backup_imported, it) },
+                    onFailure = { appContext.getString(R.string.notice_backup_import_failed, it.message ?: "unknown") }
                 )
             fetchPlatforms()
             fetchChatGroups()
@@ -216,8 +219,8 @@ class SettingViewModelV2 @Inject constructor(
         viewModelScope.launch {
             val notice = runCatching { appBackupRepository.uploadWebDavConfig() }
                 .fold(
-                    onSuccess = { "WebDAV provider config uploaded." },
-                    onFailure = { "WebDAV upload failed: ${it.message ?: "unknown"}" }
+                    onSuccess = { appContext.getString(R.string.notice_webdav_uploaded) },
+                    onFailure = { appContext.getString(R.string.notice_webdav_upload_failed, it.message ?: "unknown") }
                 )
             _operationNotice.update { notice }
         }
@@ -228,8 +231,8 @@ class SettingViewModelV2 @Inject constructor(
             val config = saveWebDavConfig(username, url, password)
             val notice = runCatching { appBackupRepository.uploadWebDavConfig(config) }
                 .fold(
-                    onSuccess = { "WebDAV provider config uploaded." },
-                    onFailure = { "WebDAV upload failed: ${it.message ?: "unknown"}" }
+                    onSuccess = { appContext.getString(R.string.notice_webdav_uploaded) },
+                    onFailure = { appContext.getString(R.string.notice_webdav_upload_failed, it.message ?: "unknown") }
                 )
             fetchWebDavConfig()
             _operationNotice.update { notice }
@@ -240,8 +243,8 @@ class SettingViewModelV2 @Inject constructor(
         viewModelScope.launch {
             val notice = runCatching { appBackupRepository.downloadWebDavConfig() }
                 .fold(
-                    onSuccess = { "WebDAV pulled $it provider configs." },
-                    onFailure = { "WebDAV pull failed: ${it.message ?: "unknown"}" }
+                    onSuccess = { appContext.getString(R.string.notice_webdav_pulled, it) },
+                    onFailure = { appContext.getString(R.string.notice_webdav_pull_failed, it.message ?: "unknown") }
                 )
             fetchPlatforms()
             _operationNotice.update { notice }
@@ -253,8 +256,8 @@ class SettingViewModelV2 @Inject constructor(
             val config = saveWebDavConfig(username, url, password)
             val notice = runCatching { appBackupRepository.downloadWebDavConfig(config) }
                 .fold(
-                    onSuccess = { "WebDAV pulled $it provider configs." },
-                    onFailure = { "WebDAV pull failed: ${it.message ?: "unknown"}" }
+                    onSuccess = { appContext.getString(R.string.notice_webdav_pulled, it) },
+                    onFailure = { appContext.getString(R.string.notice_webdav_pull_failed, it.message ?: "unknown") }
                 )
             fetchPlatforms()
             fetchWebDavConfig()

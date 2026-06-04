@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -192,8 +193,6 @@ private fun normalizePickerModel(clientType: ClientType, model: String): String 
     clientType == ClientType.QWEN && model.equals("qwen3-next-80b-a3b-thinking", ignoreCase = true) -> "qwen3.7-max"
     clientType == ClientType.QWEN && model.equals("qwen-flash", ignoreCase = true) -> "qwen3.7-plus"
     clientType == ClientType.QWEN && model.equals("qwen-plus", ignoreCase = true) -> "qwen3.7-plus"
-    clientType == ClientType.QWEN && model.equals("qwen3.6-flash", ignoreCase = true) -> "qwen3.7-plus"
-    clientType == ClientType.QWEN && model.equals("qwen3.6-plus", ignoreCase = true) -> "qwen3.7-plus"
     clientType == ClientType.QWEN && model.equals("qwen3.7-flash", ignoreCase = true) -> "qwen3.7-plus"
     clientType == ClientType.QWEN && model.equals("qwen-3.7-plus", ignoreCase = true) -> "qwen3.7-plus"
     clientType == ClientType.QWEN && model.equals("qwen-3.7-max", ignoreCase = true) -> "qwen3.7-max"
@@ -228,7 +227,11 @@ private fun ProviderModelOptionCard(
         ) {
             RadioButton(
                 selected = selected,
-                onClick = { onModelChange(model) }
+                onClick = { onModelChange(model) },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colorScheme.primary,
+                    unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
