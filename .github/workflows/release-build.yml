@@ -37,12 +37,30 @@ jobs:
       - name: Verify Launcher Icon Resources
         run: |
           set -euo pipefail
-          if grep -R -- '@mipmap/ic_gpt_mobile_foreground' app/src/main/res; then
-            echo "Launcher foreground must be a drawable vector, not a mipmap bitmap."
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            test -f "app/src/main/res/mipmap-${density}/ic_gpt_mobile.png"
+            test -f "app/src/main/res/mipmap-${density}/ic_gpt_mobile_round.png"
+            test -f "app/src/main/res/mipmap-${density}/ic_gpt_mobile_foreground.png"
+            test -f "app/src/main/res/mipmap-${density}/ic_gpt_mobile_monochrome.png"
+          done
+          if grep -R -- '@drawable/ic_gpt_mobile_foreground' app/src/main/res/mipmap-anydpi-v26; then
+            echo "Adaptive icons must use the provided density PNG foreground resources."
             exit 1
           fi
-          if find app/src/main/res -path '*/mipmap-*' \( -name 'ic_gpt_mobile.png' -o -name 'ic_gpt_mobile_round.png' \) | grep .; then
-            echo "Launcher fallback icons must stay vector-based; do not commit raster launcher PNGs."
+          if [ -e app/src/main/res/drawable/ic_gpt_mobile_foreground.xml ] || [ -e app/src/main/res/drawable/ic_gpt_mobile_monochrome.xml ]; then
+            echo "Launcher foreground vectors must not be reintroduced."
+            exit 1
+          fi
+          if [ -e app/src/main/res/mipmap-anydpi/ic_gpt_mobile.xml ] || [ -e app/src/main/res/mipmap-anydpi/ic_gpt_mobile_round.xml ]; then
+            echo "Launcher fallback must use density PNGs, not anydpi vectors."
+            exit 1
+          fi
+          if ! grep -q -- '@mipmap/ic_gpt_mobile_foreground' app/src/main/res/mipmap-anydpi-v26/ic_gpt_mobile.xml; then
+            echo "Adaptive icon foreground must reference @mipmap/ic_gpt_mobile_foreground."
+            exit 1
+          fi
+          if ! grep -q -- '<color name="ic_gpt_mobile_background">#FBF8F2</color>' app/src/main/res/values/ic_gpt_mobile_background.xml; then
+            echo "Launcher icon background must stay #FBF8F2 on main."
             exit 1
           fi
           if grep -R -- 'Theme.SplashScreen.IconBackground' app/src/main/res/values app/src/main/res/values-night; then
@@ -55,10 +73,6 @@ jobs:
           fi
           if grep -R -- '@color/ic_gpt_mobile_background' app/src/main/res/values/themes.xml app/src/main/res/values-night/themes.xml; then
             echo "Splash background must use the app surface color, not the launcher icon background."
-            exit 1
-          fi
-          if grep -E -- 'scale[XY]="1\.' app/src/main/res/drawable/ic_gpt_mobile_foreground.xml app/src/main/res/drawable/ic_gpt_mobile_monochrome.xml; then
-            echo "Launcher foreground must stay inside the adaptive icon safe zone."
             exit 1
           fi
 
