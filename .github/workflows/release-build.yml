@@ -57,8 +57,8 @@ jobs:
             echo "Splash background must use the app surface color, not the launcher icon background."
             exit 1
           fi
-          if grep -E -- 'scale[XY]="1\.' app/src/main/res/drawable/ic_gpt_mobile_foreground.xml app/src/main/res/drawable/ic_gpt_mobile_monochrome.xml; then
-            echo "Launcher foreground must stay inside the adaptive icon safe zone."
+          if grep -E -- 'viewport(Width|Height)="1024"|scale[XY]=' app/src/main/res/drawable/ic_gpt_mobile_foreground.xml app/src/main/res/drawable/ic_gpt_mobile_monochrome.xml; then
+            echo "Launcher foreground must use direct 108dp geometry, not a large viewport or runtime scale."
             exit 1
           fi
 
