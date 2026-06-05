@@ -9,7 +9,7 @@
 - `mipmap-anydpi-v26/ic_gpt_mobile.xml` 是 Android 8+ 使用的 adaptive icon。
 - adaptive icon 的背景是 `#FDE9D9`。
 - adaptive icon 的前景引用 `@drawable/ic_gpt_mobile_foreground`，这个文件是透明底 vector，只包含图案主体，并且缩进到 adaptive icon 安全区。
-- 启动页引用单独的 `@drawable/ic_gpt_mobile_splash`，背景色用 App 浅色主题背景 `#FBF8F2`，避免 launcher 安全区缩放影响开屏大小。
+- 启动页引用单独的 `@drawable/ic_gpt_mobile_splash`，背景色用 App 浅色主题背景 `#FDE9D9`，避免 launcher 安全区缩放影响开屏大小。
 - `mipmap-anydpi/ic_gpt_mobile.xml` 和 `mipmap-anydpi/ic_gpt_mobile_round.xml` 是矢量 legacy fallback，不再使用小尺寸 PNG。
 
 推荐源图：
