@@ -8,8 +8,8 @@
 
 - `mipmap-anydpi-v26/ic_gpt_mobile.xml` 是 Android 8+ 使用的 adaptive icon。
 - adaptive icon 的背景是 `#FDE9D9`。
-- adaptive icon 的前景引用 `@drawable/ic_gpt_mobile_foreground`，这个文件只是 bitmap 别名，会加载多密度 `@mipmap/ic_gpt_mobile_foreground`。
-- 启动页也引用同一个 `@drawable/ic_gpt_mobile_foreground`，保证启动页和桌面图标素材一致。
+- adaptive icon 的前景引用 `@drawable/ic_gpt_mobile_foreground`，这个文件是透明底 vector，只包含图案主体，不再引用 `@mipmap/ic_gpt_mobile_foreground`。
+- 启动页也引用同一个 `@drawable/ic_gpt_mobile_foreground`，背景色交给 splash theme，保证启动页和桌面图标素材一致。
 - `ic_gpt_mobile.png` 和 `ic_gpt_mobile_round.png` 是 legacy fallback。
 
 推荐源图：
@@ -29,14 +29,9 @@
 | `mipmap-xhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 96 x 96 |
 | `mipmap-xxhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 144 x 144 |
 | `mipmap-xxxhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 192 x 192 |
-| `mipmap-mdpi` | `ic_gpt_mobile_foreground.png` | 108 x 108 |
-| `mipmap-hdpi` | `ic_gpt_mobile_foreground.png` | 162 x 162 |
-| `mipmap-xhdpi` | `ic_gpt_mobile_foreground.png` | 216 x 216 |
-| `mipmap-xxhdpi` | `ic_gpt_mobile_foreground.png` | 324 x 324 |
-| `mipmap-xxxhdpi` | `ic_gpt_mobile_foreground.png` | 432 x 432 |
 | `app/src/main` | `ic_gpt_mobile-playstore.png` | 512 x 512 |
 
-`app-icon-preview.png` 不再额外放大或裁切主体，只按目标尺寸高质量缩放。legacy 图标会额外做圆角或圆形遮罩，adaptive foreground 保持完整 108dp 方形画布，由系统 launcher 自己套 mask。
+`app-icon-preview.png` 不再额外放大或裁切主体，只按目标尺寸高质量缩放。legacy 图标会额外做圆角或圆形遮罩，adaptive foreground 保持完整 108dp 方形画布，由系统 launcher 自己套 mask。不要再生成或提交 `ic_gpt_mobile_foreground.png`，否则容易把“完整图标”误接成 adaptive foreground。
 
 ## 聊天头像
 

@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:gravity="center"
-    android:src="@mipmap/ic_gpt_mobile_foreground" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <path
+        android:fillColor="#66B6A9"
+        android:pathData="M242,412 C269.61,412 292,434.39 292,462 L292,562 C292,589.61 269.61,612 242,612 C214.39,612 192,589.61 192,562 L192,462 C192,434.39 214.39,412 242,412 Z" />
+    <path
+        android:fillColor="#FC9317"
+        android:pathData="M423,182 C450.61,182 473,204.39 473,232 L473,752 C473,779.61 450.61,802 423,802 C395.39,802 373,779.61 373,752 L373,232 C373,204.39 395.39,182 423,182 Z" />
+    <path
+        android:fillColor="#DE432F"
+        android:pathData="M603,280 C630.61,280 653,302.39 653,330 L653,730 C653,757.61 630.61,780 603,780 C575.39,780 553,757.61 553,730 L553,330 C553,302.39 575.39,280 603,280 Z" />
+    <path
+        android:fillColor="#9C785A"
+        android:pathData="M782,387 C809.61,387 832,409.39 832,437 L832,587 C832,614.61 809.61,637 782,637 C754.39,637 732,614.61 732,587 L732,437 C732,409.39 754.39,387 782,387 Z" />
+</vector>
