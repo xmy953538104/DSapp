@@ -7,10 +7,9 @@
 当前图标结构：
 
 - `AndroidManifest.xml` 只设置 `android:icon="@mipmap/ic_gpt_mobile"`，不设置 `roundIcon`。
-- Android 8+ 使用 `mipmap-anydpi-v26/ic_gpt_mobile.xml` adaptive icon。
-- adaptive icon 的背景使用 `@color/gpt_mobile_splash_background`，颜色为 `#FBF8F2`。
-- adaptive icon 的前景使用矢量 `@drawable/ic_gpt_mobile_splash`，四根条完整落在 108dp 画布安全区内，避免贴边或裁切。
-- `mipmap-mdpi` 到 `mipmap-xxxhdpi` 的 `ic_gpt_mobile.png` 只作为旧系统 PNG fallback。
+- `mipmap-anydpi-v26/ic_gpt_mobile.xml` 是独立矢量 launcher 图标，不使用 adaptive icon。
+- launcher 图标的圆角底板和四根条都在同一个 vector 里，背景色为 `#FBF8F2`。
+- 项目 `minSdk = 31`，不保留 `mipmap-mdpi` 到 `mipmap-xxxhdpi` 的低清 PNG fallback。
 - 启动页同样引用 `@drawable/ic_gpt_mobile_splash`，背景色用 App 浅色主题背景 `#FBF8F2`。
 
 推荐源图：
@@ -18,7 +17,7 @@
 | 文件名 | 尺寸 | 用途 |
 | --- | --- | --- |
 | `app-icon-preview.png` | 1024 x 1024 | 桌面预览图，带完整底色 |
-| `图标尺寸/*.png` | 48/72/96/144/192 | 旧系统 launcher PNG fallback 源图 |
+| `图标尺寸/*.png` | 48/72/96/144/192 | 历史 PNG 源图，当前 launcher 不再直接使用 |
 | `home-logo.png` | 1024 x 1024 | 新安装首页顶部图标 |
 | `provider-qwen.png` | 512 x 512 或更高方图 | 千问聊天头像 |
 
@@ -26,12 +25,11 @@
 
 | 目录 | 文件 | 用途 |
 | --- | --- | --- |
-| `mipmap-anydpi-v26` | `ic_gpt_mobile.xml` | Android 8+ 高清 adaptive launcher 图标 |
-| `drawable` | `ic_gpt_mobile_splash.xml` | launcher adaptive 前景与开屏图标 |
-| `mipmap-mdpi` 到 `mipmap-xxxhdpi` | `ic_gpt_mobile.png` | Android 7 及以下旧式 launcher 图标 |
+| `mipmap-anydpi-v26` | `ic_gpt_mobile.xml` | 高清独立矢量 launcher 图标 |
+| `drawable` | `ic_gpt_mobile_splash.xml` | 开屏图标 |
 | `app/src/main` | `ic_gpt_mobile-playstore.png` | 512 x 512 |
 
-不要提交 `ic_gpt_mobile_foreground.png`、`ic_gpt_mobile_monochrome.png`、`ic_gpt_mobile_round.png` 或 `roundIcon`。这些资源会让不同 launcher 重新走不受控的裁切、缩放或主题图标逻辑。
+不要提交 adaptive icon、`ic_gpt_mobile.png` 密度 fallback、`ic_gpt_mobile_foreground.png`、`ic_gpt_mobile_monochrome.png`、`ic_gpt_mobile_round.png` 或 `roundIcon`。这些资源会让不同 launcher 重新走不受控的裁切、缩放、低清或主题图标逻辑。
 
 ## 聊天头像
 
