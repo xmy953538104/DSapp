@@ -4,30 +4,34 @@
 
 ## App 图标
 
-当前图标结构参考 FLClash：
+当前图标结构：
 
-- launcher icon 不使用 adaptive icon XML，避免系统二次缩放或 mask 裁切。
 - `AndroidManifest.xml` 只设置 `android:icon="@mipmap/ic_gpt_mobile"`，不设置 `roundIcon`。
-- `mipmap-mdpi` 到 `mipmap-xxxhdpi` 的 `ic_gpt_mobile.png` 是最终完整图标，已经带 `#FBF8F2` 圆角底板。
-- 启动页引用单独的 `@drawable/ic_gpt_mobile_splash`，背景色用 App 浅色主题背景 `#FBF8F2`，避免 launcher 安全区缩放影响开屏大小。
+- Android 8+ 使用 `mipmap-anydpi-v26/ic_gpt_mobile.xml` adaptive icon。
+- adaptive icon 的背景使用 `@color/gpt_mobile_splash_background`，颜色为 `#FBF8F2`。
+- adaptive icon 的前景使用矢量 `@drawable/ic_gpt_mobile_splash`，四根条完整落在 108dp 画布安全区内，避免贴边或裁切。
+- `mipmap-mdpi` 到 `mipmap-xxxhdpi` 的 `ic_gpt_mobile.png` 只作为旧系统 PNG fallback。
+- 启动页同样引用 `@drawable/ic_gpt_mobile_splash`，背景色用 App 浅色主题背景 `#FBF8F2`。
 
 推荐源图：
 
 | 文件名 | 尺寸 | 用途 |
 | --- | --- | --- |
-| `app-icon-preview.png` | 1024 x 1024 | 最终桌面观感，带完整底色 |
-| `图标尺寸/*.png` | 48/72/96/144/192 | Android launcher 分密度完整图标源图 |
+| `app-icon-preview.png` | 1024 x 1024 | 桌面预览图，带完整底色 |
+| `图标尺寸/*.png` | 48/72/96/144/192 | 旧系统 launcher PNG fallback 源图 |
 | `home-logo.png` | 1024 x 1024 | 新安装首页顶部图标 |
 | `provider-qwen.png` | 512 x 512 或更高方图 | 千问聊天头像 |
 
-由 `app-icon-preview.png` 生成的资源：
+当前生成的资源：
 
-| 目录 | 文件 | 尺寸 |
+| 目录 | 文件 | 用途 |
 | --- | --- | --- |
-| `mipmap-mdpi` 到 `mipmap-xxxhdpi` | `ic_gpt_mobile.png` | 最终 launcher 图标 |
+| `mipmap-anydpi-v26` | `ic_gpt_mobile.xml` | Android 8+ 高清 adaptive launcher 图标 |
+| `drawable` | `ic_gpt_mobile_splash.xml` | launcher adaptive 前景与开屏图标 |
+| `mipmap-mdpi` 到 `mipmap-xxxhdpi` | `ic_gpt_mobile.png` | Android 7 及以下旧式 launcher 图标 |
 | `app/src/main` | `ic_gpt_mobile-playstore.png` | 512 x 512 |
 
-不要再提交 `mipmap-anydpi-v26/ic_gpt_mobile.xml`、`ic_gpt_mobile_foreground.png`、`ic_gpt_mobile_monochrome.png` 或 `roundIcon`。这套图标现在走完整密度 PNG，目的是让 launcher 直接使用最终图，不再经过 adaptive foreground/background 缩放。
+不要提交 `ic_gpt_mobile_foreground.png`、`ic_gpt_mobile_monochrome.png`、`ic_gpt_mobile_round.png` 或 `roundIcon`。这些资源会让不同 launcher 重新走不受控的裁切、缩放或主题图标逻辑。
 
 ## 聊天头像
 

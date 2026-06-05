@@ -40,16 +40,33 @@ jobs:
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
             test -f "app/src/main/res/mipmap-${density}/ic_gpt_mobile.png"
           done
-          if find app/src/main/res -path '*/mipmap-anydpi*' \( -name 'ic_gpt_mobile.xml' -o -name 'ic_gpt_mobile_round.xml' \) | grep .; then
-            echo "Launcher icon must use exact density PNGs, not adaptive icon XML."
+          test -f "app/src/main/res/mipmap-anydpi-v26/ic_gpt_mobile.xml"
+          if ! grep -q -- '<adaptive-icon' app/src/main/res/mipmap-anydpi-v26/ic_gpt_mobile.xml; then
+            echo "Android 8+ launcher icon must be adaptive."
+            exit 1
+          fi
+          if ! grep -q -- '@drawable/ic_gpt_mobile_splash' app/src/main/res/mipmap-anydpi-v26/ic_gpt_mobile.xml; then
+            echo "Adaptive launcher foreground must use the vector splash artwork."
+            exit 1
+          fi
+          if ! grep -q -- '@color/gpt_mobile_splash_background' app/src/main/res/mipmap-anydpi-v26/ic_gpt_mobile.xml; then
+            echo "Adaptive launcher background must use the app surface color."
+            exit 1
+          fi
+          if find app/src/main/res -path '*/mipmap-anydpi*' -name 'ic_gpt_mobile_round.xml' | grep .; then
+            echo "round adaptive launcher icon must stay unset."
             exit 1
           fi
           if find app/src/main/res -path '*/mipmap-*' \( -name 'ic_gpt_mobile_round.png' -o -name 'ic_gpt_mobile_foreground.png' -o -name 'ic_gpt_mobile_monochrome.png' \) | grep .; then
-            echo "Launcher icon must not reintroduce adaptive foreground, monochrome, or round fallbacks."
+            echo "Launcher icon must not reintroduce raster foreground, monochrome, or round fallbacks."
             exit 1
           fi
           if grep -R -- 'android:roundIcon' app/src/main/AndroidManifest.xml; then
-            echo "roundIcon must stay unset so launchers use the exact main PNG icon."
+            echo "roundIcon must stay unset so launchers use the main adaptive icon."
+            exit 1
+          fi
+          if grep -R -- 'ic_gpt_mobile_foreground' app/src/main/res; then
+            echo "Launcher foreground must stay vector-only through ic_gpt_mobile_splash."
             exit 1
           fi
           if grep -R -- 'ic_gpt_mobile_background' app/src/main/res; then
