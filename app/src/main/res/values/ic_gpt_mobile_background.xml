@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_gpt_mobile_background">#FBF8F2</color>
     <color name="gpt_mobile_splash_background">#FBF8F2</color>
 </resources>

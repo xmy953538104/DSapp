@@ -6,18 +6,17 @@
 
 当前图标结构参考 FLClash：
 
-- `mipmap-anydpi-v26/ic_gpt_mobile.xml` 是 Android 8+ 使用的 adaptive icon。
-- adaptive icon 的背景是 `#FBF8F2`。
-- adaptive icon 的前景引用 `@mipmap/ic_gpt_mobile_foreground`，这个资源由各密度透明底 PNG 提供，只包含图案主体，并且缩进到 adaptive icon 安全区。
+- launcher icon 不使用 adaptive icon XML，避免系统二次缩放或 mask 裁切。
+- `AndroidManifest.xml` 只设置 `android:icon="@mipmap/ic_gpt_mobile"`，不设置 `roundIcon`。
+- `mipmap-mdpi` 到 `mipmap-xxxhdpi` 的 `ic_gpt_mobile.png` 是最终完整图标，已经带 `#FBF8F2` 圆角底板。
 - 启动页引用单独的 `@drawable/ic_gpt_mobile_splash`，背景色用 App 浅色主题背景 `#FBF8F2`，避免 launcher 安全区缩放影响开屏大小。
-- legacy fallback 使用 `mipmap-mdpi` 到 `mipmap-xxxhdpi` 的完整 PNG 图标，不再使用 anydpi 矢量 fallback。
 
 推荐源图：
 
 | 文件名 | 尺寸 | 用途 |
 | --- | --- | --- |
 | `app-icon-preview.png` | 1024 x 1024 | 最终桌面观感，带完整底色 |
-| `图标尺寸/*.png` | 48/72/96/108/144/162/192/216/324/432 | Android launcher 分密度图标源图 |
+| `图标尺寸/*.png` | 48/72/96/144/192 | Android launcher 分密度完整图标源图 |
 | `home-logo.png` | 1024 x 1024 | 新安装首页顶部图标 |
 | `provider-qwen.png` | 512 x 512 或更高方图 | 千问聊天头像 |
 
@@ -25,10 +24,10 @@
 
 | 目录 | 文件 | 尺寸 |
 | --- | --- | --- |
-| `mipmap-anydpi` | `ic_gpt_mobile.xml` / `ic_gpt_mobile_round.xml` | vector fallback |
+| `mipmap-mdpi` 到 `mipmap-xxxhdpi` | `ic_gpt_mobile.png` | 最终 launcher 图标 |
 | `app/src/main` | `ic_gpt_mobile-playstore.png` | 512 x 512 |
 
-adaptive foreground 不是最终展示图，而是 Android launcher 会裁切和套 mask 的前景层，所以主体必须比最终预览图更小。不要把带底色、带棋盘格或完整圆角底板的图片接成 adaptive foreground，否则会被系统当作整张前景层参与 mask，造成贴边。
+不要再提交 `mipmap-anydpi-v26/ic_gpt_mobile.xml`、`ic_gpt_mobile_foreground.png`、`ic_gpt_mobile_monochrome.png` 或 `roundIcon`。这套图标现在走完整密度 PNG，目的是让 launcher 直接使用最终图，不再经过 adaptive foreground/background 缩放。
 
 ## 聊天头像
 
