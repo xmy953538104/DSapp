@@ -3,6 +3,7 @@ package dev.chungjungsoo.gptmobile.presentation.ui.chat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Restaurant
@@ -359,11 +359,14 @@ private fun ChatIconCircleButton(
     selected: Boolean,
     onClick: () -> Unit
 ) {
+    val ringColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
+
     Box(
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
             .background(option.backgroundColor)
+            .border(2.dp, ringColor, CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -373,16 +376,6 @@ private fun ChatIconCircleButton(
             modifier = Modifier.size(24.dp),
             tint = option.contentColor
         )
-        if (selected) {
-            Icon(
-                imageVector = Icons.Filled.CheckCircle,
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(16.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
     }
 }
 

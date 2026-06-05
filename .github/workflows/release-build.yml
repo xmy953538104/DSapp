@@ -34,6 +34,30 @@ jobs:
           sdkmanager "$latest_stable_version"
           echo "$ANDROID_SDK_ROOT/build-tools/$latest_version_number" >> $GITHUB_PATH
 
+      - name: Verify Launcher Icon Resources
+        run: |
+          set -euo pipefail
+          if grep -R -- '@mipmap/ic_gpt_mobile_foreground' app/src/main/res; then
+            echo "Launcher foreground must be a drawable vector, not a mipmap bitmap."
+            exit 1
+          fi
+          if grep -R -- 'Theme.SplashScreen.IconBackground' app/src/main/res/values app/src/main/res/values-night; then
+            echo "Splash screen must not add a second icon background."
+            exit 1
+          fi
+          if grep -R -- 'windowSplashScreenIconBackgroundColor' app/src/main/res/values app/src/main/res/values-night; then
+            echo "Splash icon background color must stay unset."
+            exit 1
+          fi
+          if grep -R -- '@color/ic_gpt_mobile_background' app/src/main/res/values/themes.xml app/src/main/res/values-night/themes.xml; then
+            echo "Splash background must use the app surface color, not the launcher icon background."
+            exit 1
+          fi
+          if grep -E -- 'scale[XY]="1\.' app/src/main/res/drawable/ic_gpt_mobile_foreground.xml app/src/main/res/drawable/ic_gpt_mobile_monochrome.xml; then
+            echo "Launcher foreground must stay inside the adaptive icon safe zone."
+            exit 1
+          fi
+
       - name: Build Unsigned Release APK
         run: ./gradlew assembleRelease
 
