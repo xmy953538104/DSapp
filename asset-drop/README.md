@@ -10,7 +10,7 @@
 - adaptive icon 的背景是 `#FDE9D9`。
 - adaptive icon 的前景引用 `@drawable/ic_gpt_mobile_foreground`，这个文件是透明底 vector，只包含图案主体，并且缩进到 adaptive icon 安全区。
 - 启动页引用单独的 `@drawable/ic_gpt_mobile_splash`，背景色用 App 浅色主题背景 `#FBF8F2`，避免 launcher 安全区缩放影响开屏大小。
-- `ic_gpt_mobile.png` 和 `ic_gpt_mobile_round.png` 是 legacy fallback。
+- `mipmap-anydpi/ic_gpt_mobile.xml` 和 `mipmap-anydpi/ic_gpt_mobile_round.xml` 是矢量 legacy fallback，不再使用小尺寸 PNG。
 
 推荐源图：
 
@@ -24,14 +24,10 @@
 
 | 目录 | 文件 | 尺寸 |
 | --- | --- | --- |
-| `mipmap-mdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 48 x 48 |
-| `mipmap-hdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 72 x 72 |
-| `mipmap-xhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 96 x 96 |
-| `mipmap-xxhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 144 x 144 |
-| `mipmap-xxxhdpi` | `ic_gpt_mobile.png` / `ic_gpt_mobile_round.png` | 192 x 192 |
+| `mipmap-anydpi` | `ic_gpt_mobile.xml` / `ic_gpt_mobile_round.xml` | vector fallback |
 | `app/src/main` | `ic_gpt_mobile-playstore.png` | 512 x 512 |
 
-`app-icon-preview.png` 不再额外放大或裁切主体，只按目标尺寸高质量缩放。legacy 图标会额外做圆角或圆形遮罩。adaptive foreground 不是最终展示图，而是 Android launcher 会裁切和套 mask 的前景层，所以主体必须比最终预览图更小。不要再生成或提交 `ic_gpt_mobile_foreground.png`，否则容易把“完整图标”误接成 adaptive foreground。
+`app-icon-preview.png` 不再额外放大或裁切主体，只按目标尺寸高质量缩放。legacy 图标也保持 vector，避免 192px 及以下栅格图在桌面或第三方 launcher 中产生毛边。adaptive foreground 不是最终展示图，而是 Android launcher 会裁切和套 mask 的前景层，所以主体必须比最终预览图更小。不要再生成或提交 `ic_gpt_mobile_foreground.png` 或 `ic_gpt_mobile.png` 这类 launcher PNG，否则容易把“完整图标”误接成 adaptive foreground 或重新引入毛边。
 
 ## 聊天头像
 

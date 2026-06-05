@@ -41,6 +41,10 @@ jobs:
             echo "Launcher foreground must be a drawable vector, not a mipmap bitmap."
             exit 1
           fi
+          if find app/src/main/res -path '*/mipmap-*' \( -name 'ic_gpt_mobile.png' -o -name 'ic_gpt_mobile_round.png' \) | grep .; then
+            echo "Launcher fallback icons must stay vector-based; do not commit raster launcher PNGs."
+            exit 1
+          fi
           if grep -R -- 'Theme.SplashScreen.IconBackground' app/src/main/res/values app/src/main/res/values-night; then
             echo "Splash screen must not add a second icon background."
             exit 1
